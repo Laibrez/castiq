@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414249602044",
+    "project_id": "castiq-d85d4",
+    "storage_bucket": "castiq-d85d4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414249602044:android:e9869533c14788ca2dc079",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUVn0s8LCe7Jn3al7K9_gD76ad4z7ncXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
