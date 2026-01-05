@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/portfolio/portfolio_screen.dart';
@@ -6,14 +7,15 @@ import 'package:flutter_application_1/features/matchmaker/matchmaker_screen.dart
 import 'package:flutter_application_1/features/matchmaker/model_discovery_screen.dart';
 import 'package:flutter_application_1/features/chat/chat_list_screen.dart';
 import 'package:flutter_application_1/features/bookings/bookings_screen.dart';
-import 'package:flutter_application_1/features/profile/brand_profile_screen.dart';
 import 'package:flutter_application_1/features/matchmaker/brand_jobs_screen.dart';
+import 'package:flutter_application_1/features/payments/payments_screen.dart';
 
 import 'package:flutter_application_1/features/profile/feedback_screen.dart';
 import 'package:flutter_application_1/features/profile/support_screen.dart';
 import 'package:flutter_application_1/features/profile/settings_screen.dart';
 import 'package:flutter_application_1/features/auth/role_selection_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:flutter_application_1/features/profile/brand_profile_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String userType;
@@ -36,10 +38,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     if (widget.userType == 'model') {
       _pages = [
-        const MatchmakerScreen(), // Home/Feed
-        const PortfolioScreen(), // Portfolio/Profile
-        const ChatListScreen(),
-        const BookingsScreen(userType: 'model'),
+        MatchmakerScreen(), // Home/Feed
+        PortfolioScreen(), // Portfolio/Profile
+        ChatListScreen(),
+        BookingsScreen(userType: 'model'),
       ];
       _destinations = const [
         NavigationDestination(icon: Icon(LucideIcons.home), label: 'Home'),
@@ -49,16 +51,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ];
     } else {
       _pages = [
-        const BrandProfileScreen(), // My Brand
-        const ModelDiscoveryScreen(), // Models
-        const BrandJobsScreen(), // Jobs
-        const BookingsScreen(userType: 'brand'), // Bookings
+        BrandProfileScreen(), // My Brand
+        ModelDiscoveryScreen(), // Models
+        BrandJobsScreen(), // Jobs
+        BookingsScreen(userType: 'brand'), // Bookings
+        PaymentsScreen(), // Payments
       ];
       _destinations = const [
         NavigationDestination(icon: Icon(LucideIcons.briefcase), label: 'My Brand'),
         NavigationDestination(icon: Icon(LucideIcons.users), label: 'Models'),
         NavigationDestination(icon: Icon(LucideIcons.list), label: 'Jobs'),
         NavigationDestination(icon: Icon(LucideIcons.calendarCheck), label: 'Bookings'),
+        NavigationDestination(icon: Icon(LucideIcons.creditCard), label: 'Payments'),
       ];
     }
   }
@@ -102,16 +106,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  String _getPageTitle() {
+    if (widget.userType == 'model') {
+      switch (_selectedIndex) {
+        case 0: return 'Find Jobs';
+        case 1: return 'Portfolio';
+        case 2: return 'Messages';
+        case 3: return 'My Bookings';
+        default: return 'CASTIQ';
+      }
+    } else {
+      switch (_selectedIndex) {
+        case 0: return 'My Brand';
+        case 1: return 'Models';
+        case 2: return 'Jobs';
+        case 3: return 'Bookings';
+        case 4: return 'Payments';
+        default: return 'CASTIQ';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'CASTIQ',
+          _getPageTitle(),
           style: GoogleFonts.tinos(
             fontWeight: FontWeight.bold,
             fontStyle: FontStyle.italic,
-            letterSpacing: 2,
+            letterSpacing: 1.2,
           ),
         ),
       ),
@@ -154,6 +179,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.refreshCw),
+              title: Text('Switch to ${widget.userType == 'model' ? 'Brand Owner' : 'Model'}'),
+              onTap: () async {
+                final newRole = widget.userType == 'model' ? 'brand' : 'model';
+                await FirebaseFirestore.instance.collection('users').doc(_authService.currentUser!.uid).update({
+                  'role': newRole,
+                });
+                if (!mounted) return;
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => DashboardScreen(userType: newRole)),
+                );
               },
             ),
             const Divider(),

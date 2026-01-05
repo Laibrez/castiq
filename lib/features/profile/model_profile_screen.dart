@@ -17,7 +17,7 @@ class ModelProfileScreen extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               background: Image.network(
-                'https://source.unsplash.com/random/400x600/?model',
+                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop',
                 fit: BoxFit.cover,
               ),
             ),

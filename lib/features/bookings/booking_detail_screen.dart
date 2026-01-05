@@ -32,7 +32,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -83,6 +83,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               indicatorColor: const Color(0xFF6366F1),
               tabs: const [
                 Tab(text: 'Overview'),
+                Tab(text: 'Payment'),
                 Tab(text: 'Contract'),
                 Tab(text: 'Chat'),
               ],
@@ -92,6 +93,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             controller: _tabController,
             children: [
               _buildOverviewTab(booking),
+              _buildPaymentTab(booking),
               _BookingContract(
                 userType: widget.userType,
                 isSigned: ['signed', 'in_progress', 'completed', 'paid'].contains(booking.status),
@@ -127,9 +129,55 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
           const SizedBox(height: 16),
           _buildStatusTimeline(booking.status),
           const SizedBox(height: 24),
+          _buildActions(booking),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentTab(BookingModel booking) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           _buildPaymentMethodSection(booking),
           const SizedBox(height: 24),
-          _buildActions(booking),
+          if (widget.userType == 'brand' && booking.status == 'completed')
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _updateStatus('paid'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6366F1),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('Pay Now'),
+              ),
+            )
+          else if (booking.status == 'paid')
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.checkCircle, color: Colors.green),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Payment Completed',
+                    style: GoogleFonts.inter(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            )
         ],
       ),
     );

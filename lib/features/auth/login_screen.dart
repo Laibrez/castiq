@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/auth/signup_screen.dart';
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   final String userType; // 'model' or 'brand'
@@ -35,21 +36,23 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
 
-      // Fetch user role to ensure correct dashboard
-      final role = await _authService.getUserRole(userCredential.user!.uid);
+      // Use the selected userType for the dashboard to allow switching roles for testing
+      final role = widget.userType;
+
+      // Update role in Firestore to match the selected path for this session
+      // This ensures that StreamBuilders and other components use the correct role
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
+        'role': role,
+      });
 
       if (!mounted) return;
 
-      if (role != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardScreen(userType: role),
-          ),
-        );
-      } else {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error: User role not found')));
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(userType: role),
+        ),
+      );
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: $e')));

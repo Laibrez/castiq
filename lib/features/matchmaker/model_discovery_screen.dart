@@ -13,15 +13,10 @@ class ModelDiscoveryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Discover Models',
-          style: GoogleFonts.tinos(fontWeight: FontWeight.w600, fontStyle: FontStyle.italic),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
                 Expanded(
@@ -56,48 +51,50 @@ class ModelDiscoveryScreen extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .where('role', isEqualTo: 'model')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .where('role', isEqualTo: 'model')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
 
-          final docs = snapshot.data?.docs ?? [];
-          final models = docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id)).toList();
+                final docs = snapshot.data?.docs ?? [];
+                final models = docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id)).toList();
 
-          if (models.isEmpty) {
-            return Center(
-              child: Text(
-                'No models found.',
-                style: GoogleFonts.tinos(color: Colors.white54, fontSize: 18),
-              ),
-            );
-          }
+                if (models.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No models found.',
+                      style: GoogleFonts.tinos(color: Colors.white54, fontSize: 18),
+                    ),
+                  );
+                }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.75,
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: models.length,
+                  itemBuilder: (context, index) {
+                    return _ModelCard(model: models[index]);
+                  },
+                );
+              },
             ),
-            itemCount: models.length,
-            itemBuilder: (context, index) {
-              return _ModelCard(model: models[index]);
-            },
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -231,7 +228,7 @@ class _ModelCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                   image: DecorationImage(
-                    image: NetworkImage(model.profileImageUrl ?? 'https://source.unsplash.com/random/300x400/?model'),
+                    image: NetworkImage(model.profileImageUrl ?? 'https://ui-avatars.com/api/?name=${model.name}&background=random'),
                     fit: BoxFit.cover,
                   ),
                 ),

@@ -10,13 +10,9 @@ class ChatListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Messages',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-          ),
-          bottom: TabBar(
+      child: Column(
+        children: [
+          TabBar(
             labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
             unselectedLabelStyle: GoogleFonts.inter(),
             indicatorColor: const Color(0xFF6366F1),
@@ -25,13 +21,15 @@ class ChatListScreen extends StatelessWidget {
               Tab(text: 'Requested'),
             ],
           ),
-        ),
-        body: TabBarView(
-          children: [
-            _ChatList(isActive: true),
-            _ChatList(isActive: false),
-          ],
-        ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _ChatList(isActive: true),
+                _ChatList(isActive: false),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

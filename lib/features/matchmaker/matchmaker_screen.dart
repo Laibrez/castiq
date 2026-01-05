@@ -23,12 +23,6 @@ class _MatchmakerScreenState extends State<MatchmakerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Find Jobs',
-          style: GoogleFonts.tinos(fontWeight: FontWeight.w600, fontStyle: FontStyle.italic),
-        ),
-      ),
       body: StreamBuilder<List<JobModel>>(
         stream: _jobService.getOpenJobs(),
         builder: (context, snapshot) {

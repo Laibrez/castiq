@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/services/job_service.dart';
 import 'package:flutter_application_1/core/models/job_model.dart';
+import 'package:intl/intl.dart';
 
 class CreateJobScreen extends StatefulWidget {
   const CreateJobScreen({super.key});
@@ -31,7 +32,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(2026),
+      lastDate: DateTime(2030),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -85,7 +86,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
         rate: double.tryParse(_paymentController.text) ?? 0.0,
         requirements: _requirementsController.text.split('\n'),
         createdAt: DateTime.now(),
-        images: _imageUploaded ? ['https://source.unsplash.com/random/800x400/?fashion,studio'] : [],
+        images: _imageUploaded ? ['https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop'] : [],
       );
 
       await _jobService.createJob(job);
@@ -125,7 +126,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
             _buildTextField('Job Location', _locationController, icon: LucideIcons.mapPin),
             const SizedBox(height: 16),
             _buildTextField('Payment Amount', _paymentController, icon: LucideIcons.dollarSign, keyboardType: TextInputType.number),
-            const SizedBox(height: 16),
+            _buildSectionTitle('Date of Job'),
+            const SizedBox(height: 12),
             InkWell(
               onTap: () => _selectDate(context),
               borderRadius: BorderRadius.circular(12),
@@ -134,21 +136,31 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF141419),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(
+                    color: _selectedDate == null ? Colors.orange.withOpacity(0.5) : Colors.white.withOpacity(0.1),
+                    width: _selectedDate == null ? 1.5 : 1,
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.calendar, size: 20, color: Colors.white70),
+                    Icon(
+                      LucideIcons.calendar, 
+                      size: 20, 
+                      color: _selectedDate == null ? Colors.orange : Colors.white70
+                    ),
                     const SizedBox(width: 12),
                     Text(
                       _selectedDate == null
-                          ? 'Select Date of Job'
-                          : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                          ? 'Select Date (Required)'
+                          : DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate!),
                       style: GoogleFonts.inter(
-                        color: _selectedDate == null ? Colors.white54 : Colors.white,
+                        color: _selectedDate == null ? Colors.orange : Colors.white,
                         fontSize: 16,
+                        fontWeight: _selectedDate == null ? FontWeight.w500 : FontWeight.normal,
                       ),
                     ),
+                    const Spacer(),
+                    const Icon(LucideIcons.chevronDown, size: 16, color: Colors.white24),
                   ],
                 ),
               ),
@@ -188,7 +200,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          'https://source.unsplash.com/random/800x400/?fashion,studio',
+                          'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop',
                           fit: BoxFit.cover,
                         ),
                       )

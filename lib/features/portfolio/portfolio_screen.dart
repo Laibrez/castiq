@@ -110,48 +110,36 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'My Profile',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-            ),
-            actions: [
-              if (_isLoading)
-                const Center(child: Padding(padding: EdgeInsets.all(16), child: SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)))),
-              IconButton(
-                icon: Icon(_isEditing ? LucideIcons.save : LucideIcons.edit2),
-                onPressed: _isLoading ? null : () {
-                  if (_isEditing) {
-                    _saveProfile();
-                  }
-                  setState(() {
-                    _isEditing = !_isEditing;
-                  });
-                },
-              ),
-              IconButton(
-                icon: const Icon(LucideIcons.logOut),
-                onPressed: () async {
-                  await _authService.signOut();
-                  if (!mounted) return;
-                  Navigator.of(context, rootNavigator: true).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
-                  );
-                },
-              ),
-            ],
-          ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (_isLoading)
+                      const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                    TextButton.icon(
+                      icon: Icon(_isEditing ? LucideIcons.save : LucideIcons.edit2, size: 18),
+                      label: Text(_isEditing ? 'Save' : 'Edit'),
+                      onPressed: _isLoading ? null : () {
+                        if (_isEditing) {
+                          _saveProfile();
+                        }
+                        setState(() {
+                          _isEditing = !_isEditing;
+                        });
+                      },
+                    ),
+                  ],
+                ),
                 Center(
                   child: Stack(
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(userData.profileImageUrl ?? 'https://i.pravatar.cc/300'),
+                        backgroundImage: NetworkImage(userData.profileImageUrl ?? 'https://ui-avatars.com/api/?name=${userData.name}&background=random'),
                       ),
                       if (_isEditing)
                         Positioned(

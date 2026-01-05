@@ -13,6 +13,8 @@ class BookingModel {
   final DateTime? checkOutTime;
   final String? selfieUrl;
   final String? paymentMethod; // 'visa', 'mastercard', 'paypal'
+  final String? jobTitle;
+  final double? rate;
   final DateTime createdAt;
 
   BookingModel({
@@ -29,6 +31,8 @@ class BookingModel {
     this.selfieUrl,
     required this.createdAt,
     this.paymentMethod,
+    this.jobTitle,
+    this.rate,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> data, String id) {
@@ -46,6 +50,8 @@ class BookingModel {
       selfieUrl: data['selfieUrl'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       paymentMethod: data['paymentMethod'],
+      jobTitle: data['jobTitle'],
+      rate: (data['rate'] ?? 0.0).toDouble(),
     );
   }
 
@@ -63,6 +69,8 @@ class BookingModel {
       'selfieUrl': selfieUrl,
       'createdAt': FieldValue.serverTimestamp(),
       'paymentMethod': paymentMethod,
+      'jobTitle': jobTitle,
+      'rate': rate,
     };
   }
 }

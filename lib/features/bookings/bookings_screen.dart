@@ -19,33 +19,29 @@ class BookingsScreen extends StatelessWidget {
       const Tab(text: 'Action Required'),
       const Tab(text: 'Active'),
       const Tab(text: 'Completed'),
-      if (userType == 'brand') const Tab(text: 'Drafts'),
     ];
 
     return DefaultTabController(
       length: tabs.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Bookings',
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-          ),
-          bottom: TabBar(
+      child: Column(
+        children: [
+          TabBar(
             isScrollable: true,
             labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
             unselectedLabelStyle: GoogleFonts.inter(),
             indicatorColor: const Color(0xFF6366F1),
             tabs: tabs,
           ),
-        ),
-        body: TabBarView(
-          children: [
-            _BookingList(statusTab: 'Action Required', userType: userType),
-            _BookingList(statusTab: 'Active', userType: userType),
-            _BookingList(statusTab: 'Completed', userType: userType),
-            if (userType == 'brand') _BookingList(statusTab: 'Drafts', userType: userType),
-          ],
-        ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _BookingList(statusTab: 'Action Required', userType: userType),
+                _BookingList(statusTab: 'Active', userType: userType),
+                _BookingList(statusTab: 'Completed', userType: userType),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
