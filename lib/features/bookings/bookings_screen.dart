@@ -172,7 +172,7 @@ class _BookingCard extends StatelessWidget {
                         children: [
                           // In a real app, we'd fetch the counterpart's name
                           Text(
-                            userType == 'brand' ? 'Model Application' : 'Job Application',
+                            booking.jobTitle ?? (userType == 'brand' ? 'Model Application' : 'Job Application'),
                             style: GoogleFonts.inter(
                               fontWeight: FontWeight.w600,
                               fontSize: 16,
@@ -202,10 +202,12 @@ class _BookingCard extends StatelessWidget {
                         style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        DateFormat('MMM d, yyyy').format(booking.createdAt),
-                        style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
-                      ),
+                        Text(
+                          booking.date != null 
+                            ? DateFormat('MMM d, yyyy').format(booking.date!)
+                            : DateFormat('MMM d, yyyy').format(booking.createdAt),
+                          style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                        ),
                     ],
                   ),
                 ),

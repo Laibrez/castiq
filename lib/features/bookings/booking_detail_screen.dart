@@ -7,6 +7,10 @@ import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class BookingDetailScreen extends StatefulWidget {
   final String userType;
@@ -96,8 +100,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               _buildPaymentTab(booking),
               _BookingContract(
                 userType: widget.userType,
-                isSigned: ['signed', 'in_progress', 'completed', 'paid'].contains(booking.status),
-                onSignContract: () => _updateStatus('signed'),
+                booking: booking,
+                onStatusUpdate: _updateStatus,
               ),
               const ChatDetailScreen(isRequested: false),
             ],
@@ -113,11 +117,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (booking.jobId == 'direct_offer') ...[
+            _buildOfferDetails(booking),
+            const SizedBox(height: 24),
+          ],
           if (booking.status == 'completed' || booking.status == 'paid')
             _buildJobSummaryFlashcard(booking)
           else
             _buildInfoCard(
-              title: 'Job Application',
+              title: booking.jobTitle ?? 'Job Application',
               subtitle: widget.userType == 'brand' ? 'Model Application' : 'Brand Application',
               details: [
                 {'icon': LucideIcons.calendar, 'text': DateFormat('MMM d, yyyy').format(booking.createdAt)},
@@ -130,6 +138,60 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
           _buildStatusTimeline(booking.status),
           const SizedBox(height: 24),
           _buildActions(booking),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOfferDetails(BookingModel booking) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Offer Details',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: const Color(0xFF6366F1),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildDetailRow(LucideIcons.calendar, 'Date', 
+              booking.date != null ? DateFormat('MMM d, yyyy').format(booking.date!) : 'Not set'),
+          _buildDetailRow(LucideIcons.mapPin, 'Location', booking.location ?? 'Not set'),
+          _buildDetailRow(LucideIcons.clock, 'Hours', '${booking.hours ?? 0} hours'),
+          _buildDetailRow(LucideIcons.dollarSign, 'Pay', '\$${booking.rate ?? 0}'),
+          const Divider(height: 24, color: Colors.white10),
+          Text(
+            'Description',
+            style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: Colors.white70),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            booking.description ?? 'No description provided.',
+            style: GoogleFonts.inter(color: Colors.white54),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.white54),
+          const SizedBox(width: 8),
+          Text('$label: ', style: GoogleFonts.inter(color: Colors.white54)),
+          Text(value, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -239,6 +301,44 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   Widget _buildActions(BookingModel booking) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
+    if (widget.userType == 'model' && booking.status == 'pending') {
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () => _updateStatus('declined'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+                side: const BorderSide(color: Colors.red),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('Decline'),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => _updateStatus('confirmed'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('Accept'),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (widget.userType == 'brand' && booking.status == 'pending') {
+      return Center(
+        child: Text(
+          'Waiting for model to accept...',
+          style: GoogleFonts.inter(color: Colors.white54, fontStyle: FontStyle.italic),
+        ),
+      );
+    }
+
     if (widget.userType == 'brand') {
       if (booking.status == 'pending') {
         return Row(
@@ -260,58 +360,190 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             ),
           ],
         );
+      } else if (booking.status == 'confirmed' && booking.brandSignature == null) {
+        return _buildStatusMessage('Waiting for you to sign the contract');
+      } else if (booking.status == 'confirmed' && booking.modelSignature == null) {
+        return _buildStatusMessage('Waiting for model to sign the contract');
       } else if (booking.status == 'signed') {
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => _updateStatus('in_progress'),
-            child: const Text('Start Job'),
-          ),
+        return Column(
+          children: [
+            _buildStatusMessage('Show this QR code to the model to check-in'),
+            const SizedBox(height: 16),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: QrImageView(
+                  data: booking.id,
+                  version: QrVersions.auto,
+                  size: 200.0,
+                ),
+              ),
+            ),
+          ],
         );
       } else if (booking.status == 'in_progress') {
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => _updateStatus('completed'),
-            child: const Text('Complete Job'),
-          ),
+        return _buildStatusMessage('Job is currently in progress');
+      } else if (booking.status == 'awaiting_confirmation') {
+        return Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => _disputeJob(booking.id),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                ),
+                child: const Text('Dispute'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => _confirmJob(booking.id),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                child: const Text('Confirm Completion'),
+              ),
+            ),
+          ],
         );
       }
     } else {
       // Model actions
-      if (booking.status == 'confirmed') {
+      if (booking.status == 'pending') {
+        return _buildStatusMessage('Waiting for you to accept the offer');
+      } else if (booking.status == 'confirmed' && booking.brandSignature == null) {
+        return _buildStatusMessage('Waiting for brand to sign the contract');
+      } else if (booking.status == 'confirmed' && booking.modelSignature == null) {
+        return _buildStatusMessage('Waiting for you to sign the contract');
+      } else if (booking.status == 'signed') {
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () => _tabController.animateTo(1),
-            child: const Text('Go to Contract to Sign'),
+            onPressed: () => _startScanning(booking.id),
+            child: const Text('Start Job (Scan QR)'),
           ),
         );
       } else if (booking.status == 'in_progress') {
-        return Column(
-          children: [
-            if (booking.checkInTime == null)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _bookingService.updateCheckInOut(booking.id, checkIn: DateTime.now()),
-                  child: const Text('Check In'),
-                ),
-              )
-            else if (booking.checkOutTime == null)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => _bookingService.updateCheckInOut(booking.id, checkOut: DateTime.now()),
-                  child: const Text('Check Out'),
-                ),
-              ),
-          ],
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () => _completeJob(booking.id),
+            child: const Text('Complete Job (Take Selfie)'),
+          ),
         );
+      } else if (booking.status == 'awaiting_confirmation') {
+        return _buildStatusMessage('Waiting for brand to confirm completion');
       }
     }
 
     return const SizedBox.shrink();
+  }
+
+  Future<void> _startScanning(String bookingId) async {
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: MobileScanner(
+          onDetect: (capture) {
+            final List<Barcode> barcodes = capture.barcodes;
+            for (final barcode in barcodes) {
+              if (barcode.rawValue == bookingId) {
+                Navigator.pop(context, barcode.rawValue);
+              }
+            }
+          },
+        ),
+      ),
+    );
+
+    if (result == bookingId) {
+      await _bookingService.updateCheckInOut(bookingId, checkIn: DateTime.now());
+      await _updateStatus('in_progress');
+    } else if (result != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid QR code for this booking')),
+      );
+    }
+  }
+
+  Future<void> _completeJob(String bookingId) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      setState(() => _isLoading = true);
+      try {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('completion_selfies')
+            .child('$bookingId.jpg');
+        
+        final uploadTask = await storageRef.putData(await image.readAsBytes());
+        final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+        await _bookingService.updateCheckInOut(bookingId, 
+            checkOut: DateTime.now(), 
+            selfieUrl: downloadUrl);
+        await _updateStatus('awaiting_confirmation');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error uploading selfie: $e')),
+        );
+      } finally {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _confirmJob(String bookingId) async {
+    setState(() => _isLoading = true);
+    try {
+      await _bookingService.confirmCompletion(bookingId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Job completion confirmed!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error confirming job: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _disputeJob(String bookingId) async {
+    setState(() => _isLoading = true);
+    try {
+      await _bookingService.disputeJob(bookingId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Dispute raised. Support will contact you.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error raising dispute: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Widget _buildStatusMessage(String message, {bool isSuccess = false}) {
+    return Center(
+      child: Text(
+        message,
+        style: GoogleFonts.inter(
+          color: isSuccess ? Colors.green : Colors.white54,
+          fontStyle: FontStyle.italic,
+          fontWeight: isSuccess ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+    );
   }
 
   Widget _buildJobSummaryFlashcard(BookingModel booking) {
@@ -376,9 +608,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   }
 
   Widget _buildStatusTimeline(String currentStatus) {
-    bool isConfirmed = ['confirmed', 'signed', 'in_progress', 'completed', 'paid'].contains(currentStatus);
-    bool isSigned = ['signed', 'in_progress', 'completed', 'paid'].contains(currentStatus);
-    bool isInProgress = ['in_progress', 'completed', 'paid'].contains(currentStatus);
+    bool isConfirmed = ['confirmed', 'signed', 'in_progress', 'awaiting_confirmation', 'completed', 'paid'].contains(currentStatus);
+    bool isSigned = ['signed', 'in_progress', 'awaiting_confirmation', 'completed', 'paid'].contains(currentStatus);
+    bool isInProgress = ['in_progress', 'awaiting_confirmation', 'completed', 'paid'].contains(currentStatus);
     bool isCompleted = ['completed', 'paid'].contains(currentStatus);
 
     return Row(
@@ -423,31 +655,211 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   }
 }
 
-class _BookingContract extends StatelessWidget {
+class _BookingContract extends StatefulWidget {
   final String userType;
-  final bool isSigned;
-  final VoidCallback onSignContract;
+  final BookingModel booking;
+  final Function(String) onStatusUpdate;
 
-  const _BookingContract({required this.userType, required this.isSigned, required this.onSignContract});
+  const _BookingContract({
+    required this.userType,
+    required this.booking,
+    required this.onStatusUpdate,
+  });
+
+  @override
+  State<_BookingContract> createState() => _BookingContractState();
+}
+
+class _BookingContractState extends State<_BookingContract> {
+  final BookingService _bookingService = BookingService();
+  bool _isSigning = false;
+
+  Future<void> _sign() async {
+    setState(() => _isSigning = true);
+    try {
+      final signature = 'Digital Signature: ${widget.userType.toUpperCase()}';
+      await _bookingService.signContract(widget.booking.id, widget.userType, signature);
+      
+      // If both have signed, update status to 'signed'
+      if (widget.userType == 'brand' && widget.booking.modelSignature != null) {
+        await widget.onStatusUpdate('signed');
+      } else if (widget.userType == 'model' && widget.booking.brandSignature != null) {
+        await widget.onStatusUpdate('signed');
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contract signed successfully!')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error signing contract: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isSigning = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final hasBrandSigned = widget.booking.brandSignature != null;
+    final hasModelSigned = widget.booking.modelSignature != null;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 300,
-            width: double.infinity,
-            color: Colors.white10,
-            child: const Center(child: Text('Contract Document Preview', style: TextStyle(color: Colors.white54))),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Service Agreement',
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _buildContractSection('Job Title', widget.booking.jobTitle ?? 'Model Booking'),
+                _buildContractSection('Date', 
+                    widget.booking.date != null ? DateFormat('MMMM d, yyyy').format(widget.booking.date!) : 'Not set'),
+                _buildContractSection('Location', widget.booking.location ?? 'Not set'),
+                _buildContractSection('Rate', '\$${widget.booking.rate ?? 0} total'),
+                const Divider(height: 32, color: Colors.white10),
+                _buildContractSection('Cancellation Terms', 
+                    widget.booking.cancellationTerms ?? 'Standard terms apply.'),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSignatureBox(
+                        'Brand Owner',
+                        hasBrandSigned,
+                        widget.booking.brandSignedAt,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildSignatureBox(
+                        'Model',
+                        hasModelSigned,
+                        widget.booking.modelSignedAt,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 24),
-          if (!isSigned && userType == 'model')
-            ElevatedButton(onPressed: onSignContract, child: const Text('Sign Contract'))
+          const SizedBox(height: 32),
+          if (widget.userType == 'brand' && !hasBrandSigned && widget.booking.status == 'confirmed')
+            _buildSignButton()
+          else if (widget.userType == 'model' && !hasModelSigned && hasBrandSigned)
+            _buildSignButton()
+          else if (!hasBrandSigned)
+            _buildStatusMessage('Awaiting Brand Signature')
+          else if (!hasModelSigned)
+            _buildStatusMessage('Awaiting Model Signature')
           else
-            Text(isSigned ? 'Contract Signed' : 'Awaiting Model Signature', style: const TextStyle(color: Colors.white70)),
+            _buildStatusMessage('Contract Fully Signed', isSuccess: true),
         ],
+      ),
+    );
+  }
+
+  Widget _buildContractSection(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: Colors.white54,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.inter(fontSize: 16, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSignatureBox(String role, bool isSigned, DateTime? signedAt) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          role,
+          style: GoogleFonts.inter(fontSize: 12, color: Colors.white70),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 60,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: isSigned ? Colors.green.withOpacity(0.5) : Colors.white10),
+          ),
+          child: Center(
+            child: isSigned
+                ? const Icon(LucideIcons.check, color: Colors.green)
+                : const Icon(LucideIcons.penTool, color: Colors.white10),
+          ),
+        ),
+        if (isSigned && signedAt != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              DateFormat('MMM d, HH:mm').format(signedAt),
+              style: GoogleFonts.inter(fontSize: 10, color: Colors.white38),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSignButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _isSigning ? null : _sign,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF6366F1),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        child: _isSigning
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text('Sign Contract Digitally'),
+      ),
+    );
+  }
+
+  Widget _buildStatusMessage(String message, {bool isSuccess = false}) {
+    return Center(
+      child: Text(
+        message,
+        style: GoogleFonts.inter(
+          color: isSuccess ? Colors.green : Colors.white54,
+          fontStyle: FontStyle.italic,
+          fontWeight: isSuccess ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
     );
   }

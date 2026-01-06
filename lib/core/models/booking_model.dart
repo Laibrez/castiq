@@ -5,7 +5,7 @@ class BookingModel {
   final String jobId;
   final String brandId;
   final String modelId;
-  final String status; // 'pending', 'confirmed', 'signed', 'in_progress', 'completed', 'paid'
+  final String status; // 'pending', 'confirmed', 'signed', 'in_progress', 'awaiting_confirmation', 'completed', 'paid'
   final String? contractUrl;
   final String? modelSignature;
   final String? brandSignature;
@@ -15,6 +15,15 @@ class BookingModel {
   final String? paymentMethod; // 'visa', 'mastercard', 'paypal'
   final String? jobTitle;
   final double? rate;
+  final String? location;
+  final DateTime? date;
+  final double? hours;
+  final String? description;
+  final String? cancellationTerms;
+  final DateTime? brandSignedAt;
+  final DateTime? modelSignedAt;
+  final DateTime? brandConfirmedAt;
+  final bool isDisputed;
   final DateTime createdAt;
 
   BookingModel({
@@ -29,10 +38,19 @@ class BookingModel {
     this.checkInTime,
     this.checkOutTime,
     this.selfieUrl,
-    required this.createdAt,
     this.paymentMethod,
     this.jobTitle,
     this.rate,
+    this.location,
+    this.date,
+    this.hours,
+    this.description,
+    this.cancellationTerms,
+    this.brandSignedAt,
+    this.modelSignedAt,
+    this.brandConfirmedAt,
+    this.isDisputed = false,
+    required this.createdAt,
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> data, String id) {
@@ -52,6 +70,15 @@ class BookingModel {
       paymentMethod: data['paymentMethod'],
       jobTitle: data['jobTitle'],
       rate: (data['rate'] ?? 0.0).toDouble(),
+      location: data['location'],
+      date: (data['date'] as Timestamp?)?.toDate(),
+      hours: (data['hours'] ?? 0.0).toDouble(),
+      description: data['description'],
+      cancellationTerms: data['cancellationTerms'],
+      brandSignedAt: (data['brandSignedAt'] as Timestamp?)?.toDate(),
+      modelSignedAt: (data['modelSignedAt'] as Timestamp?)?.toDate(),
+      brandConfirmedAt: (data['brandConfirmedAt'] as Timestamp?)?.toDate(),
+      isDisputed: data['isDisputed'] ?? false,
     );
   }
 
@@ -71,6 +98,15 @@ class BookingModel {
       'paymentMethod': paymentMethod,
       'jobTitle': jobTitle,
       'rate': rate,
+      'location': location,
+      'date': date != null ? Timestamp.fromDate(date!) : null,
+      'hours': hours,
+      'description': description,
+      'cancellationTerms': cancellationTerms,
+      'brandSignedAt': brandSignedAt != null ? Timestamp.fromDate(brandSignedAt!) : null,
+      'modelSignedAt': modelSignedAt != null ? Timestamp.fromDate(modelSignedAt!) : null,
+      'brandConfirmedAt': brandConfirmedAt != null ? Timestamp.fromDate(brandConfirmedAt!) : null,
+      'isDisputed': isDisputed,
     };
   }
 }

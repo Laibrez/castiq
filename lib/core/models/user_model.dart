@@ -14,6 +14,8 @@ class UserModel {
   // Model specific
   final List<String>? portfolio;
   final Map<String, dynamic>? stats;
+  final String? category;
+  final String? availability;
   
   // Brand specific
   final String? companyName;
@@ -32,6 +34,8 @@ class UserModel {
     this.location,
     this.portfolio,
     this.stats,
+    this.category,
+    this.availability,
     this.companyName,
     this.industry,
     this.website,
@@ -50,6 +54,8 @@ class UserModel {
       location: data['location'],
       portfolio: data['portfolio'] != null ? List<String>.from(data['portfolio']) : null,
       stats: data['stats'],
+      category: data['category'],
+      availability: data['availability'],
       companyName: data['companyName'],
       industry: data['industry'],
       website: data['website'],
@@ -69,6 +75,8 @@ class UserModel {
       'location': location,
       'portfolio': portfolio,
       'stats': stats,
+      'category': category,
+      'availability': availability,
       'companyName': companyName,
       'industry': industry,
       'website': website,

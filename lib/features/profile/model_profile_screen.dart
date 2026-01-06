@@ -3,9 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/booking/booking_request_screen.dart';
 import 'package:flutter_application_1/features/chat/chat_detail_screen.dart';
+import 'package:flutter_application_1/core/models/user_model.dart';
+import 'package:flutter_application_1/features/booking/send_offer_screen.dart';
 
 class ModelProfileScreen extends StatelessWidget {
-  const ModelProfileScreen({super.key});
+  final UserModel model;
+
+  const ModelProfileScreen({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +21,7 @@ class ModelProfileScreen extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               background: Image.network(
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop',
+                model.profileImageUrl ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop',
                 fit: BoxFit.cover,
               ),
             ),
@@ -25,6 +29,28 @@ class ModelProfileScreen extends StatelessWidget {
               icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SendOfferScreen(model: model)),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      minimumSize: Size.zero,
+                    ),
+                    child: const Text('Send Offer'),
+                  ),
+                ),
+              ),
+            ],
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -39,7 +65,7 @@ class ModelProfileScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Jane Doe',
+                            model.name,
                             style: GoogleFonts.tinos(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -47,7 +73,7 @@ class ModelProfileScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '24 years old • New York, NY',
+                            '${model.location ?? "Location not set"}',
                             style: GoogleFonts.tinos(
                               fontSize: 16,
                               color: Colors.white70,
@@ -81,31 +107,29 @@ class ModelProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _StatItem(label: 'Height', value: "5'9\""),
-                      _StatItem(label: 'Bust', value: '34"'),
-                      _StatItem(label: 'Waist', value: '24"'),
-                      _StatItem(label: 'Hips', value: '35"'),
-                      _StatItem(label: 'Shoes', value: '8'),
+                      _StatItem(label: 'Height', value: model.stats?['height'] ?? "5'9\""),
+                      _StatItem(label: 'Bust', value: model.stats?['bust'] ?? '34"'),
+                      _StatItem(label: 'Waist', value: model.stats?['waist'] ?? '24"'),
+                      _StatItem(label: 'Hips', value: model.stats?['hips'] ?? '35"'),
+                      _StatItem(label: 'Shoes', value: model.stats?['shoes'] ?? '8'),
                     ],
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    'Physical & Characteristics',
+                    'Availability',
                     style: GoogleFonts.tinos(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _StatItem(label: 'Eyes', value: 'Blue'),
-                      _StatItem(label: 'Hair', value: 'Blonde'),
-                      _StatItem(label: 'Skin', value: 'Fair'),
-                      _StatItem(label: 'Dress', value: '4'),
-                    ],
+                  const SizedBox(height: 12),
+                  Text(
+                    model.availability ?? 'Flexible availability. Contact for specific dates.',
+                    style: GoogleFonts.tinos(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   Text(
@@ -121,10 +145,9 @@ class ModelProfileScreen extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _Chip(label: 'Editorial'),
+                      _Chip(label: model.category ?? 'Editorial'),
                       _Chip(label: 'Commercial'),
                       _Chip(label: 'Runway'),
-                      _Chip(label: 'UGC'),
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -138,37 +161,11 @@ class ModelProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Professional fashion and commercial model with 5 years of experience. Available for photoshoots, runway, and brand campaigns. Passionate about sustainable fashion and artistic expression.',
+                    model.bio ?? 'Professional model available for brand campaigns and artistic projects.',
                     style: GoogleFonts.tinos(
                       fontSize: 16,
                       color: Colors.white70,
                       height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    'Walk Video',
-                    style: GoogleFonts.tinos(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(12),
-                      image: const DecorationImage(
-                        image: NetworkImage('https://source.unsplash.com/random/800x400/?runway'),
-                        fit: BoxFit.cover,
-                        opacity: 0.7,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Icon(LucideIcons.playCircle, color: Colors.white, size: 64),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -190,20 +187,23 @@ class ModelProfileScreen extends StatelessWidget {
                       mainAxisSpacing: 8,
                       childAspectRatio: 1,
                     ),
-                    itemCount: 6,
+                    itemCount: model.portfolio?.length ?? 6,
                     itemBuilder: (context, index) {
+                      final imageUrl = model.portfolio != null 
+                          ? model.portfolio![index] 
+                          : 'https://source.unsplash.com/random/200x200/?fashion,model&sig=$index';
                       return Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           image: DecorationImage(
-                            image: NetworkImage('https://source.unsplash.com/random/200x200/?fashion,model&sig=$index'),
+                            image: NetworkImage(imageUrl),
                             fit: BoxFit.cover,
                           ),
                         ),
                       );
                     },
                   ),
-                  const SizedBox(height: 100), // Space for bottom button
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
@@ -218,35 +218,15 @@ class ModelProfileScreen extends StatelessWidget {
         ),
         child: SafeArea(
           child: SizedBox(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ChatDetailScreen(isRequested: true)),
-                      );
-                    },
-                    child: const Text('Make an Offer'),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ChatDetailScreen()),
-                      );
-                    },
-                    child: const Text('Chat'),
-                  ),
-                ),
-              ],
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChatDetailScreen()),
+                );
+              },
+              child: const Text('Chat'),
             ),
           ),
         ),

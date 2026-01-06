@@ -205,7 +205,7 @@ class _ModelCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ModelProfileScreen()),
+          MaterialPageRoute(builder: (context) => ModelProfileScreen(model: model)),
         );
       },
       child: Container(
@@ -252,6 +252,15 @@ class _ModelCard extends StatelessWidget {
                     style: GoogleFonts.tinos(
                       fontSize: 12,
                       color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    model.category ?? 'Fashion',
+                    style: GoogleFonts.tinos(
+                      fontSize: 12,
+                      color: const Color(0xFF6366F1),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 8),

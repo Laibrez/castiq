@@ -52,4 +52,40 @@ class BookingService {
       throw e;
     }
   }
+
+  // Digital signature
+  Future<void> signContract(String bookingId, String role, String signature) async {
+    try {
+      final data = {
+        role == 'brand' ? 'brandSignature' : 'modelSignature': signature,
+        role == 'brand' ? 'brandSignedAt' : 'modelSignedAt': FieldValue.serverTimestamp(),
+      };
+      await _firestore.collection('bookings').doc(bookingId).update(data);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Confirm job completion (Brand)
+  Future<void> confirmCompletion(String bookingId) async {
+    try {
+      await _firestore.collection('bookings').doc(bookingId).update({
+        'status': 'completed',
+        'brandConfirmedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Dispute job (Brand)
+  Future<void> disputeJob(String bookingId) async {
+    try {
+      await _firestore.collection('bookings').doc(bookingId).update({
+        'isDisputed': true,
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
 }
