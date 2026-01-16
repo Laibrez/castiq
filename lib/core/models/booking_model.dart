@@ -25,6 +25,9 @@ class BookingModel {
   final DateTime? brandConfirmedAt;
   final bool isDisputed;
   final DateTime createdAt;
+  final bool initiatedByBrand;
+  final Map<String, String> signedDocuments; // Map<DocType, SignatureInfo>
+
 
   BookingModel({
     required this.id,
@@ -51,6 +54,8 @@ class BookingModel {
     this.brandConfirmedAt,
     this.isDisputed = false,
     required this.createdAt,
+    this.initiatedByBrand = false,
+    this.signedDocuments = const {},
   });
 
   factory BookingModel.fromMap(Map<String, dynamic> data, String id) {
@@ -79,6 +84,8 @@ class BookingModel {
       modelSignedAt: (data['modelSignedAt'] as Timestamp?)?.toDate(),
       brandConfirmedAt: (data['brandConfirmedAt'] as Timestamp?)?.toDate(),
       isDisputed: data['isDisputed'] ?? false,
+      initiatedByBrand: data['initiatedByBrand'] ?? false,
+      signedDocuments: data['signedDocuments'] != null ? Map<String, String>.from(data['signedDocuments']) : {},
     );
   }
 
@@ -107,6 +114,8 @@ class BookingModel {
       'modelSignedAt': modelSignedAt != null ? Timestamp.fromDate(modelSignedAt!) : null,
       'brandConfirmedAt': brandConfirmedAt != null ? Timestamp.fromDate(brandConfirmedAt!) : null,
       'isDisputed': isDisputed,
+      'initiatedByBrand': initiatedByBrand,
+      'signedDocuments': signedDocuments,
     };
   }
 }

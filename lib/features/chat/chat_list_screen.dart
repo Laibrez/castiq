@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/chat/chat_detail_screen.dart';
 
@@ -13,8 +12,8 @@ class ChatListScreen extends StatelessWidget {
       child: Column(
         children: [
           TabBar(
-            labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
-            unselectedLabelStyle: GoogleFonts.inter(),
+            labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            unselectedLabelStyle: const TextStyle(),
             indicatorColor: const Color(0xFF6366F1),
             tabs: const [
               Tab(text: 'Active'),
@@ -81,14 +80,14 @@ class _ChatList extends StatelessWidget {
           ),
           title: Text(
             isActive ? 'Model Name $index' : 'Brand Name $index',
-            style: GoogleFonts.inter(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16,
             ),
           ),
           subtitle: Text(
             isActive ? 'Sure, I can make it!' : 'New Job Request: Fashion Shoot',
-            style: GoogleFonts.inter(
+            style: TextStyle(
               color: (isActive && index < 2) ? Colors.white : Colors.white70,
               fontWeight: (isActive && index < 2) ? FontWeight.w600 : FontWeight.normal,
             ),
@@ -101,7 +100,7 @@ class _ChatList extends StatelessWidget {
             children: [
               Text(
                 '10:30 AM',
-                style: GoogleFonts.inter(
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.white70,
                 ),
@@ -116,7 +115,7 @@ class _ChatList extends StatelessWidget {
                   ),
                   child: Text(
                     '2',
-                    style: GoogleFonts.inter(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

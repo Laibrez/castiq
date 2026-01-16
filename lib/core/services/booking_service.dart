@@ -30,6 +30,20 @@ class BookingService {
     });
   }
 
+  // Fetch bookings for a specific job
+  Stream<List<BookingModel>> getJobBookings(String jobId) {
+    return _firestore
+        .collection('bookings')
+        .where('jobId', isEqualTo: jobId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => BookingModel.fromMap(doc.data(), doc.id))
+          .toList();
+    });
+  }
+
+
   // Update booking status
   Future<void> updateBookingStatus(String bookingId, String status) async {
     try {

@@ -53,4 +53,13 @@ class JobService {
       throw e;
     }
   }
+
+  // Update job documents
+  Future<void> updateJobDocuments(String jobId, Map<String, String> documents) async {
+    try {
+      await _firestore.collection('jobs').doc(jobId).update({'documents': documents});
+    } catch (e) {
+      throw e;
+    }
+  }
 }

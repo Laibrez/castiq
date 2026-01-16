@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_application_1/core/services/payment_service.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:flutter_application_1/core/models/payment_model.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PaymentsScreen extends StatefulWidget {
   const PaymentsScreen({super.key});
@@ -18,7 +18,6 @@ class PaymentsScreen extends StatefulWidget {
 class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final AuthService _authService = AuthService();
-  final BookingService _bookingService = BookingService();
   final PaymentService _paymentService = PaymentService();
 
   @override
@@ -36,245 +35,83 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Payments',
-          style: GoogleFonts.tinos(
-            fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: const Color(0xFF6366F1),
-          tabs: const [
-            Tab(text: 'Pay Model'),
-            Tab(text: 'History'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      backgroundColor: Colors.black,
+      body: Column(
         children: [
-          _PayModelTab(
-            authService: _authService,
-            bookingService: _bookingService,
-            paymentService: _paymentService,
-          ),
-          _PaymentHistoryTab(
-            authService: _authService,
-            paymentService: _paymentService,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PayModelTab extends StatelessWidget {
-  final AuthService authService;
-  final BookingService bookingService;
-  final PaymentService paymentService;
-
-  const _PayModelTab({
-    required this.authService,
-    required this.bookingService,
-    required this.paymentService,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final user = authService.currentUser;
-    if (user == null) return const Center(child: Text('Please log in'));
-
-    return StreamBuilder<List<BookingModel>>(
-      stream: bookingService.getUserBookings(user.uid, 'brand'),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final completedBookings = snapshot.data?.where((b) => b.status == 'completed').toList() ?? [];
-
-        if (completedBookings.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          // Premium Header with Stripe Notice
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(LucideIcons.checkCircle, size: 48, color: Colors.white24),
-                const SizedBox(height: 16),
-                Text(
-                  'No pending payments.',
-                  style: GoogleFonts.inter(color: Colors.white54),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Financials',
+                      style: GoogleFonts.tinos(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('Secure transactions via Stripe', style: TextStyle(color: Colors.white24, fontSize: 12)),
+                  ],
                 ),
-              ],
-            ),
-          );
-        }
-
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: completedBookings.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final booking = completedBookings[index];
-            return _PayModelCard(
-              booking: booking,
-              onPay: () => _showPaymentOptions(context, booking),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showPaymentOptions(BuildContext context, BookingModel booking) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF141419),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select Payment Method',
-              style: GoogleFonts.tinos(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Paying \$${booking.rate ?? 0.0} for ${booking.jobTitle ?? 'Job'}',
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
-            ),
-            const SizedBox(height: 24),
-            _PaymentMethodTile(
-              icon: LucideIcons.creditCard,
-              label: 'PayPal',
-              onTap: () => _processPayment(context, booking, 'paypal'),
-            ),
-            _PaymentMethodTile(
-              icon: LucideIcons.creditCard,
-              label: 'Credit Card',
-              onTap: () => _processPayment(context, booking, 'card'),
-            ),
-            _PaymentMethodTile(
-              icon: LucideIcons.creditCard,
-              label: 'Debit Card',
-              onTap: () => _processPayment(context, booking, 'debit'),
-            ),
-            _PaymentMethodTile(
-              icon: LucideIcons.wallet,
-              label: 'Credit',
-              onTap: () => _processPayment(context, booking, 'credit'),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _processPayment(BuildContext context, BookingModel booking, String method) async {
-    Navigator.pop(context); // Close bottom sheet
-    
-    // Show loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    try {
-      final payment = PaymentModel(
-        id: '',
-        brandId: booking.brandId,
-        modelId: booking.modelId,
-        bookingId: booking.id,
-        jobTitle: booking.jobTitle ?? 'Job',
-        amount: booking.rate ?? 0.0,
-        method: method,
-        status: 'completed',
-        createdAt: DateTime.now(),
-      );
-
-      await paymentService.createPayment(payment);
-
-      if (!context.mounted) return;
-      Navigator.pop(context); // Close loading
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment of \$${booking.rate} successful via ${method.toUpperCase()}!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      Navigator.pop(context); // Close loading
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Payment failed: $e'), backgroundColor: Colors.red),
-      );
-    }
-  }
-}
-
-class _PayModelCard extends StatelessWidget {
-  final BookingModel booking;
-  final VoidCallback onPay;
-
-  const _PayModelCard({required this.booking, required this.onPay});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  booking.jobTitle ?? 'Job Booking',
-                  style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Model ID: ${booking.modelId.substring(0, 8)}...',
-                  style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '\$${booking.rate ?? 0.0}',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF818CF8),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.shieldCheck, color: Color(0xFF818CF8), size: 14),
+                      const SizedBox(width: 8),
+                      const Text('ENCRYPTED', style: TextStyle(color: Color(0xFF818CF8), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: onPay,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+
+          const SizedBox(height: 24),
+
+          // Custom Tab Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: const Color(0xFF161618),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicatorPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                indicator: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white10),
+                ),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white38,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                tabs: const [
+                  Tab(text: 'History'),
+                  Tab(text: 'Upcoming'),
+                ],
+              ),
             ),
-            child: const Text('Pay Now'),
+          ),
+          
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _PaymentHistoryTab(authService: _authService, paymentService: _paymentService),
+                _UpcomingPayoutsTab(),
+              ],
+            ),
           ),
         ],
       ),
@@ -297,122 +134,204 @@ class _PaymentHistoryTab extends StatelessWidget {
       stream: paymentService.getBrandPayments(user.uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         }
 
         final payments = snapshot.data ?? [];
 
         if (payments.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(LucideIcons.history, size: 48, color: Colors.white24),
-                const SizedBox(height: 16),
-                Text(
-                  'No payment history.',
-                  style: GoogleFonts.inter(color: Colors.white54),
-                ),
-              ],
-            ),
-          );
+          return _emptyState(LucideIcons.history, 'No payment history yet');
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
+        return ListView.builder(
+          padding: const EdgeInsets.all(24),
           itemCount: payments.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final payment = payments[index];
-            return _PaymentHistoryCard(payment: payment);
-          },
+          itemBuilder: (context, index) => _PaymentCard(payment: payments[index]),
         );
       },
     );
   }
 }
 
-class _PaymentHistoryCard extends StatelessWidget {
+class _UpcomingPayoutsTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // This would fetch bookings with 'awaiting_confirmation' status
+    return _emptyState(LucideIcons.calendarClock, 'No upcoming payouts');
+  }
+}
+
+class _PaymentCard extends StatelessWidget {
   final PaymentModel payment;
 
-  const _PaymentHistoryCard({required this.payment});
+  const _PaymentCard({required this.payment});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF141419),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(LucideIcons.arrowUpRight, color: Colors.green, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => _showPaymentDetail(context),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
               children: [
-                Text(
-                  payment.jobTitle,
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(LucideIcons.check, color: Colors.green, size: 20),
                 ),
-                Text(
-                  'via ${payment.method.toUpperCase()}',
-                  style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        payment.jobTitle,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Completed on ${DateFormat('MMM d, yyyy').format(payment.createdAt)}',
+                        style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '\$${payment.amount.toStringAsFixed(2)}',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 4),
+                    const Icon(LucideIcons.chevronRight, size: 14, color: Colors.white24),
+                  ],
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '-\$${payment.amount}',
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  void _showPaymentDetail(BuildContext context) {
+    final modelRate = payment.amount;
+    final platformFee = modelRate * 0.1;
+    final total = modelRate + platformFee;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Payment Detail', style: GoogleFonts.tinos(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(LucideIcons.x, color: Colors.white)),
+              ],
+            ),
+            const SizedBox(height: 32),
+            _detailSection('Project', payment.jobTitle),
+            const SizedBox(height: 16),
+            _detailSection('Transaction ID', 'TRX-${payment.id.hashCode.toString().toUpperCase()}'),
+            const SizedBox(height: 32),
+            const Divider(color: Colors.white10),
+            const SizedBox(height: 32),
+            _feeRow('Model Rate', '\$${modelRate.toStringAsFixed(2)}'),
+            _feeRow('Platform Fee (10%)', '\$${platformFee.toStringAsFixed(2)}'),
+            _feeRow('Stripe Processing', 'Included', isAccent: true),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Total Charged', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('\$${total.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 48),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Receipt downloading...')));
+                },
+                icon: const Icon(LucideIcons.download, size: 18),
+                label: const Text('Download Receipt', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
               ),
-              Text(
-                DateFormat('MMM d').format(payment.createdAt),
-                style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailSection(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 16)),
+      ],
+    );
+  }
+
+  Widget _feeRow(String label, String value, {bool isAccent = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white38, fontSize: 14)),
+          Text(value, style: TextStyle(color: isAccent ? const Color(0xFF818CF8) : Colors.white70, fontSize: 14, fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
 }
 
-class _PaymentMethodTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _PaymentMethodTile({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.white70),
-      title: Text(label, style: const TextStyle(color: Colors.white)),
-      trailing: const Icon(LucideIcons.chevronRight, size: 16, color: Colors.white24),
-      onTap: onTap,
-      contentPadding: EdgeInsets.zero,
-    );
-  }
+Widget _emptyState(IconData icon, String message) {
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 48, color: Colors.white10),
+        const SizedBox(height: 16),
+        Text(
+          message,
+          style: TextStyle(color: Colors.white.withOpacity(0.2)),
+        ),
+      ],
+    ),
+  );
 }

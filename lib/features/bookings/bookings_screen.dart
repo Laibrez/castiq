@@ -1,117 +1,149 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/bookings/booking_detail_screen.dart';
-
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class BookingsScreen extends StatelessWidget {
+class BookingsScreen extends StatefulWidget {
   final String userType;
 
   const BookingsScreen({super.key, required this.userType});
 
   @override
-  Widget build(BuildContext context) {
-    final tabs = [
-      const Tab(text: 'Action Required'),
-      const Tab(text: 'Active'),
-      const Tab(text: 'Completed'),
-    ];
+  State<BookingsScreen> createState() => _BookingsScreenState();
+}
 
-    return DefaultTabController(
-      length: tabs.length,
-      child: Column(
+class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final AuthService _authService = AuthService();
+  final BookingService _bookingService = BookingService();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = _authService.currentUser;
+    if (user == null) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: Text('Please log in', style: TextStyle(color: Colors.white))),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
         children: [
-          TabBar(
-            isScrollable: true,
-            labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
-            unselectedLabelStyle: GoogleFonts.inter(),
-            indicatorColor: const Color(0xFF6366F1),
-            tabs: tabs,
-          ),
+          // Custom Tab Bar for Brands
+          if (widget.userType == 'brand')
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF161618),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  indicator: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white38,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  tabs: const [
+                    Tab(text: 'Upcoming'),
+                    Tab(text: 'Completed'),
+                    Tab(text: 'Canceled'),
+                  ],
+                ),
+              ),
+            ),
+          
           Expanded(
-            child: TabBarView(
-              children: [
-                _BookingList(statusTab: 'Action Required', userType: userType),
-                _BookingList(statusTab: 'Active', userType: userType),
-                _BookingList(statusTab: 'Completed', userType: userType),
-              ],
+            child: StreamBuilder<List<BookingModel>>(
+              stream: _bookingService.getUserBookings(user.uid, widget.userType),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                }
+
+                final allBookings = snapshot.data ?? [];
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildBookingList(allBookings, 'upcoming'),
+                    _buildBookingList(allBookings, 'completed'),
+                    _buildBookingList(allBookings, 'canceled'),
+                  ],
+                );
+              },
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _BookingList extends StatelessWidget {
-  final String statusTab;
-  final String userType;
+  Widget _buildBookingList(List<BookingModel> bookings, String filter) {
+    List<BookingModel> filtered;
+    
+    switch (filter) {
+      case 'upcoming':
+        filtered = bookings.where((b) => ['pending', 'confirmed', 'signed', 'in_progress', 'awaiting_confirmation'].contains(b.status)).toList();
+        break;
+      case 'completed':
+        filtered = bookings.where((b) => ['completed', 'paid'].contains(b.status)).toList();
+        break;
+      case 'canceled':
+        filtered = bookings.where((b) => ['canceled', 'declined'].contains(b.status)).toList();
+        break;
+      default:
+        filtered = bookings;
+    }
 
-  const _BookingList({required this.statusTab, required this.userType});
-
-  @override
-  Widget build(BuildContext context) {
-    final authService = AuthService();
-    final bookingService = BookingService();
-    final user = authService.currentUser;
-
-    if (user == null) return const Center(child: Text('Please log in'));
-
-    return StreamBuilder<List<BookingModel>>(
-      stream: bookingService.getUserBookings(user.uid, userType),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final allBookings = snapshot.data ?? [];
-        
-        // Filter based on tab status
-        final bookings = allBookings.where((b) {
-          if (statusTab == 'Action Required') {
-            return ['pending', 'confirmed', 'signed'].contains(b.status);
-          } else if (statusTab == 'Active') {
-            return b.status == 'in_progress';
-          } else if (statusTab == 'Completed') {
-            return ['completed', 'paid'].contains(b.status);
-          } else {
-            return false; // Drafts not implemented yet
-          }
-        }).toList();
-
-        if (bookings.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(LucideIcons.calendar, size: 48, color: Colors.white24),
-                const SizedBox(height: 16),
-                Text(
-                  'No bookings in this category.',
-                  style: GoogleFonts.inter(color: Colors.white54),
-                ),
-              ],
+    if (filtered.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(LucideIcons.calendarX, size: 48, color: Colors.white10),
+            const SizedBox(height: 16),
+            Text(
+              'No $filter bookings',
+              style: TextStyle(color: Colors.white.withOpacity(0.2)),
             ),
-          );
-        }
+          ],
+        ),
+      );
+    }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: bookings.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            return _BookingCard(booking: bookings[index], userType: userType);
-          },
-        );
-      },
+    return ListView.builder(
+      padding: const EdgeInsets.all(24),
+      itemCount: filtered.length,
+      itemBuilder: (context, index) => _BookingCard(
+        booking: filtered[index],
+        userType: widget.userType,
+      ),
     );
   }
 }
@@ -125,17 +157,16 @@ class _BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF141419),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          highlightColor: Colors.white.withOpacity(0.1),
-          splashColor: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(24),
           onTap: () {
             Navigator.push(
               context,
@@ -149,67 +180,97 @@ class _BookingCard extends StatelessWidget {
             );
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+            padding: const EdgeInsets.all(24),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(LucideIcons.user, color: Colors.white),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // In a real app, we'd fetch the counterpart's name
-                          Text(
-                            booking.jobTitle ?? (userType == 'brand' ? 'Model Application' : 'Job Application'),
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(booking.status).withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              booking.status.toUpperCase(),
-                              style: GoogleFonts.inter(
-                                color: _getStatusColor(booking.status),
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Model/Brand Avatar Placeholder
+                    FutureBuilder<DocumentSnapshot>(
+                      future: FirebaseFirestore.instance.collection('users').doc(userType == 'brand' ? booking.modelId : booking.brandId).get(),
+                      builder: (context, snapshot) {
+                        final userData = snapshot.data?.data() as Map<String, dynamic>?;
+                        final name = userData?['name'] ?? (userType == 'brand' ? 'Model' : 'Brand');
+                        final photoUrl = userData?['profileImageUrl'];
+
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(12),
+                                image: photoUrl != null 
+                                  ? DecorationImage(image: NetworkImage(photoUrl), fit: BoxFit.cover)
+                                  : null,
                               ),
+                              child: photoUrl == null ? const Icon(LucideIcons.user, color: Colors.white24, size: 24) : null,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Booking ID: ${booking.id.substring(0, 8)}...',
-                        style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
-                      ),
-                      const SizedBox(height: 4),
-                        Text(
-                          booking.date != null 
-                            ? DateFormat('MMM d, yyyy').format(booking.date!)
-                            : DateFormat('MMM d, yyyy').format(booking.createdAt),
-                          style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  booking.jobTitle ?? 'Model Booking',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white.withOpacity(0.4),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    const Spacer(),
+                    _statusBadge(booking.status),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    _infoItem(LucideIcons.calendar, DateFormat('MMM d, h:mm a').format(booking.date ?? booking.createdAt)),
+                    const SizedBox(width: 20),
+                    _infoItem(LucideIcons.mapPin, booking.location ?? 'Miami, FL'),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _infoItem(LucideIcons.dollarSign, '${booking.rate?.toInt() ?? 0} total'),
+                    if (booking.initiatedByBrand)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6366F1).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                    ],
-                  ),
+                        child: const Text(
+                          'INVITATION',
+                          style: TextStyle(
+                            color: Color(0xFF818CF8),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -219,24 +280,51 @@ class _BookingCard extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(String status) {
+  Widget _statusBadge(String status) {
+    Color color;
     switch (status) {
-      case 'pending':
-        return Colors.orange;
-      case 'confirmed':
-        return Colors.blue;
-      case 'signed':
-        return Colors.indigo;
-      case 'in_progress':
-        return Colors.amber;
-      case 'completed':
-        return Colors.green;
-      case 'paid':
-        return Colors.teal;
+      case 'pending': color = Colors.orange; break;
+      case 'confirmed': color = Colors.blue; break;
+      case 'signed': color = Colors.indigo; break;
+      case 'in_progress': color = Colors.amber; break;
+      case 'completed': color = Colors.green; break;
+      case 'paid': color = Colors.green; break;
       case 'declined':
-        return Colors.red;
-      default:
-        return Colors.white;
+      case 'canceled': color = Colors.red; break;
+      default: color = Colors.grey;
     }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        status.toUpperCase(),
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _infoItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: Colors.white24),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.white.withOpacity(0.4),
+          ),
+        ),
+      ],
+    );
   }
 }

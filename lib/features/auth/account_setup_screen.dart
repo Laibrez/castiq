@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -95,9 +95,9 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'Complete your profile to get started.',
-                style: GoogleFonts.tinos(
+                style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
                 ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:flutter_application_1/core/services/job_service.dart';
@@ -37,15 +36,15 @@ class _MatchmakerScreenState extends State<MatchmakerScreen> {
           final jobs = snapshot.data ?? [];
 
           if (jobs.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(LucideIcons.briefcase, size: 48, color: Colors.white24),
-                  const SizedBox(height: 16),
+                  Icon(LucideIcons.briefcase, size: 48, color: Colors.white24),
+                  SizedBox(height: 16),
                   Text(
                     'No jobs available yet.',
-                    style: GoogleFonts.tinos(color: Colors.white54, fontSize: 18),
+                    style: TextStyle(color: Colors.white54, fontSize: 18),
                   ),
                 ],
               ),
@@ -105,14 +104,14 @@ class _JobCard extends StatelessWidget {
                 children: [
                   Text(
                     job.brandName,
-                    style: GoogleFonts.tinos(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
                   ),
                   Text(
                     '${job.location} • ${DateFormat('MMM d').format(job.date)}',
-                    style: GoogleFonts.tinos(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white70,
                       fontStyle: FontStyle.italic,
@@ -130,10 +129,10 @@ class _JobCard extends StatelessWidget {
                 ),
                 child: Text(
                   '\$${job.rate.toInt()}/day',
-                  style: GoogleFonts.tinos(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF818CF8),
+                    color: Color(0xFF818CF8),
                   ),
                 ),
               ),
@@ -142,7 +141,7 @@ class _JobCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             job.title,
-            style: GoogleFonts.tinos(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.italic,
@@ -151,7 +150,7 @@ class _JobCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             job.description,
-            style: GoogleFonts.tinos(
+            style: const TextStyle(
               fontSize: 14,
               color: Colors.white70,
               height: 1.4,
@@ -255,7 +254,7 @@ class _Tag extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: GoogleFonts.tinos(
+        style: const TextStyle(
           fontSize: 12,
           color: Colors.white70,
         ),

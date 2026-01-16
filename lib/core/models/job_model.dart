@@ -13,6 +13,8 @@ class JobModel {
   final String status; // 'open', 'closed', 'completed'
   final DateTime createdAt;
   final List<String> images;
+  final Map<String, String> documents;
+
 
   JobModel({
     required this.id,
@@ -27,6 +29,7 @@ class JobModel {
     this.status = 'open',
     required this.createdAt,
     this.images = const [],
+    this.documents = const {},
   });
 
   factory JobModel.fromMap(Map<String, dynamic> data, String id) {
@@ -43,6 +46,7 @@ class JobModel {
       status: data['status'] ?? 'open',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       images: data['images'] != null ? List<String>.from(data['images']) : [],
+      documents: data['documents'] != null ? Map<String, String>.from(data['documents']) : {},
     );
   }
 
@@ -59,6 +63,7 @@ class JobModel {
       'status': status,
       'createdAt': FieldValue.serverTimestamp(),
       'images': images,
+      'documents': documents,
     };
   }
 }

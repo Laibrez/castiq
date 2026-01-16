@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:flutter_application_1/features/auth/id_verification_status_screen.dart';
+import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -36,7 +35,7 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const IDVerificationStatusScreen(),
+          builder: (context) => DashboardScreen(userType: widget.userType),
         ),
       );
     } catch (e) {
@@ -52,9 +51,9 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'ID Verification',
-          style: GoogleFonts.tinos(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       body: SafeArea(
@@ -63,17 +62,17 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Verify your identity.',
-                style: GoogleFonts.tinos(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'To ensure the safety of our community, we need to verify your identity. Please upload a valid government-issued ID.',
-                style: GoogleFonts.tinos(
+                style: TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
                 ),
@@ -165,7 +164,7 @@ class _UploadCard extends StatelessWidget {
             const SizedBox(width: 16),
             Text(
               title,
-              style: GoogleFonts.tinos(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: isUploaded ? Colors.white : Colors.white70,
@@ -173,9 +172,9 @@ class _UploadCard extends StatelessWidget {
             ),
             const Spacer(),
             if (isUploaded)
-              Text(
+              const Text(
                 'Uploaded',
-                style: GoogleFonts.tinos(
+                style: TextStyle(
                   fontSize: 14,
                   color: Colors.green,
                   fontWeight: FontWeight.w600,

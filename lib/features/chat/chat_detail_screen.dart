@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:flutter_application_1/features/contract/contract_screen.dart';
 
 class ChatDetailScreen extends StatelessWidget {
   final bool isRequested;
+  final bool isLocked;
 
-  const ChatDetailScreen({super.key, this.isRequested = false});
+  const ChatDetailScreen({
+    super.key, 
+    this.isRequested = false,
+    this.isLocked = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +20,21 @@ class ChatDetailScreen extends StatelessWidget {
             const CircleAvatar(
               radius: 16,
               child: Icon(LucideIcons.user, size: 20),
-              // backgroundImage: NetworkImage('https://source.unsplash.com/random/100x100/?face'),
             ),
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'User Name',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(
+                const Text(
                   'Online',
-                  style: GoogleFonts.inter(
+                  style: TextStyle(
                     fontSize: 12,
                     color: Colors.green,
                   ),
@@ -50,20 +52,42 @@ class ChatDetailScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+          if (isLocked)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              color: const Color(0xFF6366F1).withOpacity(0.1),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.lock, size: 14, color: Color(0xFF818CF8)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Chat will be enabled once the application is accepted.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: const Color(0xFF818CF8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (isRequested)
             Container(
               padding: const EdgeInsets.all(16),
               color: const Color(0xFF141419),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'New Job Request',
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     'Fashion Shoot • \$500 • NYC',
-                    style: GoogleFonts.inter(color: Colors.white70),
+                    style: TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -103,33 +127,37 @@ class ChatDetailScreen extends StatelessWidget {
               ),
             ),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: 20,
-              reverse: true,
-              itemBuilder: (context, index) {
-                final isMe = index % 2 == 0;
-                return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isMe ? const Color(0xFF6366F1) : const Color(0xFF141419),
-                      borderRadius: BorderRadius.circular(20).copyWith(
-                        bottomRight: isMe ? const Radius.circular(0) : null,
-                        bottomLeft: !isMe ? const Radius.circular(0) : null,
+            child: Opacity(
+              opacity: isLocked ? 0.3 : 1.0,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: isLocked ? 1 : 20,
+                reverse: true,
+                itemBuilder: (context, index) {
+                  if (isLocked) return const SizedBox.shrink();
+                  final isMe = index % 2 == 0;
+                  return Align(
+                    alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isMe ? const Color(0xFF6366F1) : const Color(0xFF141419),
+                        borderRadius: BorderRadius.circular(20).copyWith(
+                          bottomRight: isMe ? const Radius.circular(0) : null,
+                          bottomLeft: !isMe ? const Radius.circular(0) : null,
+                        ),
+                      ),
+                      child: const Text(
+                        'This is a message text example.',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      'This is a message text example.',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           Container(
@@ -141,48 +169,12 @@ class ChatDetailScreen extends StatelessWidget {
             child: SafeArea(
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(LucideIcons.plus),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: const Color(0xFF1A1A1A),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                        ),
-                        builder: (context) => Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: const Icon(LucideIcons.fileText, color: Colors.white),
-                              title: Text('Send Contract', style: GoogleFonts.inter(color: Colors.white)),
-                              onTap: () {
-                                Navigator.pop(context);
-                                // Navigate to Contract Screen
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const ContractScreen()),
-                                );
-                              },
-                            ),
-                            ListTile(
-                              leading: const Icon(LucideIcons.dollarSign, color: Colors.white),
-                              title: Text('Send Offer', style: GoogleFonts.inter(color: Colors.white)),
-                              onTap: () {
-                                Navigator.pop(context);
-                                // Show Offer Dialog
-                              },
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
+                      enabled: !isLocked,
                       decoration: InputDecoration(
-                        hintText: 'Type a message...',
+                        hintText: isLocked ? 'Chat locked' : 'Type a message...',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide.none,
@@ -197,7 +189,7 @@ class ChatDetailScreen extends StatelessWidget {
                   IconButton(
                     icon: const Icon(LucideIcons.send),
                     color: const Color(0xFF6366F1),
-                    onPressed: () {},
+                    onPressed: isLocked ? null : () {},
                   ),
                 ],
               ),

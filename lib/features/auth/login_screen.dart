@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/auth/signup_screen.dart';
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
               Text(
                 'Log in as a ${widget.userType == 'model' ? 'Model' : 'Brand Owner'}.',
-                style: GoogleFonts.tinos(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
                   fontStyle: FontStyle.italic,
@@ -138,9 +138,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     // TODO: Forgot Password
                   },
-                  child: Text(
+                  child: const Text(
                     'Forgot Password?',
-                          style: GoogleFonts.tinos(
+                          style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -151,9 +151,9 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Don't have an account? ",
-                          style: GoogleFonts.tinos(color: Colors.white70),
+                          style: TextStyle(color: Colors.white70),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -164,9 +164,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'Sign Up',
-                            style: GoogleFonts.tinos(
+                            style: TextStyle(
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),

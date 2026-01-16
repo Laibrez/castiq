@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class FeedbackScreen extends StatefulWidget {
@@ -17,21 +16,21 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Feedback', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+        title: const Text('Feedback', style: TextStyle(fontWeight: FontWeight.w600)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'We value your feedback!',
-              style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Tell us what you think about the app or report any issues.',
-              style: GoogleFonts.inter(color: Colors.white54),
+              style: TextStyle(color: Colors.white54),
             ),
             const SizedBox(height: 32),
             TextField(

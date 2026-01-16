@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/auth/login_screen.dart';
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/features/auth/id_verification_screen.dart';
@@ -96,7 +96,7 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 8),
               Text(
                 'Sign up as a ${widget.userType == 'model' ? 'Model' : 'Brand Owner'} to get started.',
-                style: GoogleFonts.tinos(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white70,
                   fontStyle: FontStyle.italic,
@@ -162,9 +162,9 @@ class _SignupScreenState extends State<SignupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Already have an account? ",
-                          style: GoogleFonts.tinos(color: Colors.white70),
+                          style: TextStyle(color: Colors.white70),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -175,9 +175,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'Log In',
-                            style: GoogleFonts.tinos(
+                            style: TextStyle(
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),
