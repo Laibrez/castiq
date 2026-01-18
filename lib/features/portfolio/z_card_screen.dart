@@ -2,11 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 
 class ZCardScreen extends StatelessWidget {
   final UserModel userData;
 
   const ZCardScreen({super.key, required this.userData});
+
+  // Generate unique Z-Card URL
+  String get zCardUrl => 'https://castiq-d85d4.web.app/zcard/${userData.uid}';
+
+  void _shareZCard(BuildContext context) async {
+    final result = await Share.share(
+      'Check out my professional Z-Card on Castiq!\n\n$zCardUrl',
+      subject: '${userData.name} - Z-Card',
+    );
+
+    if (result.status == ShareResultStatus.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Z-Card shared successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  void _copyLink(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: zCardUrl));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Z-Card link copied to clipboard!'),
+        backgroundColor: Color(0xFF6366F1),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +68,39 @@ class ZCardScreen extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(LucideIcons.share2, color: Colors.black, size: 20),
-            onPressed: () {
-              // TODO: Simulate share link
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Public Z-Card link copied to clipboard')),
-              );
+            color: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            onSelected: (value) {
+              if (value == 'share') {
+                _shareZCard(context);
+              } else if (value == 'copy') {
+                _copyLink(context);
+              }
             },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'share',
+                child: Row(
+                  children: [
+                    Icon(LucideIcons.share2, size: 18, color: Colors.black.withOpacity(0.7)),
+                    const SizedBox(width: 12),
+                    const Text('Share Z-Card'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'copy',
+                child: Row(
+                  children: [
+                    Icon(LucideIcons.copy, size: 18, color: Colors.black.withOpacity(0.7)),
+                    const SizedBox(width: 12),
+                    const Text('Copy Link'),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 8),
         ],

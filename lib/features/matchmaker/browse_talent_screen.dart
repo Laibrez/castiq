@@ -296,7 +296,7 @@ class _ReadOnlyModelCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          model.category ?? 'Fashion',
+          (model.categories?.isNotEmpty == true ? model.categories!.first : 'Fashion'),
           style: const TextStyle(
             fontSize: 12,
             color: Color(0xFF6366F1),

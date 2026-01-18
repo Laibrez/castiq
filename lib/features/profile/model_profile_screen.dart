@@ -423,7 +423,7 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildExperienceItem('Specialties', widget.model.category?.split(',') ?? ['High Fashion', 'Editorial', 'Runway', 'Commercial']),
+            _buildExperienceItem('Specialties', widget.model.categories ?? ['High Fashion', 'Editorial', 'Runway', 'Commercial']),
             const SizedBox(height: 32),
             Text(
               'Verified History',
