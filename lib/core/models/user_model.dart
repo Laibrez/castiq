@@ -10,6 +10,7 @@ class UserModel {
   final bool isVerified;
   final String? bio;
   final String? location;
+  final String? category;
   
   // Model specific
   final List<String>? portfolio;
@@ -21,6 +22,12 @@ class UserModel {
   final int? reviewCount;
   final String? portfolioVideo;
   final List<String>? portfolioImages;
+  final String? zCardUrl;
+  final String? zCardUrl;
+  final String? proofOfAddressUrl;
+  final String? phone;
+  final List<Map<String, dynamic>>? socialMedia;
+
   // Brand specific
   final String? companyName;
   final String? industry;
@@ -36,6 +43,7 @@ class UserModel {
     this.isVerified = false,
     this.bio,
     this.location,
+    this.category,
     this.portfolio,
     this.stats,
     this.categories,
@@ -45,6 +53,11 @@ class UserModel {
     this.reviewCount,
     this.portfolioVideo,
     this.portfolioImages,
+    this.zCardUrl,
+    this.zCardUrl,
+    this.proofOfAddressUrl,
+    this.phone,
+    this.socialMedia,
     this.companyName,
     this.industry,
     this.website,
@@ -61,8 +74,9 @@ class UserModel {
       isVerified: data['isVerified'] ?? false,
       bio: data['bio'],
       location: data['location'],
+      category: data['category'],
       portfolio: data['portfolio'] != null ? List<String>.from(data['portfolio']) : null,
-      stats: data['stats'],
+      stats: data['stats'] ?? data['measurements'], // Support both keys
       categories: data['categories'] != null ? List<String>.from(data['categories'] as List) : null,
       age: data['age'],
       availability: data['availability'],
@@ -70,6 +84,12 @@ class UserModel {
       reviewCount: data['reviewCount'],
       portfolioVideo: data['portfolioVideo'],
       portfolioImages: data['portfolioImages'] != null ? List<String>.from(data['portfolioImages']) : null,
+      zCardUrl: data['zCardUrl'],
+      proofOfAddressUrl: data['proofOfAddressUrl'],
+      phone: data['phone'],
+      socialMedia: data['socialMedia'] != null 
+          ? List<Map<String, dynamic>>.from(data['socialMedia']) 
+          : null,
       companyName: data['companyName'],
       industry: data['industry'],
       website: data['website'],
@@ -87,6 +107,7 @@ class UserModel {
       'isVerified': isVerified,
       'bio': bio,
       'location': location,
+      'category': category,
       'portfolio': portfolio,
       'stats': stats,
       'categories': categories,
@@ -96,6 +117,10 @@ class UserModel {
       'reviewCount': reviewCount,
       'portfolioVideo': portfolioVideo,
       'portfolioImages': portfolioImages,
+      'zCardUrl': zCardUrl,
+      'proofOfAddressUrl': proofOfAddressUrl,
+      'phone': phone,
+      'socialMedia': socialMedia,
       'companyName': companyName,
       'industry': industry,
       'website': website,

@@ -291,10 +291,12 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
   }
 
   Widget _buildZCardTab(Map<String, dynamic> stats) {
-    final images = widget.model.portfolio ?? [
-      'https://images.unsplash.com/photo-1539109132381-31a0b302653a?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=400&auto=format&fit=crop',
-    ];
+    if (widget.model.zCardUrl == null && widget.model.portfolio == null) {
+        return const Center(child: Text('No Z-Card available', style: TextStyle(color: Colors.white54)));
+    }
+    
+    // Use uploaded Z-Card if available, otherwise fallback to first portfolio item loop (for demo) or default
+    final imageUrl = widget.model.zCardUrl ?? (widget.model.portfolio != null && widget.model.portfolio!.isNotEmpty ? widget.model.portfolio!.first : 'https://images.unsplash.com/photo-1539109132381-31a0b302653a?q=80&w=400&auto=format&fit=crop');
 
     return Container(
       decoration: BoxDecoration(
@@ -307,7 +309,7 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
         children: [
           AspectRatio(
             aspectRatio: 0.8,
-            child: Image.network(images[0], fit: BoxFit.cover),
+            child: Image.network(imageUrl, fit: BoxFit.cover),
           ),
           Padding(
             padding: const EdgeInsets.all(24),
@@ -355,22 +357,13 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
     return Column(
       children: [
         _buildMeasurementTable('Body Metrics', {
-          'Height': stats['height'] ?? '5\'10"',
-          'Bust': stats['bust'] ?? '34"',
-          'Waist': stats['waist'] ?? '24"',
-          'Hips': stats['hips'] ?? '35"',
-          'Inside Leg': stats['inside_leg'] ?? '32"',
-          'Shoes': stats['shoes'] ?? '8.5',
-          'Dress': stats['dress'] ?? '2',
+          'Height': stats['height'] != null ? '${stats['height']} cm' : '-',
+          'Bust': stats['bust'] != null ? '${stats['bust']} cm' : '-',
+          'Waist': stats['waist'] != null ? '${stats['waist']} cm' : '-',
+          'Hips': stats['hips'] != null ? '${stats['hips']} cm' : '-',
+          'Shoe': stats['shoe'] ?? '-',
         }),
         const SizedBox(height: 32),
-        _buildMeasurementTable('Physical Attributes', {
-          'Eyes': stats['eyes'] ?? 'Blue',
-          'Hair': stats['hair'] ?? 'Blonde',
-          'Skin': stats['skin'] ?? 'Fair',
-          'Tattoos': stats['tattoos'] ?? 'No',
-          'Piercings': stats['piercings'] ?? 'Yes',
-        }),
       ],
     );
   }
