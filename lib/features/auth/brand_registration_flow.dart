@@ -33,6 +33,7 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
   final _addressCountryController = TextEditingController();
   final _taxIdController = TextEditingController();
   final _websiteController = TextEditingController();
+
   // removed simple _socialController in favor of list
   final _phoneNumberController = TextEditingController();
   List<Map<String, String>> _socialMediaLinks = [];
@@ -53,12 +54,22 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
       );
 
       if (result != null) {
+        final file = result.files.first;
+        if (file.size > 5 * 1024 * 1024) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('File too large. Max 5MB allowed.')),
+            );
+          }
+          return;
+        }
+
         setState(() {
-          _proofOfAddressFile = result.files.first;
+          _proofOfAddressFile = file;
         });
       }
     } catch (e) {
-      debugPrint("Error picking file: $e");
+      // Silent error
     }
   }
 
@@ -66,9 +77,12 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
     setState(() => _isSubmitting = true);
     
     try {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Starting submission...'), duration: Duration(milliseconds: 500)));
+      
       // 1. Create/Get User
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Creating account...'), duration: Duration(milliseconds: 500)));
           final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
@@ -87,15 +101,29 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
           
           final metadata = SettableMetadata(contentType: 'application/$ext'); // Simple content type guess
 
-          if (kIsWeb || _proofOfAddressFile!.bytes != null) {
-             await ref.putData(_proofOfAddressFile!.bytes!, metadata);
-          } else if (_proofOfAddressFile!.path != null) {
-             await ref.putFile(File(_proofOfAddressFile!.path!), metadata);
+          print('Uploading proof of address...');
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading documents...'), duration: Duration(milliseconds: 500)));
+          if (kIsWeb) {
+             if (_proofOfAddressFile!.bytes != null) {
+                 await ref.putData(_proofOfAddressFile!.bytes!, metadata);
+             } else {
+                 print('Error: Web file bytes are null');
+             }
+          } else {
+             if (_proofOfAddressFile!.path != null) {
+                 await ref.putFile(File(_proofOfAddressFile!.path!), metadata);
+             }
           }
-          proofUrl = await ref.getDownloadURL();
+          try {
+            proofUrl = await ref.getDownloadURL();
+          } catch (e) {
+            print('Proof upload/url failed (might be expected if upload failed): $e');
+            // Continues without proof URL if failed
+          }
       }
 
       // 3. Save to Firestore
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saving profile data...'), duration: Duration(milliseconds: 500)));
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'uid': user.uid,
         'email': user.email,
@@ -127,15 +155,29 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
           context,
           MaterialPageRoute(
             builder: (context) => const RegistrationSuccessScreen(
-              message: 'Thanks for applying.\nWe’re verifying your business information.\nYou’ll receive an email once your account is approved.',
+              message: 'Application Sent!',
             ),
           ),
         );
       }
 
+    } on FirebaseAuthException catch (e) {
+      String message = 'Registration Failed';
+      if (e.code == 'network-request-failed' || e.code == 'unavailable') {
+        message = 'No internet connection. Please check your network and try again.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'This email is already registered.';
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red));
+      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong. Please check your connection.'), backgroundColor: Colors.red),
+        );
+        print('Registration Generic Error: $e');
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -1001,7 +1043,7 @@ class _Step7Summary extends StatelessWidget {
             child: ElevatedButton(
               onPressed: isLoading ? null : onSubmit,
               child: isLoading 
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)) 
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) 
                   : const Text('Confirm & Submit'),
             ),
           ),

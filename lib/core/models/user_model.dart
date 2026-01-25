@@ -23,6 +23,8 @@ class UserModel {
   final String? portfolioVideo;
   final List<String>? portfolioImages;
   final String? zCardUrl;
+  final bool? willingToTravel;
+
   final String? proofOfAddressUrl;
   final String? phone;
   final List<Map<String, dynamic>>? socialMedia;
@@ -53,6 +55,8 @@ class UserModel {
     this.portfolioVideo,
     this.portfolioImages,
     this.zCardUrl,
+    this.willingToTravel, // Added
+
     this.proofOfAddressUrl,
     this.phone,
     this.socialMedia,
@@ -83,6 +87,7 @@ class UserModel {
       portfolioVideo: data['portfolioVideo'],
       portfolioImages: data['portfolioImages'] != null ? List<String>.from(data['portfolioImages']) : null,
       zCardUrl: data['zCardUrl'],
+      willingToTravel: data['willingToTravel'] ?? data['willTravel'], // Support legacy key if any
       proofOfAddressUrl: data['proofOfAddressUrl'],
       phone: data['phone'],
       socialMedia: data['socialMedia'] != null 
@@ -116,6 +121,7 @@ class UserModel {
       'portfolioVideo': portfolioVideo,
       'portfolioImages': portfolioImages,
       'zCardUrl': zCardUrl,
+      'willingToTravel': willingToTravel,
       'proofOfAddressUrl': proofOfAddressUrl,
       'phone': phone,
       'socialMedia': socialMedia,

@@ -54,7 +54,8 @@ class MediaUploadService {
 
       return downloadUrl;
     } catch (e) {
-      print('Error uploading video: $e');
+    } catch (e) {
+      // Handle error
       return null;
     }
   }
@@ -76,7 +77,8 @@ class MediaUploadService {
         downloadUrls.add(downloadUrl);
         onProgress(i + 1, imageFiles.length);
       } catch (e) {
-        print('Error uploading image $i: $e');
+      } catch (e) {
+        // Continue with other images
       }
     }
 
@@ -109,7 +111,8 @@ class MediaUploadService {
       final snapshot = await uploadTask;
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      print('Error uploading image: $e');
+    } catch (e) {
+      // Handle error
       return null;
     }
   }

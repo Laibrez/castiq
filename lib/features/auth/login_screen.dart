@@ -36,23 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
 
-      // Use the selected userType for the dashboard to allow switching roles for testing
-      final role = widget.userType;
-
-      // Update role in Firestore to match the selected path for this session
-      // This ensures that StreamBuilders and other components use the correct role
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
-        'role': role,
-      });
-
+      // Navigate back to root (AuthWrapper) which will handle the routing
       if (!mounted) return;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DashboardScreen(userType: role),
-        ),
-      );
+      Navigator.of(context).popUntil((route) => route.isFirst);
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: $e')));

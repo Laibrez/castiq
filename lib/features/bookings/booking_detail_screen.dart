@@ -167,6 +167,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               style: TextStyle(color: Colors.white.withOpacity(0.5), height: 1.6),
             ),
           ),
+          const SizedBox(height: 32),
+          Text(
+            'Call Sheet',
+            style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 16),
+          _buildCallSheetFlashcards(booking),
         ],
       ),
     );
@@ -768,3 +775,68 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     );
   }
 }
+
+  Widget _buildCallSheetFlashcards(BookingModel booking) {
+    // Mock data if specific call sheet fields aren't in model yet
+    final cards = [
+      {'icon': LucideIcons.clock, 'label': 'Call Time', 'value': '08:00 AM'},
+      {'icon': LucideIcons.camera, 'label': 'Shoot Starts', 'value': '09:00 AM'},
+      {'icon': LucideIcons.mapPin, 'label': 'Location', 'value': booking.location ?? 'TBD'},
+      {'icon': LucideIcons.user, 'label': 'Contact', 'value': 'Sarah J.'},
+    ];
+
+    return SizedBox(
+      height: 140,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: cards.length,
+        itemBuilder: (context, index) {
+          final card = cards[index];
+          return Container(
+            width: 120,
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF161618),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(card['icon'] as IconData, color: const Color(0xFF6366F1), size: 20),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  card['value'] as String,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  card['label'] as String,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 11,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }

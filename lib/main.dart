@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:flutter_application_1/features/auth/onboarding_screen.dart';
+import 'package:flutter_application_1/features/auth/auth_wrapper.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/firebase_options.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       title: 'Castiq',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const OnboardingScreen(),
+      home: const AuthWrapper(),
     );
   }
 }

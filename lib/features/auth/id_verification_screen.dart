@@ -94,12 +94,9 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
           .update(updateData);
 
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DashboardScreen(userType: widget.userType),
-        ),
-      );
+      if (!mounted) return;
+      // Navigate back to root (AuthWrapper)
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

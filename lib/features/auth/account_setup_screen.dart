@@ -56,13 +56,11 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
           .update(updateData);
 
       if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DashboardScreen(userType: widget.userType),
-        ),
-        (route) => false,
-      );
+      // Navigate back to root. The AuthWrapper will detect the completed profile 
+      // (if we added a check) or just existing user and show the dashboard.
+      // Note: Ideally AuthWrapper checks 'setupCompleted' if we want to enforce this flow,
+      // but for now popping reveals the dashboard which AuthWrapper is already rendering.
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save profile: $e')),

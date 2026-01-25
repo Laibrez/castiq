@@ -65,19 +65,22 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                   Icon(LucideIcons.messageSquare, size: 64, color: Colors.white.withOpacity(0.1)),
                   const SizedBox(height: 24),
                   Text(
-                    'No messages yet',
+                    'Messages are locked',
                     style: GoogleFonts.tinos(
                       fontSize: 20,
                       color: Colors.white.withOpacity(0.3),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    widget.userRole == 'model'
-                        ? 'When you accept an offer, you can chat here'
-                        : 'When a model accepts your offer, you can chat here',
-                    style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 14),
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Text(
+                      widget.userRole == 'model'
+                          ? 'Chat becomes active once you accept a brand invitation or a job offer.'
+                          : 'Chat becomes active once a model accepts your offer.',
+                      style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),

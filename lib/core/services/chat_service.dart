@@ -150,7 +150,8 @@ class ChatService {
         await doc.reference.update({'isRead': true});
       }
     } catch (e) {
-      print('Error marking messages as read: $e');
+    } catch (e) {
+      // Error
     }
   }
 
