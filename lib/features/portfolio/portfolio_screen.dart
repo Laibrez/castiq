@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/features/portfolio/z_card_screen.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
+import 'package:flutter_application_1/core/widgets/media_upload_widget.dart';
+import 'package:flutter_application_1/features/portfolio/edit_portfolio_screen.dart';
 import 'package:intl/intl.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -97,7 +99,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                     _IconButton(
                                       icon: LucideIcons.edit3,
                                       onTap: () {
-                                        // TODO: Implement Edit navigation
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditPortfolioScreen(userData: userData),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ],
@@ -180,6 +187,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
+                    // MEDIA UPLOAD WIDGET
+                    const MediaUploadWidget(),
+                    const SizedBox(height: 16),
+
                     // ABOUT CARD
                     _Card(
                       title: 'About',
@@ -244,7 +255,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
-                            children: (userData.category?.split(',') ?? ['Runway', 'Commercial', 'Editorial', 'Swimwear']).map((cat) {
+                            children: (userData.categories ?? ['Runway', 'Commercial', 'Editorial', 'Swimwear']).map((cat) {
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                 decoration: BoxDecoration(

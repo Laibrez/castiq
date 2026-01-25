@@ -10,13 +10,24 @@ class UserModel {
   final bool isVerified;
   final String? bio;
   final String? location;
+  final String? category;
   
   // Model specific
   final List<String>? portfolio;
   final Map<String, dynamic>? stats;
-  final String? category;
+  final List<String>? categories;
+  final int? age;
   final String? availability;
-  
+  final double? rating;
+  final int? reviewCount;
+  final String? portfolioVideo;
+  final List<String>? portfolioImages;
+  final String? zCardUrl;
+  final String? zCardUrl;
+  final String? proofOfAddressUrl;
+  final String? phone;
+  final List<Map<String, dynamic>>? socialMedia;
+
   // Brand specific
   final String? companyName;
   final String? industry;
@@ -32,10 +43,21 @@ class UserModel {
     this.isVerified = false,
     this.bio,
     this.location,
+    this.category,
     this.portfolio,
     this.stats,
-    this.category,
+    this.categories,
+    this.age,
     this.availability,
+    this.rating,
+    this.reviewCount,
+    this.portfolioVideo,
+    this.portfolioImages,
+    this.zCardUrl,
+    this.zCardUrl,
+    this.proofOfAddressUrl,
+    this.phone,
+    this.socialMedia,
     this.companyName,
     this.industry,
     this.website,
@@ -52,10 +74,22 @@ class UserModel {
       isVerified: data['isVerified'] ?? false,
       bio: data['bio'],
       location: data['location'],
-      portfolio: data['portfolio'] != null ? List<String>.from(data['portfolio']) : null,
-      stats: data['stats'],
       category: data['category'],
+      portfolio: data['portfolio'] != null ? List<String>.from(data['portfolio']) : null,
+      stats: data['stats'] ?? data['measurements'], // Support both keys
+      categories: data['categories'] != null ? List<String>.from(data['categories'] as List) : null,
+      age: data['age'],
       availability: data['availability'],
+      rating: (data['rating'] as num?)?.toDouble(),
+      reviewCount: data['reviewCount'],
+      portfolioVideo: data['portfolioVideo'],
+      portfolioImages: data['portfolioImages'] != null ? List<String>.from(data['portfolioImages']) : null,
+      zCardUrl: data['zCardUrl'],
+      proofOfAddressUrl: data['proofOfAddressUrl'],
+      phone: data['phone'],
+      socialMedia: data['socialMedia'] != null 
+          ? List<Map<String, dynamic>>.from(data['socialMedia']) 
+          : null,
       companyName: data['companyName'],
       industry: data['industry'],
       website: data['website'],
@@ -73,10 +107,20 @@ class UserModel {
       'isVerified': isVerified,
       'bio': bio,
       'location': location,
+      'category': category,
       'portfolio': portfolio,
       'stats': stats,
-      'category': category,
+      'categories': categories,
+      'age': age,
       'availability': availability,
+      'rating': rating,
+      'reviewCount': reviewCount,
+      'portfolioVideo': portfolioVideo,
+      'portfolioImages': portfolioImages,
+      'zCardUrl': zCardUrl,
+      'proofOfAddressUrl': proofOfAddressUrl,
+      'phone': phone,
+      'socialMedia': socialMedia,
       'companyName': companyName,
       'industry': industry,
       'website': website,

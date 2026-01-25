@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/auth/login_screen.dart';
-import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/features/auth/id_verification_screen.dart';
 import 'package:flutter_application_1/features/auth/account_setup_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';

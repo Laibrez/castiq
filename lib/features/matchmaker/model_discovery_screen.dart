@@ -20,6 +20,35 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
   final JobService _jobService = JobService();
   final AuthService _authService = AuthService();
 
+  // Filter State
+  List<String> _selectedCategories = [];
+  RangeValues _ageRange = const RangeValues(18, 45);
+  String? _selectedLocation;
+  
+  // Sorting State
+  String _sortOption = 'Newest'; // Options: 'Newest', 'Highest Rated'
+
+  Query _buildQuery() {
+    Query query = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'model');
+
+    if (_selectedCategories.isNotEmpty) {
+      query = query.where('categories', arrayContainsAny: _selectedCategories);
+    }
+
+    if (_selectedLocation != null && _selectedLocation != 'Global') {
+      query = query.where('location', isEqualTo: _selectedLocation);
+    }
+
+    // Age filtering: Firebase allows range on one field only.
+    // Since we are not using range on other fields, this is fine.
+    query = query.where('age', isGreaterThanOrEqualTo: _ageRange.start.toInt());
+    query = query.where('age', isLessThanOrEqualTo: _ageRange.end.toInt());
+
+    return query;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,6 +77,9 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       ),
+                      onChanged: (text) {
+                        setState(() {}); // Trigger rebuild to filter locally if needed, or update query
+                      },
                     ),
                   ),
                 ),
@@ -59,9 +91,12 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFF161618),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      border: Border.all(color: (_selectedCategories.isNotEmpty || _selectedLocation != null) 
+                        ? const Color(0xFF6366F1) : Colors.white.withOpacity(0.05)),
                     ),
-                    child: const Icon(LucideIcons.slidersHorizontal, size: 20, color: Colors.white),
+                    child: Icon(LucideIcons.slidersHorizontal, size: 20, 
+                      color: (_selectedCategories.isNotEmpty || _selectedLocation != null) 
+                        ? const Color(0xFF818CF8) : Colors.white),
                   ),
                 ),
               ],
@@ -74,10 +109,70 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Row(
               children: [
-                _quickFilter('All Models', isSelected: true),
-                _quickFilter('Available Now'),
-                _quickFilter('Top Rated'),
-                _quickFilter('Newly Joined'),
+                _quickFilter('All Models', isSelected: _selectedLocation == null && _selectedCategories.isEmpty, onTap: () {
+                  setState(() {
+                    _selectedLocation = null;
+                    _selectedCategories = [];
+                  });
+                }),
+                _quickFilter('Miami', isSelected: _selectedLocation == 'Miami', onTap: () {
+                  setState(() => _selectedLocation = 'Miami');
+                }),
+                _quickFilter('Editorial', isSelected: _selectedCategories.contains('Editorial'), onTap: () {
+                  setState(() {
+                    if (_selectedCategories.contains('Editorial')) {
+                      _selectedCategories.remove('Editorial');
+                    } else {
+                      _selectedCategories.add('Editorial');
+                    }
+                  });
+                }),
+                _quickFilter('Runway', isSelected: _selectedCategories.contains('Runway'), onTap: () {
+                  setState(() {
+                    if (_selectedCategories.contains('Runway')) {
+                      _selectedCategories.remove('Runway');
+                    } else {
+                      _selectedCategories.add('Runway');
+                    }
+                  });
+                }),
+              ],
+            ),
+          ),
+
+          // Sorting Dropdown
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Results', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF161618),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _sortOption,
+                      dropdownColor: const Color(0xFF1a1a1a),
+                      icon: const Icon(LucideIcons.chevronDown, size: 16, color: Colors.white54),
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      isDense: true,
+                      items: ['Newest', 'Highest Rated'].map((opt) => DropdownMenuItem(
+                        value: opt,
+                        child: Text(opt),
+                      )).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() => _sortOption = val);
+                        }
+                      },
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -85,10 +180,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
           // Models Grid
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .where('role', isEqualTo: 'model')
-                  .snapshots(),
+              stream: _buildQuery().snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator(color: Colors.white));
@@ -101,20 +193,43 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                       children: [
                         Icon(LucideIcons.users, size: 48, color: Colors.white.withOpacity(0.1)),
                         const SizedBox(height: 16),
-                        Text('No models found', style: TextStyle(color: Colors.white.withOpacity(0.3))),
+                        Text('No models match your filters', style: TextStyle(color: Colors.white.withOpacity(0.3))),
+                        if (_selectedCategories.isNotEmpty || _selectedLocation != null) 
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedCategories = [];
+                                _selectedLocation = null;
+                                _ageRange = const RangeValues(18, 45);
+                              });
+                            },
+                            child: const Text('Clear Filters', style: TextStyle(color: Color(0xFF818CF8))),
+                          ),
                       ],
                     ),
                   );
                 }
 
-                final models = snapshot.data!.docs
+                var models = snapshot.data!.docs
                     .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
                     .toList();
+
+                // Client-side text search if needed (Firestore doesn't do full-text natively well)
+                if (_searchController.text.isNotEmpty) {
+                  models = models.where((m) => m.name.toLowerCase().contains(_searchController.text.toLowerCase())).toList();
+                }
+
+                // Client-side sorting
+                if (_sortOption == 'Newest') {
+                  models.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+                } else if (_sortOption == 'Highest Rated') {
+                  models.sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
+                }
 
                 return GridView.builder(
                   padding: const EdgeInsets.all(24),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1, // Flashcards look better as full-width list items or large cards
+                    crossAxisCount: 1, 
                     mainAxisSpacing: 24,
                     childAspectRatio: 0.85,
                   ),
@@ -132,20 +247,23 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
     );
   }
 
-  Widget _quickFilter(String label, {bool isSelected = false}) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.white : Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.black : Colors.white60,
-          fontSize: 13,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  Widget _quickFilter(String label, {bool isSelected = false, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.black : Colors.white60,
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );
@@ -189,7 +307,40 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              _filterSection('Category', ['Fashion', 'Commercial', 'Editorial', 'Runway', 'Fitness']),
+              _filterSection('Category', ['Fashion', 'Commercial', 'Editorial', 'Runway', 'Fitness'], isMulti: true),
+              
+              const Text(
+                'Age Range',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              StatefulBuilder(
+                builder: (context, setSheetState) => Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('${_ageRange.start.toInt()} years', style: const TextStyle(color: Color(0xFF818CF8), fontSize: 13)),
+                        Text('${_ageRange.end.toInt()} years', style: const TextStyle(color: Color(0xFF818CF8), fontSize: 13)),
+                      ],
+                    ),
+                    RangeSlider(
+                      values: _ageRange,
+                      min: 16,
+                      max: 65,
+                      divisions: 49,
+                      activeColor: const Color(0xFF6366F1),
+                      inactiveColor: Colors.white10,
+                      onChanged: (values) {
+                        setSheetState(() => _ageRange = values);
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
               _filterSection('Location', ['Miami', 'New York', 'Los Angeles', 'London', 'Paris']),
               _filterSection('Skin Tone', ['Fair', 'Medium', 'Olive', 'Dark', 'Deep']),
               _filterSection('Eye Color', ['Brown', 'Blue', 'Green', 'Hazel', 'Grey']),
@@ -216,7 +367,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
     );
   }
 
-  Widget _filterSection(String title, List<String> options) {
+  Widget _filterSection(String title, List<String> options, {bool isMulti = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -228,18 +379,40 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: options.map((opt) => _multiSelectChip(opt)).toList(),
+          children: options.map((opt) {
+            bool isSelected;
+            if (title == 'Location') {
+              isSelected = _selectedLocation == opt;
+            } else {
+              isSelected = _selectedCategories.contains(opt);
+            }
+            return _multiSelectChip(opt, isSelected, () {
+              setState(() {
+                if (title == 'Location') {
+                  _selectedLocation = (_selectedLocation == opt) ? null : opt;
+                } else {
+                  if (_selectedCategories.contains(opt)) {
+                    _selectedCategories.remove(opt);
+                  } else {
+                    _selectedCategories.add(opt);
+                  }
+                }
+              });
+            });
+          }).toList(),
         ),
         const SizedBox(height: 24),
       ],
     );
   }
 
-  Widget _multiSelectChip(String label) {
-    bool isSelected = false; // Mock state
+  Widget _multiSelectChip(String label, bool isSelected, VoidCallback onTap) {
     return StatefulBuilder(
-      builder: (context, setState) => GestureDetector(
-        onTap: () => setState(() => isSelected = !isSelected),
+      builder: (context, setSheetState) => GestureDetector(
+        onTap: () {
+          onTap();
+          setSheetState(() {});
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
@@ -367,15 +540,22 @@ class _ModelFlashcard extends StatelessWidget {
                               model.location ?? 'Global',
                               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13),
                             ),
+                            if (model.age != null) ...[
+                              const SizedBox(width: 12),
+                              Text(
+                                '${model.age} yrs',
+                                style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13),
+                              ),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 4,
-                          children: [
-                            _miniChip(model.category ?? 'Fashion'),
-                            _miniChip('Editorial'),
-                          ],
+                          runSpacing: 4,
+                          children: (model.categories != null && model.categories!.isNotEmpty)
+                            ? model.categories!.take(2).map((c) => _miniChip(c)).toList()
+                            : [_miniChip('Fashion')],
                         ),
                       ],
                     ),
