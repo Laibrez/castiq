@@ -7,7 +7,8 @@ import 'package:path/path.dart' as path;
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 class IdVerificationScreen extends StatefulWidget {
   final String userType;
 
@@ -42,12 +43,29 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
       final String fileName = path.basename(image.path);
       final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final String userId = _authService.currentUser?.uid ?? 'temp_user_id';
-      final String storagePath = 'model_verification/$userId/${type}_$timestamp$fileName';
-
-      final Reference ref = FirebaseStorage.instance.ref().child(storagePath);
-      final UploadTask uploadTask = ref.putFile(File(image.path));
-      final TaskSnapshot snapshot = await uploadTask;
-      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
+      CloudinaryResponse response;
+      if (kIsWeb) {
+         final bytes = await image.readAsBytes();
+         response = await cloudinary.uploadFile(
+           CloudinaryFile.fromBytesData(
+             bytes,
+             identifier: '${type}_$timestamp',
+             folder: 'model_verification/$userId',
+           ),
+         );
+      } else {
+         response = await cloudinary.uploadFile(
+           CloudinaryFile.fromFile(
+             image.path, 
+             identifier: '${type}_$timestamp',
+             folder: 'model_verification/$userId',
+           ),
+         );
+      }
+      
+      final String downloadUrl = response.secureUrl;
 
       setState(() {
         _isLoading = false;

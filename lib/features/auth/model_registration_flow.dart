@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
@@ -81,15 +82,30 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
       final String fileName = path.basename(image.path);
       final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'temp_${DateTime.now().millisecondsSinceEpoch}';
-      final String storagePath = 'model_verification/$userId/id_$timestamp$fileName';
-
-      final Reference ref = FirebaseStorage.instance.ref().child(storagePath);
-      final UploadTask uploadTask = ref.putFile(File(image.path));
-      final TaskSnapshot snapshot = await uploadTask;
-      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
+      CloudinaryResponse response;
+      if (kIsWeb) {
+         final bytes = await image.readAsBytes();
+         response = await cloudinary.uploadFile(
+           CloudinaryFile.fromBytesData(
+             bytes,
+             identifier: 'id_$timestamp',
+             folder: 'model_verification/$userId',
+           ),
+         );
+      } else {
+         response = await cloudinary.uploadFile(
+           CloudinaryFile.fromFile(
+             image.path, 
+             identifier: 'id_$timestamp',
+             folder: 'model_verification/$userId',
+           ),
+         );
+      }
 
       setState(() {
-        _idDocumentUrl = downloadUrl;
+        _idDocumentUrl = response.secureUrl;
         _isUploadingId = false;
       });
     } catch (e) {
@@ -118,15 +134,30 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
       final String fileName = path.basename(image.path);
       final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'temp_${DateTime.now().millisecondsSinceEpoch}';
-      final String storagePath = 'model_verification/$userId/selfie_$timestamp$fileName';
-
-      final Reference ref = FirebaseStorage.instance.ref().child(storagePath);
-      final UploadTask uploadTask = ref.putFile(File(image.path));
-      final TaskSnapshot snapshot = await uploadTask;
-      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      
+      final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
+      CloudinaryResponse response;
+      if (kIsWeb) {
+         final bytes = await image.readAsBytes();
+         response = await cloudinary.uploadFile(
+           CloudinaryFile.fromBytesData(
+             bytes,
+             identifier: 'selfie_$timestamp',
+             folder: 'model_verification/$userId',
+           ),
+         );
+      } else {
+         response = await cloudinary.uploadFile(
+           CloudinaryFile.fromFile(
+             image.path, 
+             identifier: 'selfie_$timestamp',
+             folder: 'model_verification/$userId',
+           ),
+         );
+      }
 
       setState(() {
-        _selfieUrl = downloadUrl;
+        _selfieUrl = response.secureUrl;
         _isUploadingSelfie = false;
       });
     } catch (e) {

@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/auth/registration_success_screen.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
 
 class BrandRegistrationFlow extends StatefulWidget {
   const BrandRegistrationFlow({super.key});
@@ -93,32 +94,44 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
       if (user == null) throw Exception("Failed to create user");
 
       // 2. Upload Profile/Docs
+      // 2. Upload Profile/Docs - CLOUDINARY
       String? proofUrl;
       if (_proofOfAddressFile != null) {
           final ext = _proofOfAddressFile!.extension ?? 'jpg';
-          final path = 'business_docs/${user.uid}/proof_of_address.$ext';
-          final ref = FirebaseStorage.instance.ref().child(path);
+          final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
           
-          final metadata = SettableMetadata(contentType: 'application/$ext'); // Simple content type guess
-
-          print('Uploading proof of address...');
+          print('Uploading proof of address to Cloudinary...');
           if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading documents...'), duration: Duration(milliseconds: 500)));
-          if (kIsWeb) {
-             if (_proofOfAddressFile!.bytes != null) {
-                 await ref.putData(_proofOfAddressFile!.bytes!, metadata);
-             } else {
-                 print('Error: Web file bytes are null');
-             }
-          } else {
-             if (_proofOfAddressFile!.path != null) {
-                 await ref.putFile(File(_proofOfAddressFile!.path!), metadata);
-             }
-          }
+          
           try {
-            proofUrl = await ref.getDownloadURL();
+             CloudinaryResponse response;
+             if (_proofOfAddressFile!.bytes != null) {
+                 response = await cloudinary.uploadFile(
+                   CloudinaryFile.fromBytesData(
+                     _proofOfAddressFile!.bytes!,
+                     identifier: 'proof_${user.uid}',
+                     folder: 'business_docs/${user.uid}',
+                     resourceType: CloudinaryResourceType.Auto, 
+                   ),
+                 );
+             } else if (_proofOfAddressFile!.path != null) {
+                 response = await cloudinary.uploadFile(
+                   CloudinaryFile.fromFile(
+                     _proofOfAddressFile!.path!,
+                     identifier: 'proof_${user.uid}',
+                     folder: 'business_docs/${user.uid}',
+                     resourceType: CloudinaryResourceType.Auto,
+                   ),
+                 );
+             } else {
+                 throw Exception('No file data available');
+             }
+             proofUrl = response.secureUrl;
+             print('Upload successful: $proofUrl');
           } catch (e) {
-            print('Proof upload/url failed (might be expected if upload failed): $e');
-            // Continues without proof URL if failed
+             print('Proof upload failed: $e');
+             // Consider if this should blocking or not. For now logging errors.
+             if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Proof upload failed: $e')));
           }
       }
 

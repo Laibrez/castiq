@@ -81,6 +81,33 @@ class RoleSelectionScreen extends StatelessWidget {
                   }
                 },
               ),
+              const SizedBox(height: 32),
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => RoleSelectionScreen(isLogin: !isLogin)),
+                    );
+                  },
+                  child: RichText(
+                    text: TextSpan(
+                      text: isLogin ? "Don't have an account? " : "Already have an account? ",
+                      style: const TextStyle(color: Colors.white54, fontSize: 16),
+                      children: [
+                        TextSpan(
+                          text: isLogin ? "Join Now" : "Log In",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 48),
             ],
           ),
