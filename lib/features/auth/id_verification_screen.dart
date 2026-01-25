@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as path;
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,22 +18,80 @@ class IdVerificationScreen extends StatefulWidget {
 }
 
 class _IdVerificationScreenState extends State<IdVerificationScreen> {
-  bool _frontUploaded = false;
-  bool _backUploaded = false;
+  bool _idUploaded = false;
   bool _selfieUploaded = false;
   bool _isLoading = false;
+  String? _idDocumentUrl;
+  String? _selfieUrl;
   final AuthService _authService = AuthService();
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickAndUploadImage(String type) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image == null) return;
+
+      setState(() => _isLoading = true);
+
+      final String fileName = path.basename(image.path);
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final String userId = _authService.currentUser?.uid ?? 'temp_user_id';
+      final String storagePath = 'model_verification/$userId/${type}_$timestamp$fileName';
+
+      final Reference ref = FirebaseStorage.instance.ref().child(storagePath);
+      final UploadTask uploadTask = ref.putFile(File(image.path));
+      final TaskSnapshot snapshot = await uploadTask;
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      setState(() {
+        _isLoading = false;
+        if (type == 'id') {
+          _idDocumentUrl = downloadUrl;
+          _idUploaded = true;
+        } else {
+          _selfieUrl = downloadUrl;
+          _selfieUploaded = true;
+        }
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error uploading: ${e.toString()}')),
+        );
+      }
+    }
+  }
 
   Future<void> _handleSubmit() async {
+    if (!_idUploaded || !_selfieUploaded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please upload both ID and selfie')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final user = _authService.currentUser;
       if (user == null) throw 'User not found';
 
+      Map<String, dynamic> updateData = {
+        'isVerified': true,
+        'idDocumentUrl': _idDocumentUrl,
+        'selfieUrl': _selfieUrl,
+      };
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
-          .update({'isVerified': true});
+          .update(updateData);
 
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -39,9 +101,11 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to submit verification: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to submit verification: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -50,70 +114,162 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          'ID Verification',
-          style: TextStyle(fontWeight: FontWeight.w600),
+        backgroundColor: Colors.black,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Step 3 of 10',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 4),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: 3 / 10,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                  minHeight: 6,
+                ),
+              ),
+            ],
+          ),
         ),
+        leadingWidth: 120,
+        title: const Text(
+          'Verify Identity',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
+        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Verify your identity.',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Verify Your Identity',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'To ensure the safety of our community, we need to verify your identity. Please upload a valid government-issued ID.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
+                const SizedBox(height: 12),
+                const Text(
+                  'Upload your ID and a selfie to verify you are who you say you are',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              _UploadCard(
-                title: 'Front of ID',
-                isUploaded: _frontUploaded,
-                onTap: () {
-                  setState(() => _frontUploaded = !_frontUploaded);
-                },
-              ),
-              const SizedBox(height: 16),
-              _UploadCard(
-                title: 'Back of ID',
-                isUploaded: _backUploaded,
-                onTap: () {
-                  setState(() => _backUploaded = !_backUploaded);
-                },
-              ),
-              const SizedBox(height: 16),
-              _UploadCard(
-                title: 'Selfie with ID',
-                isUploaded: _selfieUploaded,
-                onTap: () {
-                  setState(() => _selfieUploaded = !_selfieUploaded);
-                },
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: (_frontUploaded && _backUploaded && _selfieUploaded && !_isLoading)
-                      ? _handleSubmit
-                      : null,
-                  child: _isLoading 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('Submit & Continue'),
+                const SizedBox(height: 32),
+                // Two side-by-side upload sections
+                Row(
+                  children: [
+                    Expanded(
+                      child: _UploadSection(
+                        title: 'Government ID',
+                        icon: Icons.credit_card,
+                        buttonText: 'Upload ID',
+                        description: 'Passport, Driver\'s License, or National ID',
+                        isUploaded: _idUploaded,
+                        onTap: () => _pickAndUploadImage('id'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _UploadSection(
+                        title: 'Selfie with ID',
+                        icon: Icons.camera_alt,
+                        buttonText: 'Upload Selfie',
+                        description: 'Hold your ID next to your face',
+                        isUploaded: _selfieUploaded,
+                        onTap: () => _pickAndUploadImage('selfie'),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                // Informational box
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Why do we need this?',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Identity verification helps keep our community safe and ensures brands can trust the models they work with.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: (_idUploaded && _selfieUploaded && !_isLoading)
+                        ? _handleSubmit
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: const Color(0xFF6366F1),
+                      disabledBackgroundColor: Colors.grey[800],
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text(
+                            'Continue',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -121,65 +277,86 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
   }
 }
 
-class _UploadCard extends StatelessWidget {
+class _UploadSection extends StatelessWidget {
   final String title;
+  final IconData icon;
+  final String buttonText;
+  final String description;
   final bool isUploaded;
   final VoidCallback onTap;
 
-  const _UploadCard({
+  const _UploadSection({
     required this.title,
+    required this.icon,
+    required this.buttonText,
+    required this.description,
     required this.isUploaded,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isUploaded ? Colors.white : Colors.grey,
-            width: isUploaded ? 2 : 1,
+            color: isUploaded ? Colors.green : Colors.white24,
+            width: 2,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: isUploaded ? Colors.white.withOpacity(0.1) : Colors.black,
+          color: Colors.transparent,
         ),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isUploaded ? Colors.white : Colors.grey[800],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                isUploaded ? LucideIcons.check : LucideIcons.camera,
-                color: isUploaded ? Colors.black : Colors.white70,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isUploaded ? Colors.white : Colors.white70,
+                color: Colors.white,
               ),
             ),
-            const Spacer(),
-            if (isUploaded)
-              const Text(
-                'Uploaded',
+            const SizedBox(height: 16),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 40,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isUploaded ? Colors.green : Colors.white24,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                isUploaded ? 'Uploaded' : buttonText,
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.green,
+                  color: Colors.white,
                   fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
               ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.white54,
+              ),
+            ),
           ],
         ),
       ),

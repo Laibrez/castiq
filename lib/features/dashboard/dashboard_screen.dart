@@ -18,6 +18,8 @@ import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/features/brands/brand_profile_screen.dart';
 import 'package:flutter_application_1/features/jobs/job_offers_screen.dart';
 import 'package:flutter_application_1/features/payments/earnings_screen.dart';
+import 'package:flutter_application_1/features/admin/admin_brand_applications_screen.dart';
+import 'package:flutter_application_1/features/admin/admin_dashboard_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String userType;
@@ -181,6 +183,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+              },
+            ),
+            // Admin section (only show for admin users - you can add role check)
+            ListTile(
+              leading: const Icon(LucideIcons.shield),
+              title: const Text('Admin Dashboard'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.building2),
+              title: const Text('Admin - Brand Applications'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminBrandApplicationsScreen()),
+                );
               },
             ),
             ListTile(
