@@ -23,7 +23,6 @@ class UserModel {
   final String? portfolioVideo;
   final List<String>? portfolioImages;
   final String? zCardUrl;
-  final String? zCardUrl;
   final String? proofOfAddressUrl;
   final String? phone;
   final List<Map<String, dynamic>>? socialMedia;
@@ -53,7 +52,6 @@ class UserModel {
     this.reviewCount,
     this.portfolioVideo,
     this.portfolioImages,
-    this.zCardUrl,
     this.zCardUrl,
     this.proofOfAddressUrl,
     this.phone,

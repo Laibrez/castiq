@@ -33,7 +33,6 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
   final _addressCountryController = TextEditingController();
   final _taxIdController = TextEditingController();
   final _websiteController = TextEditingController();
-  final _websiteController = TextEditingController();
   // removed simple _socialController in favor of list
   final _phoneNumberController = TextEditingController();
   List<Map<String, String>> _socialMediaLinks = [];
@@ -220,8 +219,6 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
           ),
           _Step5OnlinePresence(
             nextStep: _nextStep,
-          _Step5OnlinePresence(
-            nextStep: _nextStep,
             websiteController: _websiteController,
             socialLinks: _socialMediaLinks,
             onLinksChanged: (links) => setState(() => _socialMediaLinks = links),
@@ -240,11 +237,7 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
             country: _countryController.text,
             address: '${_addressController.text}, ${_addressCountryController.text}',
             taxId: _taxIdController.text,
-            email: _emailController.text,
-            country: _countryController.text,
-            address: '${_addressController.text}, ${_addressCountryController.text}',
             phone: _phoneNumberController.text,
-            taxId: _taxIdController.text,
             repName: _repNameController.text,
             socialLinks: _socialMediaLinks,
             proofFile: _proofOfAddressFile,
