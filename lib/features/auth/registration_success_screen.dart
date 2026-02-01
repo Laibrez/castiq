@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/auth/onboarding_screen.dart';
+import 'package:flutter_application_1/features/auth/auth_wrapper.dart';
 
 class RegistrationSuccessScreen extends StatelessWidget {
   final String message;
@@ -60,7 +61,7 @@ class RegistrationSuccessScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+                      MaterialPageRoute(builder: (context) => const AuthWrapper()),
                       (route) => false,
                     );
                   },

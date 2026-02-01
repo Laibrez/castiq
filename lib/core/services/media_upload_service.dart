@@ -1,12 +1,13 @@
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MediaUploadService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ImagePicker _picker = ImagePicker();
+  final CloudinaryPublic _cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
 
   // Pick a video from gallery or camera
   Future<XFile?> pickVideo({bool fromCamera = false}) async {
@@ -36,16 +37,27 @@ class MediaUploadService {
     required Function(double) onProgress,
   }) async {
     try {
-      final ref = _storage.ref().child('portfolios/$userId/video_${DateTime.now().millisecondsSinceEpoch}.mp4');
-      final uploadTask = ref.putFile(videoFile);
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      
+      // Note: pure cloudinary_public doesn't emit progress in the same granular way as Firebase
+      // We will simulate completion for now or use the Future completion.
+      // Since specific progress hooks might not be available in this package version without deeper config,
+      // we'll just await the upload.
+      
+      onProgress(0.1); // Started
+      
+      CloudinaryResponse response = await _cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          videoFile.path,
+          identifier: 'video_$timestamp',
+          folder: 'portfolios/$userId',
+          resourceType: CloudinaryResourceType.Video,
+        ),
+      );
+      
+      onProgress(1.0); // Completed
 
-      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-        final progress = snapshot.bytesTransferred / snapshot.totalBytes;
-        onProgress(progress);
-      });
-
-      final snapshot = await uploadTask;
-      final downloadUrl = await snapshot.ref.getDownloadURL();
+      final downloadUrl = response.secureUrl;
 
       // Update Firestore
       await _firestore.collection('users').doc(userId).update({
@@ -54,8 +66,7 @@ class MediaUploadService {
 
       return downloadUrl;
     } catch (e) {
-    } catch (e) {
-      // Handle error
+      print('Error uploading video: $e');
       return null;
     }
   }
@@ -70,19 +81,27 @@ class MediaUploadService {
 
     for (int i = 0; i < imageFiles.length; i++) {
       try {
-        final ref = _storage.ref().child('portfolios/$userId/image_${DateTime.now().millisecondsSinceEpoch}_$i.jpg');
-        final uploadTask = ref.putFile(imageFiles[i]);
-        final snapshot = await uploadTask;
-        final downloadUrl = await snapshot.ref.getDownloadURL();
-        downloadUrls.add(downloadUrl);
+        final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+        
+        CloudinaryResponse response = await _cloudinary.uploadFile(
+          CloudinaryFile.fromFile(
+            imageFiles[i].path,
+            identifier: 'image_${timestamp}_$i',
+            folder: 'portfolios/$userId',
+          ),
+        );
+        
+        downloadUrls.add(response.secureUrl);
         onProgress(i + 1, imageFiles.length);
       } catch (e) {
-      } catch (e) {
+        print('Error uploading image $i: $e');
         // Continue with other images
       }
     }
 
     // Update Firestore with all image URLs
+    // Note: This appends to the array. If the user wants to replace, logic might need adjustment elsewhere.
+    // The previous implementation used arrayUnion, which appends.
     if (downloadUrls.isNotEmpty) {
       await _firestore.collection('users').doc(userId).update({
         'portfolioImages': FieldValue.arrayUnion(downloadUrls),
@@ -100,31 +119,34 @@ class MediaUploadService {
     required Function(double) onProgress,
   }) async {
     try {
-      final ref = _storage.ref().child('$folder/$userId/image_${DateTime.now().millisecondsSinceEpoch}.jpg');
-      final uploadTask = ref.putFile(imageFile);
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      
+      onProgress(0.1); 
 
-      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-        final progress = snapshot.bytesTransferred / snapshot.totalBytes;
-        onProgress(progress);
-      });
+      CloudinaryResponse response = await _cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          imageFile.path,
+          identifier: 'image_$timestamp',
+          folder: '$folder/$userId',
+        ),
+      );
 
-      final snapshot = await uploadTask;
-      return await snapshot.ref.getDownloadURL();
+      onProgress(1.0);
+      
+      return response.secureUrl;
     } catch (e) {
-    } catch (e) {
-      // Handle error
+      print('Error uploading single image: $e');
       return null;
     }
   }
 
   // Delete a media file from storage
   Future<bool> deleteMedia(String url) async {
-    try {
-      await _storage.refFromURL(url).delete();
-      return true;
-    } catch (e) {
-      print('Error deleting media: $e');
-      return false;
-    }
+    // Cloudinary unsigned deletion from client side safely is not typically supported 
+    // without using a signature generated by a backend or using the Admin API (bad practice on client).
+    // For now, we will return false or just silently fail as "not supported yet".
+    // To properly support this, we would need a Cloud Function or backend endpoint.
+    print('Deleting Cloudinary media from client is not securely supported without backend signature.');
+    return false; 
   }
 }

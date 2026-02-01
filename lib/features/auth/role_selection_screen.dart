@@ -21,97 +21,109 @@ class RoleSelectionScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              Text(
-                isLogin ? 'Welcome Back' : 'Join Castiq',
-                style: GoogleFonts.tinos(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: -1,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                isLogin ? 'Log in to your account.' : 'How would you like to use the platform?',
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.white70,
-                ),
-              ),
-              const Spacer(),
-              _RoleButton(
-                title: isLogin ? "Login as Model" : "I'm a Model",
-                icon: LucideIcons.user,
-                onTap: () {
-                  if (isLogin) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen(userType: 'model')),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ModelRegistrationFlow()),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              _RoleButton(
-                title: isLogin ? "Login as Brand Manager" : "I'm a Brand / Production Manager",
-                icon: LucideIcons.briefcase,
-                onTap: () {
-                  if (isLogin) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen(userType: 'brand')),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const BrandRegistrationFlow()),
-                    );
-                  }
-                },
-              ),
-              const SizedBox(height: 32),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => RoleSelectionScreen(isLogin: !isLogin)),
-                    );
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      text: isLogin ? "Don't have an account? " : "Already have an account? ",
-                      style: const TextStyle(color: Colors.white54, fontSize: 16),
-                      children: [
-                        TextSpan(
-                          text: isLogin ? "Join Now" : "Log In",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 40),
+                      Text(
+                        isLogin ? 'Welcome Back' : 'Join Castiq',
+                        style: GoogleFonts.tinos(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        isLogin ? 'Log in to your account.' : 'How would you like to use the platform?',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const Spacer(),
+                      _RoleButton(
+                        title: isLogin ? "Login as Model" : "I'm a Model",
+                        icon: LucideIcons.user,
+                        onTap: () {
+                          if (isLogin) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => LoginScreen(userType: 'model')),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ModelRegistrationFlow()),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _RoleButton(
+                        title: isLogin ? "Login as Brand Manager" : "I'm a Brand / Production Manager",
+                        icon: LucideIcons.briefcase,
+                        onTap: () {
+                          if (isLogin) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => LoginScreen(userType: 'brand')),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const BrandRegistrationFlow()),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 32),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => RoleSelectionScreen(isLogin: !isLogin)),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: RichText(
+                              text: TextSpan(
+                                text: isLogin ? "Don't have an account? " : "Already have an account? ",
+                                style: const TextStyle(color: Colors.white70, fontSize: 16), // Increased contrast
+                                children: [
+                                  TextSpan(
+                                    text: isLogin ? "Join Now" : "Log In",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 48),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 48),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
