@@ -39,6 +39,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
   List<String> _selectedCategories = [];
   List<String> _portfolioImages = [];
   String? _portfolioVideo;
+  String? _profileImageUrl;
 
   final List<String> _availableCategories = [
     'Fashion', 'Commercial', 'Editorial', 'Runway', 'Fitness', 'Lifestyle', 'Beauty', 'Plus Size'
@@ -63,6 +64,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
     _selectedCategories = List<String>.from(widget.userData.categories ?? []);
     _portfolioImages = List<String>.from(widget.userData.portfolioImages ?? widget.userData.portfolio ?? []);
     _portfolioVideo = widget.userData.portfolioVideo;
+    _profileImageUrl = widget.userData.profileImageUrl;
   }
 
   @override
@@ -112,6 +114,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
         'stats': stats,
         'portfolioImages': _portfolioImages,
         'portfolioVideo': _portfolioVideo,
+        'profileImageUrl': _profileImageUrl,
         'portfolio': _portfolioImages, // Keep backward compatibility
       });
 
@@ -159,11 +162,10 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
       _saveStatus = 'Uploading images...';
     });
 
-    final files = images.map((xfile) => File(xfile.path)).toList();
-
+    // Pass XFile directly now, DO NOT convert to File(path) for Web support
     final urls = await _uploadService.uploadMultipleImages(
       userId: userId,
-      imageFiles: files,
+      imageFiles: images, // Passing List<XFile>
       onProgress: (completed, total) {
         setState(() => _saveStatus = 'Uploading image $completed of $total...');
       },
@@ -174,6 +176,41 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
       _isSaving = false;
       _saveStatus = '${urls.length} images added!';
     });
+  }
+
+  Future<void> _changeProfileImage() async {
+    final image = await _uploadService.pickImage();
+    if (image == null) return;
+
+    final userId = _authService.currentUser?.uid;
+    if (userId == null) return;
+
+    setState(() {
+      _isSaving = true;
+      _saveStatus = 'Uploading profile picture...';
+    });
+
+    final url = await _uploadService.uploadSingleImage(
+      userId: userId,
+      imageFile: image,
+      folder: 'profiles',
+      onProgress: (progress) {
+        setState(() => _saveStatus = 'Uploading profile picture... ${(progress * 100).toInt()}%');
+      },
+    );
+
+    if (url != null) {
+      setState(() {
+        _profileImageUrl = url;
+        _isSaving = false;
+        _saveStatus = 'Profile picture updated!';
+      });
+    } else {
+      setState(() {
+        _isSaving = false;
+        _saveStatus = 'Failed to upload profile picture';
+      });
+    }
   }
 
   Future<void> _addVideo() async {
@@ -188,9 +225,10 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
       _saveStatus = 'Uploading video...';
     });
 
+    // Pass XFile directly
     final url = await _uploadService.uploadVideo(
       userId: userId,
-      videoFile: File(video.path),
+      videoFile: video, 
       onProgress: (progress) {
         setState(() => _saveStatus = 'Uploading video... ${(progress * 100).toInt()}%');
       },
@@ -260,7 +298,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                 padding: const EdgeInsets.all(16),
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: _saveStatus.contains('success') || _saveStatus.contains('added') || _saveStatus.contains('uploaded')
+                  color: _saveStatus.contains('success') || _saveStatus.contains('added') || _saveStatus.contains('uploaded') || _saveStatus.contains('updated')
                       ? Colors.green.withOpacity(0.1)
                       : const Color(0xFF6366F1).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -284,6 +322,48 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                   ],
                 ),
               ),
+
+             // Profile Picture Section
+            Center(
+              child: Stack(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                      image: _profileImageUrl != null
+                          ? DecorationImage(
+                              image: NetworkImage(_profileImageUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: _profileImageUrl == null
+                        ? const Icon(LucideIcons.user, size: 40, color: Colors.white54)
+                        : null,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: GestureDetector(
+                      onTap: _isSaving ? null : _changeProfileImage,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF818CF8),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black, width: 2),
+                        ),
+                        child: const Icon(LucideIcons.camera, size: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
 
             // Basic Info Section
             _sectionTitle('Basic Information'),
@@ -394,6 +474,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.7),
                               shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
                             ),
                             child: const Icon(LucideIcons.x, size: 14, color: Colors.white),
                           ),

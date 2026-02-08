@@ -33,27 +33,35 @@ class MediaUploadService {
   // Upload video with progress callback
   Future<String?> uploadVideo({
     required String userId,
-    required File videoFile,
+    required XFile videoFile,
     required Function(double) onProgress,
   }) async {
     try {
       final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       
-      // Note: pure cloudinary_public doesn't emit progress in the same granular way as Firebase
-      // We will simulate completion for now or use the Future completion.
-      // Since specific progress hooks might not be available in this package version without deeper config,
-      // we'll just await the upload.
-      
       onProgress(0.1); // Started
       
-      CloudinaryResponse response = await _cloudinary.uploadFile(
-        CloudinaryFile.fromFile(
-          videoFile.path,
-          identifier: 'video_$timestamp',
-          folder: 'portfolios/$userId',
-          resourceType: CloudinaryResourceType.Video,
-        ),
-      );
+      CloudinaryResponse response;
+      if (kIsWeb) {
+        final bytes = await videoFile.readAsBytes();
+        response = await _cloudinary.uploadFile(
+          CloudinaryFile.fromBytesData(
+            bytes,
+            identifier: 'video_$timestamp',
+            folder: 'portfolios/$userId',
+            resourceType: CloudinaryResourceType.Video,
+          ),
+        );
+      } else {
+        response = await _cloudinary.uploadFile(
+          CloudinaryFile.fromFile(
+            videoFile.path,
+            identifier: 'video_$timestamp',
+            folder: 'portfolios/$userId',
+            resourceType: CloudinaryResourceType.Video,
+          ),
+        );
+      }
       
       onProgress(1.0); // Completed
 
@@ -74,7 +82,7 @@ class MediaUploadService {
   // Upload multiple images with progress callback
   Future<List<String>> uploadMultipleImages({
     required String userId,
-    required List<File> imageFiles,
+    required List<XFile> imageFiles,
     required Function(int completed, int total) onProgress,
   }) async {
     List<String> downloadUrls = [];
@@ -83,13 +91,25 @@ class MediaUploadService {
       try {
         final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
         
-        CloudinaryResponse response = await _cloudinary.uploadFile(
-          CloudinaryFile.fromFile(
-            imageFiles[i].path,
-            identifier: 'image_${timestamp}_$i',
-            folder: 'portfolios/$userId',
-          ),
-        );
+        CloudinaryResponse response;
+        if (kIsWeb) {
+          final bytes = await imageFiles[i].readAsBytes();
+          response = await _cloudinary.uploadFile(
+            CloudinaryFile.fromBytesData(
+              bytes,
+              identifier: 'image_${timestamp}_$i',
+              folder: 'portfolios/$userId',
+            ),
+          );
+        } else {
+          response = await _cloudinary.uploadFile(
+            CloudinaryFile.fromFile(
+              imageFiles[i].path,
+              identifier: 'image_${timestamp}_$i',
+              folder: 'portfolios/$userId',
+            ),
+          );
+        }
         
         downloadUrls.add(response.secureUrl);
         onProgress(i + 1, imageFiles.length);
@@ -100,8 +120,6 @@ class MediaUploadService {
     }
 
     // Update Firestore with all image URLs
-    // Note: This appends to the array. If the user wants to replace, logic might need adjustment elsewhere.
-    // The previous implementation used arrayUnion, which appends.
     if (downloadUrls.isNotEmpty) {
       await _firestore.collection('users').doc(userId).update({
         'portfolioImages': FieldValue.arrayUnion(downloadUrls),
@@ -114,7 +132,7 @@ class MediaUploadService {
   // Upload a single image (for profile photo, etc.)
   Future<String?> uploadSingleImage({
     required String userId,
-    required File imageFile,
+    required XFile imageFile,
     required String folder,
     required Function(double) onProgress,
   }) async {
@@ -123,13 +141,25 @@ class MediaUploadService {
       
       onProgress(0.1); 
 
-      CloudinaryResponse response = await _cloudinary.uploadFile(
-        CloudinaryFile.fromFile(
-          imageFile.path,
-          identifier: 'image_$timestamp',
-          folder: '$folder/$userId',
-        ),
-      );
+      CloudinaryResponse response;
+      if (kIsWeb) {
+        final bytes = await imageFile.readAsBytes();
+        response = await _cloudinary.uploadFile(
+          CloudinaryFile.fromBytesData(
+            bytes,
+            identifier: 'image_$timestamp',
+            folder: '$folder/$userId',
+          ),
+        );
+      } else {
+        response = await _cloudinary.uploadFile(
+          CloudinaryFile.fromFile(
+            imageFile.path,
+            identifier: 'image_$timestamp',
+            folder: '$folder/$userId',
+          ),
+        );
+      }
 
       onProgress(1.0);
       

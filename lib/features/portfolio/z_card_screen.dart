@@ -15,7 +15,7 @@ class ZCardScreen extends StatelessWidget {
 
   void _shareZCard(BuildContext context) async {
     final result = await Share.share(
-      'Check out my professional Z-Card on Castiq!\n\n$zCardUrl',
+      'Check out my professional Z-Card on Caztiq!\n\n$zCardUrl',
       subject: '${userData.name} - Z-Card',
     );
 
@@ -202,7 +202,7 @@ class ZCardScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'CASTIQ',
+                                    'CAZTIQ',
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w900,

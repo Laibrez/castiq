@@ -1,4 +1,4 @@
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,7 +39,7 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
 
     final result = await _uploadService.uploadVideo(
       userId: userId,
-      videoFile: File(video.path),
+      videoFile: video,
       onProgress: (progress) {
         setState(() {
           _uploadProgress = progress;
@@ -80,11 +80,9 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
       _uploadStatus = 'Uploading images...';
     });
 
-    final files = images.map((xfile) => File(xfile.path)).toList();
-
     final results = await _uploadService.uploadMultipleImages(
       userId: userId,
-      imageFiles: files,
+      imageFiles: images,
       onProgress: (completed, total) {
         setState(() {
           _completedImages = completed;

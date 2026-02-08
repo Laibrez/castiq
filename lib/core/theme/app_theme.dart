@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
 
@@ -19,44 +20,46 @@ class AppTheme {
       background: Colors.black,
       onBackground: Colors.white,
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontSize: 72,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -2,
-        color: Colors.white,
-        height: 1.1,
-      ),
-      displayMedium: TextStyle(
-        fontSize: 48,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -1,
-        color: Colors.white,
-      ),
-      headlineLarge: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-      titleLarge: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      ),
-      bodyLarge: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w400,
-        color: Color(0xFFB4B4B8),
-        height: 1.6,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 16,
-        color: Color(0xFFB4B4B8),
+    textTheme: GoogleFonts.cormorantGaramondTextTheme(
+      const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 72,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -2,
+          color: Colors.white,
+          height: 1.1,
+        ),
+        displayMedium: TextStyle(
+          fontSize: 48,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -1,
+          color: Colors.white,
+        ),
+        headlineLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w400,
+          color: Color(0xFFB4B4B8),
+          height: 1.6,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 16,
+          color: Color(0xFFB4B4B8),
+        ),
       ),
     ),
     appBarTheme: const AppBarTheme(

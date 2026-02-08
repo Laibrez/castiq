@@ -34,7 +34,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     children: [
                       const SizedBox(height: 40),
                       Text(
-                        isLogin ? 'Welcome Back' : 'Join Castiq',
+                        isLogin ? 'Welcome Back' : 'Join Caztiq',
                         style: GoogleFonts.tinos(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,

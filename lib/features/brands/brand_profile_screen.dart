@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
 import 'package:flutter_application_1/features/jobs/job_detail_screen.dart';
+import 'package:flutter_application_1/features/brands/edit_brand_profile_screen.dart';
 
 class BrandProfileScreen extends StatefulWidget {
   final String? brandId; // Optional: If null, shows the current user's brand profile
@@ -99,7 +100,14 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                           ),
                           if (widget.brandId == null) // Edit button only for own profile
                             IconButton(
-                              onPressed: () {}, // TODO: Implement edit
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditBrandProfileScreen(userData: userData),
+                                  ),
+                                ).then((_) => setState(() {})); // Refresh on return
+                              },
                               icon: const Icon(LucideIcons.edit3, color: Colors.white54, size: 20),
                             ),
                         ],
@@ -114,7 +122,7 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                       _buildSectionTitle('About'),
                       const SizedBox(height: 12),
                       Text(
-                        userData.bio ?? 'A premium brand on Castiq dedicated to finding the worlds top talent for high-end fashion and commercial projects.',
+                        userData.bio ?? 'A premium brand on Caztiq dedicated to finding the worlds top talent for high-end fashion and commercial projects.',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.6),
                           fontSize: 15,

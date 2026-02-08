@@ -117,7 +117,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         case 1: return 'Portfolio';
         case 2: return 'Bookings';
         case 3: return 'Earnings';
-        default: return 'CASTIQ';
+        default: return 'CAZTIQ';
       }
     } else {
       switch (_selectedIndex) {
@@ -126,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         case 2: return 'Jobs';
         case 3: return 'Bookings';
         case 4: return 'Payments';
-        default: return 'CASTIQ';
+        default: return 'CAZTIQ';
       }
     }
   }
@@ -151,7 +151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: const BoxDecoration(color: Colors.black),
               child: Center(
                 child: Text(
-                  'CASTIQ',
+                  'CAZTIQ',
                   style: GoogleFonts.tinos(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

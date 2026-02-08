@@ -21,7 +21,7 @@ class SupportScreen extends StatelessWidget {
           _buildSupportItem(
             icon: LucideIcons.mail,
             title: 'Email Support',
-            subtitle: 'support@castiq.com',
+            subtitle: 'support@caztiq.com',
             onTap: () {},
           ),
           _buildSupportItem(

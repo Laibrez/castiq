@@ -118,7 +118,7 @@ class BrowseTalentScreen extends StatelessWidget {
         backgroundColor: Colors.black,
         elevation: 0,
         title: const Text(
-          'CASTIQ',
+          'CAZTIQ',
           style: TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 2,
@@ -193,7 +193,7 @@ class BrowseTalentScreen extends StatelessWidget {
             ),
           ),
           child: const Text(
-            'Apply to Join Castiq',
+            'Apply to Join Caztiq',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,

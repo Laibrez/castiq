@@ -48,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     OnboardingData(
       title: 'Elevate Your\nProduction',
-      subtitle: 'Join leading brands and agencies who\ntrust Castiq for their talent\nbooking needs.',
+      subtitle: 'Join leading brands and agencies who\ntrust Caztiq for their talent\nbooking needs.',
     ),
   ];
 
