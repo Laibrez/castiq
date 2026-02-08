@@ -36,7 +36,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -107,7 +107,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               labelPadding: const EdgeInsets.symmetric(horizontal: 20),
               tabs: const [
                 Tab(text: 'Overview'),
-                Tab(text: 'Call Sheet'),
+
                 Tab(text: 'Requirements'),
                 Tab(text: 'Payment'),
                 Tab(text: 'Contracts'),
@@ -119,13 +119,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             controller: _tabController,
             children: [
               _buildOverviewTab(booking),
-              _buildCallSheetTab(booking),
+
               _buildRequirementsTab(booking),
               _buildPaymentTab(booking),
               _buildContractsTab(booking),
               ChatDetailScreen(
                 isRequested: false,
-                isLocked: booking.status == 'pending',
+                isLocked: booking.status == 'pending' || booking.status == 'offer_sent',
               ),
             ],
           ),
@@ -168,23 +168,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             ),
           ),
           const SizedBox(height: 32),
-          Text(
-            'Call Sheet',
-            style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          const SizedBox(height: 16),
-          _buildCallSheetFlashcards(booking),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCallSheetTab(BookingModel booking) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          const SizedBox(height: 32),
           _infoCard(
             title: 'Call Times',
             child: Column(
@@ -210,6 +194,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       ),
     );
   }
+
+
 
   Widget _buildRequirementsTab(BookingModel booking) {
     return SingleChildScrollView(
@@ -304,7 +290,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
 
   Widget _buildBottomActions(BookingModel booking) {
     if (widget.userType == 'brand') {
-      if (booking.status == 'signed' || booking.status == 'confirmed') {
+      if (booking.status == 'fully_signed' || booking.status == 'offer_accepted' || booking.status == 'confirmed') {
         return _bottomBar(
           ElevatedButton.icon(
             onPressed: () => _startScanning(booking.id),
@@ -313,7 +299,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             style: _btnStyle(const Color(0xFF6366F1), Colors.white),
           ),
         );
-      } else if (booking.status == 'in_progress' || booking.status == 'awaiting_confirmation') {
+      } else if (booking.status == 'job_in_progress' || booking.status == 'in_progress' || booking.status == 'awaiting_confirmation') {
         return _bottomBar(
           Row(
             children: [
@@ -345,7 +331,36 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       }
     } else {
       // Model actions
-      if (booking.status == 'signed' || booking.status == 'confirmed') {
+      if (booking.status == 'offer_sent' || booking.status == 'pending') {
+         return _bottomBar(
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () { 
+                    // Reject logic 
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    side: const BorderSide(color: Colors.red),
+                  ),
+                  child: const Text('Decline', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => _updateStatus('offer_accepted'),
+                  style: _btnStyle(Colors.green, Colors.white),
+                  child: const Text('Accept Offer', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else if (booking.status == 'fully_signed' || booking.status == 'offer_accepted' || booking.status == 'confirmed') {
         return _bottomBar(
           ElevatedButton.icon(
             onPressed: () => _showPersonalQR(booking),
@@ -354,7 +369,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             style: _btnStyle(const Color(0xFF6366F1), Colors.white),
           ),
         );
-      } else if (booking.status == 'in_progress') {
+      } else if (booking.status == 'job_in_progress' || booking.status == 'in_progress') {
         return _bottomBar(
           ElevatedButton.icon(
             onPressed: () => _completeJobWithPhoto(booking.id),
@@ -468,9 +483,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     final steps = ['Pending', 'Confirmed', 'Active', 'Validation', 'Paid'];
     int currentIdx;
     switch (currentStatus) {
+      case 'offer_sent':
       case 'pending': currentIdx = 0; break;
+      case 'offer_accepted':
+      case 'fully_signed':
       case 'confirmed': 
       case 'signed': currentIdx = 1; break;
+      case 'job_in_progress':
       case 'in_progress': currentIdx = 2; break;
       case 'awaiting_confirmation': currentIdx = 3; break;
       case 'completed':
@@ -776,67 +795,5 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   }
 }
 
-  Widget _buildCallSheetFlashcards(BookingModel booking) {
-    // Mock data if specific call sheet fields aren't in model yet
-    final cards = [
-      {'icon': LucideIcons.clock, 'label': 'Call Time', 'value': '08:00 AM'},
-      {'icon': LucideIcons.camera, 'label': 'Shoot Starts', 'value': '09:00 AM'},
-      {'icon': LucideIcons.mapPin, 'label': 'Location', 'value': booking.location ?? 'TBD'},
-      {'icon': LucideIcons.user, 'label': 'Contact', 'value': 'Sarah J.'},
-    ];
 
-    return SizedBox(
-      height: 140,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: cards.length,
-        itemBuilder: (context, index) {
-          final card = cards[index];
-          return Container(
-            width: 120,
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF161618),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(card['icon'] as IconData, color: const Color(0xFF6366F1), size: 20),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  card['value'] as String,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  card['label'] as String,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
-                    fontSize: 11,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+

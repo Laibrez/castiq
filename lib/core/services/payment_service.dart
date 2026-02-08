@@ -1,16 +1,47 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_application_1/core/models/payment_model.dart';
 
 class PaymentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> createPayment(PaymentModel payment) async {
-    await _firestore.collection('payments').add(payment.toMap());
-    
-    // Update booking status to 'paid'
-    await _firestore.collection('bookings').doc(payment.bookingId).update({
-      'status': 'paid',
-    });
+  Future<void> initPaymentSheet(String bookingId) async {
+    try {
+      // 1. Create payment intent on the server
+      final result = await FirebaseFunctions.instance.httpsCallable('createPaymentIntent').call({
+        'bookingId': bookingId,
+      });
+
+      final data = result.data;
+
+      // 2. Initialize the payment sheet
+      /*
+      // Requires flutter_stripe import
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: data['paymentIntent'],
+          merchantDisplayName: 'Caztiq',
+          customerId: data['customer'],
+          // customerEphemeralKeySecret: data['ephemeralKey'],
+          style: ThemeMode.dark,
+        ),
+      );
+      */
+      // NOTE: Uncomment above when flutter_stripe is fully configured with native setups
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> presentPaymentSheet() async {
+    try {
+      // await Stripe.instance.presentPaymentSheet();
+      // On success, the server webhook should update the booking status.
+      // For now, we can optimistically update or poll.
+    } catch (e) {
+      throw e;
+    }
   }
 
   Stream<List<PaymentModel>> getBrandPayments(String brandId) {

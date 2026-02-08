@@ -1,13 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
 
 class BookingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Create a new booking request
+  // Create a new booking request via Cloud Functions
   Future<void> createBooking(BookingModel booking) async {
     try {
-      await _firestore.collection('bookings').add(booking.toMap());
+      await FirebaseFunctions.instance.httpsCallable('createBooking').call({
+        'modelId': booking.modelId,
+        'jobId': booking.jobId,
+        'rate': booking.rate,
+        'details': {
+          'date': booking.date?.toIso8601String(),
+          'location': booking.location,
+          'hours': booking.hours,
+          'description': booking.description,
+          'cancellationTerms': booking.cancellationTerms,
+          'jobTitle': booking.jobTitle,
+        }
+      });
     } catch (e) {
       throw e;
     }
@@ -40,14 +53,21 @@ class BookingService {
       return snapshot.docs
           .map((doc) => BookingModel.fromMap(doc.data(), doc.id))
           .toList();
-    });
+      });
   }
 
 
   // Update booking status
   Future<void> updateBookingStatus(String bookingId, String status) async {
     try {
-      await _firestore.collection('bookings').doc(bookingId).update({'status': status});
+      if (status == 'offer_accepted') {
+        await FirebaseFunctions.instance.httpsCallable('acceptOffer').call({
+          'bookingId': bookingId,
+        });
+      } else {
+        // Fallback for other statuses not yet migrated or purely client-side for now
+        await _firestore.collection('bookings').doc(bookingId).update({'status': status});
+      }
     } catch (e) {
       throw e;
     }

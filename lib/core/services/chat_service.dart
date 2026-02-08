@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_application_1/core/models/chat_model.dart';
 
 class ChatService {
@@ -90,7 +91,7 @@ class ChatService {
             .toList());
   }
 
-  // Send a message
+  // Send a message via Cloud Function
   Future<bool> sendMessage({
     required String chatId,
     required String senderId,
@@ -99,24 +100,11 @@ class ChatService {
     required String content,
   }) async {
     try {
-      // Add message to subcollection
-      await _firestore.collection('chats').doc(chatId).collection('messages').add({
-        'senderId': senderId,
-        'senderName': senderName,
-        'senderRole': senderRole,
-        'content': content,
-        'timestamp': FieldValue.serverTimestamp(),
-        'isRead': false,
+      await FirebaseFunctions.instance.httpsCallable('sendMessage').call({
+        'chatId': chatId,
+        'text': content,
+        'type': 'text', 
       });
-
-      // Update chat document with last message info
-      await _firestore.collection('chats').doc(chatId).update({
-        'lastMessage': content,
-        'lastMessageTime': FieldValue.serverTimestamp(),
-        'lastMessageSenderId': senderId,
-        'unreadCount': FieldValue.increment(1),
-      });
-
       return true;
     } catch (e) {
       print('Error sending message: $e');
