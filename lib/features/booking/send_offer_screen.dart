@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
@@ -126,7 +127,11 @@ class _SendOfferScreenState extends State<SendOfferScreen> {
       appBar: AppBar(
         title: Text(
           'Send Offer to ${widget.model.name}',
-          style: const TextStyle(fontStyle: FontStyle.italic),
+          style: GoogleFonts.cormorantGaramond(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -138,12 +143,12 @@ class _SendOfferScreenState extends State<SendOfferScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Job Details',
-                style: TextStyle(
+                style: GoogleFonts.cormorantGaramond(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.italic,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 24),

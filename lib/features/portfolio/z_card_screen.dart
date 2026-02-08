@@ -206,7 +206,6 @@ class ZCardScreen extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w900,
-                                      fontStyle: FontStyle.italic,
                                       color: Colors.black.withOpacity(0.1),
                                     ),
                                   ),

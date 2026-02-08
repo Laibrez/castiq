@@ -142,7 +142,6 @@ class JobDetailScreen extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       color: Colors.white,
                       height: 1.1,
-                      fontStyle: FontStyle.italic,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -291,7 +290,6 @@ class JobDetailScreen extends StatelessWidget {
         fontWeight: FontWeight.bold,
         color: Colors.white,
         letterSpacing: 0.3,
-        fontStyle: FontStyle.italic,
       ),
     );
   }

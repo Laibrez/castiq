@@ -159,7 +159,6 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
           'Models',
           style: GoogleFonts.tinos(
             fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic,
             letterSpacing: 1.2,
           ),
         ),

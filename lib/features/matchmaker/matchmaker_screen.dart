@@ -114,7 +114,6 @@ class _JobCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white70,
-                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ],
@@ -144,7 +143,6 @@ class _JobCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic,
             ),
           ),
           const SizedBox(height: 8),

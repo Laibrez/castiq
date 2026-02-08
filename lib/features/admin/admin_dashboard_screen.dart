@@ -269,7 +269,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           'Admin Dashboard',
           style: GoogleFonts.tinos(
             fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic,
             letterSpacing: 1.2,
           ),
         ),

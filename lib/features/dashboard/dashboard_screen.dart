@@ -139,7 +139,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _getPageTitle(),
           style: GoogleFonts.cormorantGaramond(
             fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic,
             letterSpacing: 1.2,
           ),
         ),
@@ -155,7 +154,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: GoogleFonts.cormorantGaramond(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
                     color: Colors.white,
                   ),
                 ),

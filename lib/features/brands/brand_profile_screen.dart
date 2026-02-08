@@ -343,7 +343,6 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Colors.white,
-        fontStyle: FontStyle.italic,
       ),
     );
   }
