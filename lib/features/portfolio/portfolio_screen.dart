@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/features/portfolio/z_card_screen.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
-import 'package:flutter_application_1/core/widgets/media_upload_widget.dart';
 import 'package:flutter_application_1/features/portfolio/edit_portfolio_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -187,8 +186,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    // MEDIA UPLOAD WIDGET
-                    const MediaUploadWidget(),
+                    // MEDIA UPLOAD WIDGET REMOVED PER USER REQUEST
+                    // Uploads are now handled in EditPortfolioScreen
                     const SizedBox(height: 16),
 
                     // ABOUT CARD
