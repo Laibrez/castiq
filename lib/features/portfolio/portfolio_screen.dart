@@ -87,7 +87,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                     Expanded(
                                       child: Text(
                                         userData.name,
-                                        style: GoogleFonts.lora(
+                                        style: GoogleFonts.cormorantGaramond(
                                           fontSize: 28,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.white,
@@ -291,7 +291,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         const SizedBox(height: 32),
                         Text(
                           'Experience History',
-                          style: GoogleFonts.tinos(
+                          style: GoogleFonts.cormorantGaramond(
                             fontSize: 24,
                             fontWeight: FontWeight.w400,
                             color: Colors.white,
@@ -360,7 +360,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     const SizedBox(height: 48),
                     Text(
                       'Featured Work',
-                      style: GoogleFonts.tinos(
+                      style: GoogleFonts.cormorantGaramond(
                         fontSize: 24,
                         fontWeight: FontWeight.w400,
                         color: Colors.white,
@@ -461,7 +461,7 @@ class _Card extends StatelessWidget {
         children: [
           Text(
             title.toUpperCase(),
-            style: GoogleFonts.tinos(
+            style: GoogleFonts.cormorantGaramond(
               fontSize: 12,
               fontWeight: FontWeight.w800,
               color: const Color(0xFF6366F1),

@@ -137,7 +137,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Text(
           _getPageTitle(),
-          style: GoogleFonts.tinos(
+          style: GoogleFonts.cormorantGaramond(
             fontWeight: FontWeight.bold,
             fontStyle: FontStyle.italic,
             letterSpacing: 1.2,
@@ -152,7 +152,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Center(
                 child: Text(
                   'CAZTIQ',
-                  style: GoogleFonts.tinos(
+                  style: GoogleFonts.cormorantGaramond(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic,

@@ -236,7 +236,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                   children: [
                     Text(
                       job['jobName'],
-                      style: GoogleFonts.tinos(
+                      style: GoogleFonts.cormorantGaramond(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

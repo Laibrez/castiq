@@ -177,7 +177,7 @@ class _JobCard extends StatelessWidget {
                       children: [
                         Text(
                           job.title,
-                          style: GoogleFonts.tinos(
+                          style: GoogleFonts.cormorantGaramond(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,

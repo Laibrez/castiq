@@ -74,7 +74,7 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                             children: [
                               Text(
                                 userData.companyName ?? userData.name,
-                                style: GoogleFonts.tinos(
+                                style: GoogleFonts.cormorantGaramond(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -339,7 +339,7 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.tinos(
+      style: GoogleFonts.cormorantGaramond(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Colors.white,
@@ -463,7 +463,7 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.tinos(
+                    style: GoogleFonts.cormorantGaramond(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
