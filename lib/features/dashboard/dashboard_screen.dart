@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/portfolio/portfolio_screen.dart';
 import 'package:flutter_application_1/features/matchmaker/matchmaker_screen.dart';
 import 'package:flutter_application_1/features/matchmaker/model_discovery_screen.dart';
-import 'package:flutter_application_1/features/chat/chat_list_screen.dart';
 import 'package:flutter_application_1/features/bookings/bookings_screen.dart';
 import 'package:flutter_application_1/features/matchmaker/brand_jobs_screen.dart';
 import 'package:flutter_application_1/features/payments/payments_screen.dart';

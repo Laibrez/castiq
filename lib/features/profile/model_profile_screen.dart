@@ -3,7 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
-import 'package:flutter_application_1/features/booking/send_offer_screen.dart';
+import 'package:flutter_application_1/features/bookings/send_offer_screen.dart';
 import 'package:flutter_application_1/core/widgets/share_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
