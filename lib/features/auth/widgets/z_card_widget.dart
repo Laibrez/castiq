@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ZCardWidget extends StatefulWidget {
   final List<dynamic> allImages; // Uint8List or String (URL)
@@ -31,6 +32,9 @@ class ZCardWidget extends StatefulWidget {
 class _ZCardWidgetState extends State<ZCardWidget> {
   late List<dynamic> _selectedImages;
 
+  // Structured slots definition
+  final List<String> _slotNames = ['HEADSHOT', 'FULL BODY', 'EDITORIAL', 'COMMERCIAL'];
+
   @override
   void initState() {
     super.initState();
@@ -46,15 +50,14 @@ class _ZCardWidgetState extends State<ZCardWidget> {
   }
 
   void _populateSelectedImages() {
-    _selectedImages = [];
+    _selectedImages = List.filled(4, null); // Ensure 4 slots
     if (widget.allImages.isNotEmpty) {
       for (int i = 0; i < 4; i++) {
         if (i < widget.allImages.length) {
-          _selectedImages.add(widget.allImages[i]);
+          _selectedImages[i] = widget.allImages[i];
         }
       }
     }
-    // Fire initial change so parent has defaults if needed? No, let parent handle.
   }
 
   void _replaceImage(int slotIndex) {
@@ -64,24 +67,33 @@ class _ZCardWidgetState extends State<ZCardWidget> {
       context: context,
       backgroundColor: const Color(0xFF1A1A1A),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(0)), // Sharp editorial corners
       ),
       builder: (context) {
         return Container(
           padding: const EdgeInsets.all(24),
-          height: 400,
+          height: 500,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Select Image',
-                style: TextStyle(
+              Text(
+                'SELECT ${_slotNames[slotIndex]}',
+                style: GoogleFonts.didactGothic(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 2.0,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Text(
+                'Recommended: 2000px height minimal. Clean, professional lighting.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 24),
               Expanded(
                 child: GridView.builder(
                   itemCount: widget.allImages.length,
@@ -89,25 +101,26 @@ class _ZCardWidgetState extends State<ZCardWidget> {
                     crossAxisCount: 3,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
+                    childAspectRatio: 0.8, // Portrait preview
                   ),
                   itemBuilder: (context, index) {
                     final image = widget.allImages[index];
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          if (slotIndex < _selectedImages.length) {
-                            _selectedImages[slotIndex] = image;
-                          } else {
-                            if (_selectedImages.length < 4) {
-                                _selectedImages.add(image);
-                            }
-                          }
+                          _selectedImages[slotIndex] = image;
                         });
+                        // Filter out nulls for the callback to maintain list integrity if needed,
+                        // but actually we want to keep slots fixed.
+                        // The parent expects a list. If we want structured, we might need to change how we store it.
+                        // For now, let's just pass the list as is, assuming index 0 is headshot etc.
                         widget.onZCardImagesChanged(_selectedImages);
                         Navigator.pop(context);
                       },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
                         child: _buildImageWidget(image),
                       ),
                     );
@@ -123,160 +136,146 @@ class _ZCardWidgetState extends State<ZCardWidget> {
 
   Widget _buildImageWidget(dynamic image, {BoxFit fit = BoxFit.cover}) {
     if (image is Uint8List) {
-      return Image.memory(image, fit: fit);
+      return Image.memory(image, fit: fit, alignment: Alignment.topCenter);
     } else if (image is String) {
-      return Image.network(image, fit: fit);
+      return Image.network(image, fit: fit, alignment: Alignment.topCenter);
     }
     return const SizedBox.shrink();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(2), // Print-style corner
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    // Layout builder to determine clean grid based on width
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 600;
+        
+        return Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFBFBFB), // Off-white editorial background
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 2x2 Grid
-          AspectRatio(
-            aspectRatio: 4 / 5, // Typical Card ratio roughly
-            child: Row(
-              children: [
-                // Left Column
-                Expanded(
-                  child: Column(
-                    children: [
-                      Expanded(child: _buildImageSlot(0)),
-                      const SizedBox(height: 2),
-                      Expanded(child: _buildImageSlot(2)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 2), // Grid gutter
-                // Right Column
-                Expanded(
-                  child: Column(
-                    children: [
-                      Expanded(child: _buildImageSlot(1)),
-                      const SizedBox(height: 2),
-                      Expanded(child: _buildImageSlot(3)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Info Footer
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // HEADER
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       widget.name.toUpperCase(),
-                      style: const TextStyle(
-                        fontFamily: 'Didot', // Or serif fallback
-                        fontSize: 24,
+                      style: GoogleFonts.didactGothic(
+                        fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
-                        letterSpacing: 1.5,
+                        letterSpacing: 4.0,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        widget.willingToTravel ? 'TRAVEL: YES' : 'LOCAL ONLY',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${widget.category.toUpperCase()} • ${widget.location.toUpperCase()}',
+                      style: GoogleFonts.inter(
+                        color: Colors.grey[600],
+                        fontSize: 10,
+                        letterSpacing: 2.0,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-                Text(
-                  '${widget.category} • ${widget.location}',
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                    letterSpacing: 1.0,
+              ),
+
+              // GRID
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isDesktop ? 4 : 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.8, // 4:5 Ratio
                   ),
+                  itemCount: 4,
+                  itemBuilder: (context, index) => _buildSlotContainer(index),
                 ),
-                const SizedBox(height: 16),
-                const Divider(color: Colors.black, height: 1),
-                const SizedBox(height: 12),
-                
-                // Stats Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+
+              const SizedBox(height: 32),
+
+              // FOOTER STATS
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                child: Column(
                   children: [
-                    _buildStat('HEIGHT', widget.stats['Height'] ?? '-'),
-                    _buildStat('BUST', widget.stats['Bust'] ?? '-'),
-                    _buildStat('WAIST', widget.stats['Waist'] ?? '-'),
-                    _buildStat('HIPS', widget.stats['Hips'] ?? '-'),
-                    _buildStat('SHOE', widget.stats['Shoe'] ?? '-'),
+                    const Divider(color: Colors.black, thickness: 1),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildStat('HEIGHT', widget.stats['Height'] ?? '-'),
+                        _buildStat('BUST', widget.stats['Bust'] ?? '-'),
+                        _buildStat('WAIST', widget.stats['Waist'] ?? '-'),
+                        _buildStat('HIPS', widget.stats['Hips'] ?? '-'),
+                        _buildStat('SHOE', widget.stats['Shoe'] ?? '-'),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildImageSlot(int index) {
-    Uint8List? image;
-    if (index < _selectedImages.length) {
-      image = _selectedImages[index];
-    }
+  Widget _buildSlotContainer(int index) {
+    dynamic image = _selectedImages[index];
 
     return GestureDetector(
       onTap: () => _replaceImage(index),
-      child: Stack(
-        fit: StackFit.expand,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            color: const Color(0xFFF5F5F5),
-            child: image != null
-                ? _buildImageWidget(image, fit: BoxFit.cover)
-                : const Center(
-                    child: Icon(LucideIcons.image, color: Colors.grey),
-                  ),
-          ),
-          // Edit Overlay Hint
-          Positioned(
-            bottom: 8,
-            right: 8,
+          Expanded(
             child: Container(
-              padding: const EdgeInsets.all(4),
+              width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                shape: BoxShape.circle,
+                color: const Color(0xFFEEEEEE),
+                border: Border.all(color: Colors.transparent),
               ),
-              child: const Icon(LucideIcons.edit2, size: 12, color: Colors.white),
+              child: image != null
+                  ? _buildImageWidget(image, fit: BoxFit.cover)
+                  : Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(LucideIcons.camera, color: Colors.grey[400], size: 24),
+                        // Optional subtle silhouette could go here
+                      ],
+                    ),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _slotNames[index],
+                style: GoogleFonts.inter(
+                  fontSize: 8,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  color: Colors.black,
+                ),
+              ),
+              if (widget.isEditable)
+                const Icon(LucideIcons.edit2, size: 10, color: Colors.black),
+            ],
           ),
         ],
       ),
@@ -288,22 +287,24 @@ class _ZCardWidgetState extends State<ZCardWidget> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 9,
+          style: GoogleFonts.inter(
+            color: Colors.grey[600],
+            fontSize: 8,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
         Text(
-          value,
-          style: const TextStyle(
+          value.toUpperCase(),
+          style: GoogleFonts.didactGothic(
             color: Colors.black,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
     );
   }
 }
+

@@ -21,7 +21,7 @@ class ModelProfileScreen extends StatefulWidget {
 
 class _ModelProfileScreenState extends State<ModelProfileScreen> {
   int _selectedTabIndex = 0;
-  final List<String> _tabs = ['Portfolio', 'Z-Card', 'Measurements', 'Experience'];
+  final List<String> _tabs = ['Z-CARD', 'PORTFOLIO', 'MEASUREMENTS', 'HISTORY'];
   final BookingService _bookingService = BookingService();
 
   @override
@@ -29,40 +29,29 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
     final stats = widget.model.stats ?? {};
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white, // Editorial white background
       body: CustomScrollView(
         slivers: [
-          // 1. High-Fidelity Header
+          // 1. Editorial Header
           SliverAppBar(
-            expandedHeight: 450,
+            expandedHeight: 500,
             pinned: true,
-            backgroundColor: Colors.black,
-            leading: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                backgroundColor: Colors.black54,
-                child: IconButton(
-                  icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(LucideIcons.arrowLeft, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
             ),
             actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  backgroundColor: Colors.black54,
-                  child: IconButton(
-                    icon: const Icon(LucideIcons.share, color: Colors.white, size: 20),
-                    onPressed: () {
-                      ShareModal.show(
-                        context,
-                        shareUrl: 'https://castiq-d85d4.web.app/profile/${widget.model.uid}',
-                        title: widget.model.name,
-                      );
-                    },
-                  ),
-                ),
+              IconButton(
+                icon: const Icon(LucideIcons.share, color: Colors.black, size: 20),
+                onPressed: () {
+                  ShareModal.show(
+                    context,
+                    shareUrl: 'https://castiq-d85d4.web.app/profile/${widget.model.uid}',
+                    title: widget.model.name,
+                  );
+                },
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -72,16 +61,24 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
                   Image.network(
                     widget.model.profileImageUrl ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop',
                     fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.8),
-                        ],
+                  // Subtle gradient only at very bottom for text readability if needed, but keeping it minimal
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 150,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.4),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -92,73 +89,40 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          widget.model.name.toUpperCase(),
+                          style: GoogleFonts.didactGothic(
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.model.name,
-                                    style: GoogleFonts.tinos(
-                                      fontSize: 40,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Icon(LucideIcons.mapPin, size: 14, color: Colors.white.withOpacity(0.6)),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        widget.model.location ?? 'Miami, FL',
-                                        style: TextStyle(
-                                          color: Colors.white.withOpacity(0.6),
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                            Text(
+                              widget.model.location?.toUpperCase() ?? 'MIAMI, FL',
+                              style: GoogleFonts.inter(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.5,
                               ),
                             ),
+                            const SizedBox(width: 12),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF6366F1),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF6366F1).withOpacity(0.3),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
+                                border: Border.all(color: Colors.white),
                               ),
-                              child: Column(
-                                children: [
-                                  const Text(
-                                    'RATE RANGE',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '\$800 - \$2,500',
-                                    style: GoogleFonts.inter(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                '\$800 - \$2.5K', // Simplified rate
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -171,43 +135,45 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
             ),
           ),
 
-          // 2. Pill-style Tab Bar
+          // 2. Minimal Tab Bar
           SliverPersistentHeader(
             pinned: true,
             delegate: _SliverAppBarDelegate(
               child: Container(
-                color: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: _tabs.asMap().entries.map((entry) {
-                      final isSelected = _selectedTabIndex == entry.key;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedTabIndex = entry.key),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Colors.white : Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: isSelected ? Colors.white : Colors.white10,
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 0),
+                child: Column(
+                  children: [
+                    const Divider(height: 1, color: Colors.black12),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: _tabs.asMap().entries.map((entry) {
+                          final isSelected = _selectedTabIndex == entry.key;
+                          return GestureDetector(
+                            onTap: () => setState(() => _selectedTabIndex = entry.key),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                border: isSelected ? const Border(bottom: BorderSide(color: Colors.black, width: 2)) : null,
+                              ),
+                              child: Text(
+                                entry.value,
+                                style: GoogleFonts.inter(
+                                  color: isSelected ? Colors.black : Colors.grey,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 11,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            entry.value,
-                            style: TextStyle(
-                              color: isSelected ? Colors.black : Colors.white60,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const Divider(height: 1, color: Colors.black12),
+                  ],
                 ),
               ),
             ),
@@ -216,27 +182,18 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
           // 3. Tab Views
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: _buildSelectedTabContent(stats),
             ),
           ),
           
-          const SliverToBoxAdapter(child: SizedBox(height: 120)),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black.withOpacity(0),
-              Colors.black.withOpacity(0.9),
-              Colors.black,
-            ],
-          ),
-        ),
+      bottomSheet: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        color: Colors.white,
         child: ElevatedButton(
           onPressed: () {
             Navigator.push(
@@ -245,12 +202,20 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero), // Sharp editorial button
+            elevation: 0,
           ),
-          child: const Text('Send Project Offer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          child: Text(
+            'SEND BOOKING OFFER',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              letterSpacing: 1.5,
+            ),
+          ),
         ),
       ),
     );
@@ -258,9 +223,9 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
 
   Widget _buildSelectedTabContent(Map<String, dynamic> stats) {
     switch (_selectedTabIndex) {
-      case 0: return _buildPortfolioTab();
-      case 1: return _buildZCardTab(stats);
-      case 2: return _buildMeasurementsTab(stats);
+      case 0: return _buildZCardTab(stats);
+      case 1: return _buildPortfolioTab(); // Swapped order, Z-Card is primary
+      case 2: return _buildMeasurementTable(stats);
       case 3: return _buildExperienceTab();
       default: return const SizedBox.shrink();
     }
@@ -274,19 +239,19 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
       'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=400&auto=format&fit=crop',
     ];
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: images.length,
-      itemBuilder: (context, index) => ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Image.network(images[index], fit: BoxFit.cover),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.7, // Portrait images
+        ),
+        itemCount: images.length,
+        itemBuilder: (context, index) => Image.network(images[index], fit: BoxFit.cover),
       ),
     );
   }
@@ -294,7 +259,6 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
   Widget _buildZCardTab(Map<String, dynamic> stats) {
     final portfolio = widget.model.portfolio ?? [];
     
-    // Convert stats keys to match ZCardWidget expectation (Capitalized)
     final zCardStats = {
       'Height': stats['height']?.toString() ?? '-',
       'Bust': stats['bust']?.toString() ?? '-',
@@ -302,114 +266,78 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
       'Hips': stats['hips']?.toString() ?? '-',
       'Shoe': stats['shoe']?.toString() ?? '-',
     };
-
-    // Determine current Z-Card images
-    // If zCard data exists in FireStore (under 'zCard' map? or 'zCardUrl' used previously?)
-    // The previous implementation used 'zCardUrl' string. The new requirement uses a structure.
-    // I should check if 'zCard' map exists on the model object.
-    // Assuming UserModel doesn't have the new 'zCard' map yet, I might need to access it raw or update UserModel.
-    // For now, I will use widget.model.portfolio as the source, and if I have a local state or saved state, use that.
     
-    // Since UserModel might not have the 'zCard' field fully typed yet, I'll rely on a dynamic approach or just use portfolio for now.
-    // Ideally, I should fetch the specific zCard image list from Firestore if I want to persist the *order*.
-    // But since I can't easily change UserModel right now without verifying it, 
-    // I'll implement the callback to update Firestore 'zCard' field.
-    
-    // To properly show the *saved* Z-Card, I need to know the saved images.
-    // I will assume for this task that if I just edit it, it updates.
-    // But for *displaying* the saved one... I might need to fetch it or assume it's passed in `model`.
-    
-    // Let's assume for now we always start with proper portfolio images if no Z-Card specific data is in UserModel.
-    // Real implementation would require UserModel update. I will assume `widget.model.toMap()['zCard']['images']` might exist if I cast it.
-    
-    List<dynamic> currentImages = portfolio;
-    // Check if we can get zCard images from model.
-    // Since I can't see UserModel definition easily, I'll try to check if I can access the raw map or if I should just use portfolio.
-    // The requirement says "Save Z-Card structure ... in Firestore".
-    // I will try to read it from Firestore stream? No, `model` is passed in.
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: ZCardWidget(
-        allImages: portfolio,
-        name: widget.model.name,
-        category: widget.model.categories?.isNotEmpty == true ? widget.model.categories!.first : 'Model',
-        location: widget.model.location ?? '',
-        willingToTravel: widget.model.willingToTravel ?? false,
-        stats: zCardStats,
-        onZCardImagesChanged: (newImages) async {
-           // Update Firestore
-           try {
-             await FirebaseFirestore.instance.collection('users').doc(widget.model.uid).set({
-               'zCard': {
-                 'images': newImages,
-                 'updatedAt': FieldValue.serverTimestamp(),
-               }
-             }, SetOptions(merge: true));
-             
-             if (mounted) {
-               ScaffoldMessenger.of(context).showSnackBar(
-                 const SnackBar(content: Text('Z-Card updated')),
-               );
+    return ZCardWidget(
+      allImages: portfolio,
+      name: widget.model.name,
+      category: widget.model.categories?.isNotEmpty == true ? widget.model.categories!.first : 'Model',
+      location: widget.model.location ?? '',
+      willingToTravel: widget.model.willingToTravel ?? false,
+      stats: zCardStats,
+      onZCardImagesChanged: (newImages) async {
+         try {
+           await FirebaseFirestore.instance.collection('users').doc(widget.model.uid).set({
+             'zCard': {
+               'images': newImages,
+               'updatedAt': FieldValue.serverTimestamp(),
              }
-           } catch (e) {
-             if (mounted) {
-               ScaffoldMessenger.of(context).showSnackBar(
-                 SnackBar(content: Text('Failed to save: $e')),
-               );
-             }
+           }, SetOptions(merge: true));
+           
+           if (mounted) {
+             ScaffoldMessenger.of(context).showSnackBar(
+               const SnackBar(content: Text('Z-Card saved')),
+             );
            }
-        },
-      ),
+         } catch (e) {
+           if (mounted) {
+             ScaffoldMessenger.of(context).showSnackBar(
+               SnackBar(content: Text('Failed to save: $e')),
+             );
+           }
+         }
+      },
     );
   }
 
-  Widget _buildMeasurementsTab(Map<String, dynamic> stats) {
-    return Column(
-      children: [
-        _buildMeasurementTable('Body Metrics', {
-          'Height': stats['height'] != null ? '${stats['height']} cm' : '-',
-          'Bust': stats['bust'] != null ? '${stats['bust']} cm' : '-',
-          'Waist': stats['waist'] != null ? '${stats['waist']} cm' : '-',
-          'Hips': stats['hips'] != null ? '${stats['hips']} cm' : '-',
-          'Shoe': stats['shoe'] ?? '-',
-        }),
-        const SizedBox(height: 32),
-      ],
-    );
-  }
+  Widget _buildMeasurementTable(Map<String, dynamic> stats) {
+    final data = {
+      'Height': stats['height'] != null ? '${stats['height']} cm' : '-',
+      'Bust': stats['bust'] != null ? '${stats['bust']} cm' : '-',
+      'Waist': stats['waist'] != null ? '${stats['waist']} cm' : '-',
+      'Hips': stats['hips'] != null ? '${stats['hips']} cm' : '-',
+      'Shoe': stats['shoe'] ?? '-',
+    };
 
-  Widget _buildMeasurementTable(String title, Map<String, String> data) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF161618),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-            child: Text(
-              title,
-              style: GoogleFonts.tinos(
-                color: const Color(0xFF6366F1),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            'MEASUREMENTS',
+            style: GoogleFonts.didactGothic(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2.0,
             ),
           ),
+          const SizedBox(height: 24),
           ...data.entries.map((entry) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.black12)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(entry.key, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 14)),
-                Text(entry.value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                Text(
+                  entry.key.toUpperCase(),
+                  style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 12, letterSpacing: 1.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  entry.value,
+                  style: GoogleFonts.didactGothic(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           )),
@@ -424,126 +352,72 @@ class _ModelProfileScreenState extends State<ModelProfileScreen> {
       builder: (context, snapshot) {
         final history = (snapshot.data ?? []).where((b) => ['completed', 'paid'].contains(b.status)).toList();
         
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildExperienceItem('Specialties', widget.model.categories ?? ['High Fashion', 'Editorial', 'Runway', 'Commercial']),
-            const SizedBox(height: 32),
-            Text(
-              'Verified History',
-              style: GoogleFonts.tinos(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            if (history.isEmpty)
-              _emptyExperience()
-            else
-              ...history.map((booking) => _bookingHistoryCard(booking)),
-          ],
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'VERIFIED HISTORY',
+                style: GoogleFonts.didactGothic(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2.0,
+                ),
+              ),
+              const SizedBox(height: 24),
+              if (history.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 40),
+                    child: Text(
+                      'No verified bookings yet',
+                      style: GoogleFonts.inter(color: Colors.grey, fontSize: 14),
+                    ),
+                  ),
+                )
+              else
+                ...history.map((booking) => _bookingHistoryItem(booking)),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildExperienceItem(String title, List<String> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: GoogleFonts.tinos(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: items.map((item) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white10),
-            ),
-            child: Text(item.trim(), style: const TextStyle(color: Colors.white70, fontSize: 13)),
-          )).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _bookingHistoryCard(BookingModel booking) {
+  Widget _bookingHistoryItem(BookingModel booking) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: const Color(0xFFF9F9F9),
+        border: Border.all(color: Colors.transparent),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(LucideIcons.check, size: 16, color: Colors.green),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                booking.jobTitle?.toUpperCase() ?? 'JOB',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  letterSpacing: 1.0,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                DateFormat('MMM yyyy').format(booking.date ?? booking.createdAt),
+                style: GoogleFonts.inter(color: Colors.grey, fontSize: 10),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(booking.jobTitle ?? 'Model Booking', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 2),
-                Text(DateFormat('MMMM yyyy').format(booking.date ?? booking.createdAt), style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12)),
-              ],
-            ),
-          ),
+          const Icon(LucideIcons.checkCircle2, size: 16, color: Colors.black),
         ],
       ),
-    );
-  }
-
-  Widget _emptyExperience() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05), style: BorderStyle.none),
-      ),
-      child: Column(
-        children: [
-          Icon(LucideIcons.history, size: 40, color: Colors.white.withOpacity(0.1)),
-          const SizedBox(height: 16),
-          Text('No verified bookings yet', style: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 14)),
-        ],
-      ),
-    );
-  }
-
-  Widget _zStat(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 10,
-            fontWeight: FontWeight.w800,
-            color: Colors.white38,
-            letterSpacing: 1.2,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value.toString().toUpperCase(),
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -554,9 +428,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
 
   @override
-  double get minExtent => 90.0;
+  double get minExtent => 50.0;
   @override
-  double get maxExtent => 90.0;
+  double get maxExtent => 50.0;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {

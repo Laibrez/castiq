@@ -16,7 +16,7 @@ import 'package:flutter_application_1/features/auth/role_selection_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/features/brands/brand_profile_screen.dart';
 import 'package:flutter_application_1/features/jobs/job_offers_screen.dart';
-import 'package:flutter_application_1/features/payments/earnings_screen.dart';
+import 'package:flutter_application_1/features/payments/work_history_screen.dart';
 import 'package:flutter_application_1/features/admin/admin_brand_applications_screen.dart';
 import 'package:flutter_application_1/features/admin/admin_dashboard_screen.dart';
 
@@ -42,15 +42,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (widget.userType == 'model') {
       _pages = [
         const JobOffersScreen(), // Offers
-        const PortfolioScreen(), // Portfolio
+        const PortfolioScreen(), // Portfolio (This will likely need updates too if it displays profile)
         const BookingsScreen(userType: 'model'), // Bookings
-        const EarningsScreen(), // Earnings
+        const WorkHistoryScreen(), // Work & Balance
       ];
       _destinations = const [
         NavigationDestination(icon: Icon(LucideIcons.briefcase), label: 'Offers'),
         NavigationDestination(icon: Icon(LucideIcons.user), label: 'Portfolio'),
         NavigationDestination(icon: Icon(LucideIcons.calendarCheck), label: 'Bookings'),
-        NavigationDestination(icon: Icon(LucideIcons.wallet), label: 'Earnings'),
+        NavigationDestination(icon: Icon(LucideIcons.wallet), label: 'Work'), // Use Wallet icon for Work/Balance
       ];
     } else {
       _pages = [
@@ -115,7 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         case 0: return 'Job Offers';
         case 1: return 'Portfolio';
         case 2: return 'Bookings';
-        case 3: return 'Earnings';
+        case 3: return 'Work & Balance';
         default: return 'CAZTIQ';
       }
     } else {

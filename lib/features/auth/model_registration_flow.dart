@@ -289,14 +289,24 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
       final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
       
       if (_selectedImageBytes != null) {
-         CloudinaryResponse response = await cloudinary.uploadFile(
-           CloudinaryFile.fromBytesData(
-             _selectedImageBytes!,
-             identifier: user.uid,
-             folder: 'profiles',
-           ),
-         );
-         downloadUrl = response.secureUrl;
+         try {
+           final timestamp = DateTime.now().millisecondsSinceEpoch;
+           CloudinaryResponse response = await cloudinary.uploadFile(
+             CloudinaryFile.fromBytesData(
+               _selectedImageBytes!,
+               identifier: '${user.uid}_profile_$timestamp', // Unique identifier to prevent caching
+               folder: 'profiles',
+             ),
+           );
+           downloadUrl = response.secureUrl;
+         } catch (e) {
+           print("Profile upload failed: $e");
+           // Fallback to default avatar if upload fails
+           downloadUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop';
+         }
+      } else {
+         // No image selected (though validation should prevent this), use fallback
+         downloadUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop';
       }
 
       // 3. Upload Portfolio to Cloudinary
@@ -304,10 +314,11 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
       List<String> portfolioUrls = [];
       for (int i = 0; i < _portfolioImages.length; i++) {
           try {
+             final timestamp = DateTime.now().millisecondsSinceEpoch;
              CloudinaryResponse response = await cloudinary.uploadFile(
                CloudinaryFile.fromBytesData(
                  _portfolioImages[i],
-                 identifier: 'portfolio_${user.uid}_${DateTime.now().millisecondsSinceEpoch}_$i',
+                 identifier: 'portfolio_${user.uid}_${timestamp}_$i',
                  folder: 'portfolio_images',
                ),
              );
