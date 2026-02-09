@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/admin/admin_brand_applications_screen.dart';
 import 'package:flutter_application_1/features/admin/admin_model_profiles_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -100,9 +101,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFFE8E4DE)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,7 +115,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Text(
                   label,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: AppTheme.grey,
                     fontSize: 14,
                   ),
                 ),
@@ -124,7 +125,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 32,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppTheme.black,
                   ),
                 ),
               ],
@@ -158,9 +159,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: AppTheme.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: const Color(0xFFE8E4DE)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,14 +172,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: const Color(0xFFE8E4DE),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 20),
+                  child: Icon(icon, color: AppTheme.gold, size: 20),
                 ),
                 Icon(
                   LucideIcons.arrowRight,
-                  color: Colors.white.withOpacity(0.5),
+                  color: AppTheme.grey,
                   size: 16,
                 ),
               ],
@@ -189,14 +190,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppTheme.black,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               description,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: AppTheme.grey,
                 fontSize: 14,
               ),
             ),
@@ -207,24 +208,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               children: [
                 Text(
                   _isLoading ? '–' : totalValue.toString(),
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.montserrat(
                     fontSize: 36,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppTheme.black,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   totalLabel,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: AppTheme.grey,
                     fontSize: 14,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Divider(color: Colors.white.withOpacity(0.1)),
+            Divider(color: const Color(0xFFE8E4DE)),
             const SizedBox(height: 12),
             Wrap(
               spacing: 16,
@@ -245,7 +246,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     Text(
                       '${stat['value']} ${stat['label']}',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: AppTheme.grey,
                         fontSize: 12,
                       ),
                     ),
@@ -262,14 +263,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         title: Text(
           'Admin Dashboard',
-          style: GoogleFonts.tinos(
+          style: GoogleFonts.cormorantGaramond(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
+            color: AppTheme.black,
           ),
         ),
       ),
@@ -284,17 +286,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               children: [
                 Text(
                   'Welcome back',
-                  style: GoogleFonts.inter(
-                    fontSize: 24,
+                  style: GoogleFonts.cormorantGaramond(
+                    fontSize: 28,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppTheme.black,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Here\'s what\'s happening with your platform today.',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: AppTheme.grey,
                     fontSize: 14,
                   ),
                 ),

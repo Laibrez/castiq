@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:flutter_application_1/features/auth/onboarding_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/auth/auth_wrapper.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class RegistrationSuccessScreen extends StatelessWidget {
   final String message;
@@ -14,7 +15,7 @@ class RegistrationSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32.0),
@@ -25,31 +26,32 @@ class RegistrationSuccessScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.1),
+                  color: AppTheme.lightGold.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   LucideIcons.checkCircle2,
                   size: 80,
-                  color: Color(0xFF6366F1),
+                  color: AppTheme.gold,
                 ),
               ),
               const SizedBox(height: 40),
-              const Text(
+              Text(
                 'Application Submitted',
-                style: TextStyle(
-                  fontSize: 32,
+                style: GoogleFonts.cormorantGaramond(
+                  fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  fontStyle: FontStyle.italic,
+                  color: AppTheme.black,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
               Text(
                 message,
-                style: const TextStyle(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: AppTheme.grey,
                   height: 1.6,
                 ),
                 textAlign: TextAlign.center,
@@ -65,7 +67,17 @@ class RegistrationSuccessScreen extends StatelessWidget {
                       (route) => false,
                     );
                   },
-                  child: const Text('Back to Home'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.gold,
+                    foregroundColor: AppTheme.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Back to Home',
+                    style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15),
+                  ),
                 ),
               ),
             ],

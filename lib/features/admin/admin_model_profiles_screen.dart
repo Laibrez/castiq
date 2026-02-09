@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/admin/models/model_profile.dart';
 import 'package:flutter_application_1/features/admin/admin_model_detail_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class AdminModelProfilesScreen extends StatefulWidget {
   const AdminModelProfilesScreen({super.key});
@@ -152,12 +153,12 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         title: Text(
           'Models',
-          style: GoogleFonts.tinos(
+          style: GoogleFonts.cormorantGaramond(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
           ),
@@ -177,14 +178,14 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppTheme.black,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Review and manage model registrations',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: AppTheme.grey,
                     fontSize: 14,
                   ),
                 ),
@@ -201,17 +202,17 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1A1A1A),
+                            color: AppTheme.white,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            border: Border.all(color: const Color(0xFFE8E4DE)),
                           ),
                           child: TextField(
                             controller: _searchController,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               hintText: 'Search by name or location...',
-                              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                              prefixIcon: const Icon(LucideIcons.search, color: Colors.white70, size: 18),
+                              hintStyle: TextStyle(color: AppTheme.grey),
+                              prefixIcon: const Icon(LucideIcons.search, color: AppTheme.grey, size: 18),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
@@ -222,7 +223,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: const Color(0xFFE8E4DE),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -242,17 +243,17 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
+                          color: AppTheme.white,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          border: Border.all(color: const Color(0xFFE8E4DE)),
                         ),
                         child: TextField(
                           controller: _searchController,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Search by name or location...',
-                            hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                            prefixIcon: const Icon(LucideIcons.search, color: Colors.white70, size: 18),
+                            hintStyle: TextStyle(color: AppTheme.grey),
+                            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.grey, size: 18),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
@@ -262,7 +263,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                       Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: const Color(0xFFE8E4DE),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -295,7 +296,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                   padding: const EdgeInsets.all(64),
                   child: Text(
                     'No models found',
-                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    style: TextStyle(color: AppTheme.grey),
                   ),
                 ),
               )
@@ -321,7 +322,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF1A1A1A) : Colors.transparent,
+          color: isSelected ? AppTheme.white : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
@@ -330,7 +331,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white70,
+                color: isSelected ? Colors.white : AppTheme.grey,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
               ),
@@ -339,7 +340,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
             Text(
               count.toString(),
               style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
+                color: AppTheme.grey,
                 fontSize: 12,
               ),
             ),
@@ -363,9 +364,9 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: AppTheme.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: const Color(0xFFE8E4DE)),
         ),
         child: Row(
           children: [
@@ -397,7 +398,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                            color: AppTheme.black,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -416,7 +417,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                         ? '${model.city}, ${model.country}'
                         : model.country ?? 'Location not set',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppTheme.grey,
                       fontSize: 14,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -435,13 +436,13 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                       margin: const EdgeInsets.only(right: 6),
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: const Color(0xFFE8E4DE),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         cat,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: AppTheme.grey,
                           fontSize: 11,
                         ),
                       ),
@@ -451,7 +452,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                     Text(
                       '+${(model.categories?.length ?? 0) - 2}',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
+                        color: AppTheme.grey,
                         fontSize: 11,
                       ),
                     ),
@@ -477,7 +478,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                   Text(
                     (model.portfolioApproved == true) ? 'Approved' : 'Pending',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppTheme.grey,
                       fontSize: 12,
                     ),
                   ),
@@ -490,7 +491,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
             const Icon(
               LucideIcons.chevronRight,
               size: 18,
-              color: Colors.white70,
+              color: AppTheme.grey,
             ),
           ],
         ),

@@ -6,13 +6,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
-import 'package:cloudinary_public/cloudinary_public.dart'; // From Stash
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/features/auth/registration_success_screen.dart';
-import 'package:flutter_application_1/features/auth/widgets/z_card_widget.dart'; // From Stash
-import 'package:google_fonts/google_fonts.dart'; // From Stash
-import 'package:flutter_application_1/core/services/auth_service.dart'; // From Upstream
+import 'package:flutter_application_1/features/auth/widgets/z_card_widget.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class ModelRegistrationFlow extends StatefulWidget {
   const ModelRegistrationFlow({super.key});
@@ -24,12 +25,12 @@ class ModelRegistrationFlow extends StatefulWidget {
 class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
-  final int _totalSteps = 9; // merged Account, Identity, Interests, Photo, Portfolio, Measurements, Location, Social, Summary
+  final int _totalSteps = 8; // Account, Interests, Photo, Portfolio, Measurements, Location, Social, Summary
 
   // Controllers
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController(); // Added missing controller
+  final TextEditingController _confirmPasswordController = TextEditingController();
   
   // Measurements
   final TextEditingController _heightController = TextEditingController();
@@ -45,162 +46,21 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
   // Interests
   final List<String> _selectedInterests = [];
   
-  // Identity Verification state (Upstream)
-  String? _idDocumentUrl;
-  String? _selfieUrl;
-  final AuthService _authService = AuthService(); // Upstream
-  final ImagePicker _picker = ImagePicker(); // Upstream
-  bool _isUploadingId = false;
-  bool _isUploadingSelfie = false;
+  final AuthService _authService = AuthService();
+  final ImagePicker _picker = ImagePicker();
 
-  // Portfolio / Profile State (Stash)
-  File? _selectedImageFile; // Legacy
+  // Portfolio / Profile State
+  File? _selectedImageFile;
   Uint8List? _selectedImageBytes;
   final List<Uint8List> _portfolioImages = [];
-  List<int> _zCardSelectedIndices = [0, 1, 2, 3]; // Default to first 4
+  List<int> _zCardSelectedIndices = [0, 1, 2, 3];
   
   // Social Media
   List<Map<String, String>> _socialMediaLinks = [];
 
   bool _isSubmitting = false;
 
-  // --- Identity Verification Methods (Upstream) ---
-
-  Future<void> _uploadId(ImageSource source) async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: source,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-
-      if (image == null) return;
-
-      setState(() => _isUploadingId = true);
-
-      final String fileName = path.basename(image.path);
-      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'temp_${DateTime.now().millisecondsSinceEpoch}';
-      
-      final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
-      CloudinaryResponse response;
-      if (kIsWeb) {
-         final bytes = await image.readAsBytes();
-         response = await cloudinary.uploadFile(
-           CloudinaryFile.fromBytesData(
-             bytes,
-             identifier: 'id_$timestamp',
-             folder: 'model_verification/$userId',
-           ),
-         );
-      } else {
-         response = await cloudinary.uploadFile(
-           CloudinaryFile.fromFile(
-             image.path, 
-             identifier: 'id_$timestamp',
-             folder: 'model_verification/$userId',
-           ),
-         );
-      }
-
-      setState(() {
-        _idDocumentUrl = response.secureUrl;
-        _isUploadingId = false;
-      });
-    } catch (e) {
-      setState(() => _isUploadingId = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error uploading ID: ${e.toString()}')),
-        );
-      }
-    }
-  }
-
-  Future<void> _takeSelfie() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-
-      if (image == null) return;
-
-      setState(() => _isUploadingSelfie = true);
-
-      final String fileName = path.basename(image.path);
-      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-      final String userId = FirebaseAuth.instance.currentUser?.uid ?? 'temp_${DateTime.now().millisecondsSinceEpoch}';
-      
-      final cloudinary = CloudinaryPublic('dhkugnymi', 'castiq', cache: false);
-      CloudinaryResponse response;
-      if (kIsWeb) {
-         final bytes = await image.readAsBytes();
-         response = await cloudinary.uploadFile(
-           CloudinaryFile.fromBytesData(
-             bytes,
-             identifier: 'selfie_$timestamp',
-             folder: 'model_verification/$userId',
-           ),
-         );
-      } else {
-         response = await cloudinary.uploadFile(
-           CloudinaryFile.fromFile(
-             image.path, 
-             identifier: 'selfie_$timestamp',
-             folder: 'model_verification/$userId',
-           ),
-         );
-      }
-
-      setState(() {
-        _selfieUrl = response.secureUrl;
-        _isUploadingSelfie = false;
-      });
-    } catch (e) {
-      setState(() => _isUploadingSelfie = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error uploading selfie: ${e.toString()}')),
-        );
-      }
-    }
-  }
-
-  void _showIdSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: Colors.black),
-                title: const Text('Choose from Gallery', style: TextStyle(color: Colors.black)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _uploadId(ImageSource.gallery);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt, color: Colors.black),
-                title: const Text('Take a Photo', style: TextStyle(color: Colors.black)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _uploadId(ImageSource.camera);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // --- Portfolio / Profile Methods (Stash) ---
+  // --- Portfolio / Profile Methods ---
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -208,7 +68,7 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
         final length = await image.length();
-        if (length > 5 * 1024 * 1024) { // 5MB limit
+        if (length > 5 * 1024 * 1024) {
            if (mounted) {
              ScaffoldMessenger.of(context).showSnackBar(
                const SnackBar(content: Text('Image too large. Max 5MB allowed.')),
@@ -254,7 +114,7 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
     }
   }
 
-  // --- Submit Registration (Merged) ---
+  // --- Submit Registration ---
 
   Future<void> _submitRegistration() async {
     if (_selectedImageFile == null && _selectedImageBytes == null) {
@@ -294,18 +154,16 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
            CloudinaryResponse response = await cloudinary.uploadFile(
              CloudinaryFile.fromBytesData(
                _selectedImageBytes!,
-               identifier: '${user.uid}_profile_$timestamp', // Unique identifier to prevent caching
+               identifier: '${user.uid}_profile_$timestamp',
                folder: 'profiles',
              ),
            );
            downloadUrl = response.secureUrl;
          } catch (e) {
            print("Profile upload failed: $e");
-           // Fallback to default avatar if upload fails
            downloadUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop';
          }
       } else {
-         // No image selected (though validation should prevent this), use fallback
          downloadUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop';
       }
 
@@ -328,7 +186,7 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
           }
       }
 
-      // 4. Save to Firestore (Merged Data)
+      // 4. Save to Firestore
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saving profile...'), duration: Duration(milliseconds: 500)));
       
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
@@ -340,12 +198,6 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
         'zCard': {
            'images': _zCardSelectedIndices.map((i) => i < portfolioUrls.length ? portfolioUrls[i] : null).whereType<String>().toList(),
            'generatedAt': FieldValue.serverTimestamp(),
-        },
-        'verification': {
-          'idDocumentUrl': _idDocumentUrl,
-          'selfieUrl': _selfieUrl,
-          'verified': false,
-          'submittedAt': FieldValue.serverTimestamp(),
         },
         'interests': _selectedInterests,
         'measurements': {
@@ -409,19 +261,19 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.black),
           onPressed: _previousStep,
         ),
         title: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
             value: (_currentStep + 1) / _totalSteps,
-            backgroundColor: Colors.white.withOpacity(0.1),
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+            backgroundColor: AppTheme.grey.withOpacity(0.15),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.gold),
             minHeight: 6,
           ),
         ),
@@ -442,17 +294,6 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
             emailController: _emailController,
             passwordController: _passwordController,
             confirmPasswordController: _confirmPasswordController,
-          ),
-          _Step2IdentityVerification(
-             nextStep: _nextStep, 
-             onIdUploaded: (url) => setState(() => _idDocumentUrl = url), 
-             onSelfieUploaded: (url) => setState(() => _selfieUrl = url), 
-             idDocumentUrl: _idDocumentUrl, 
-             selfieUrl: _selfieUrl, 
-             isUploadingId: _isUploadingId,
-             isUploadingSelfie: _isUploadingSelfie,
-             onUploadId: _showIdSourceDialog,
-             onTakeSelfie: _takeSelfie,
           ),
           _Step3Interests(
             nextStep: _nextStep,
@@ -520,6 +361,57 @@ class _ModelRegistrationFlowState extends State<ModelRegistrationFlow> {
   }
 }
 
+// ── Shared helpers ──
+
+Widget _buildStyledTextField(String label, IconData icon, {
+  bool obscureText = false,
+  TextEditingController? controller,
+  TextInputType? keyboardType,
+}) {
+  return TextField(
+    controller: controller,
+    obscureText: obscureText,
+    keyboardType: keyboardType,
+    style: GoogleFonts.montserrat(color: AppTheme.black),
+    decoration: InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+      prefixIcon: Icon(icon, color: AppTheme.grey, size: 20),
+      filled: true,
+      fillColor: AppTheme.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
+      ),
+    ),
+  );
+}
+
+Widget _buildStyledButton({required String label, required VoidCallback onPressed}) {
+  return SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.gold,
+        foregroundColor: AppTheme.black,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
+      ),
+      child: Text(label, style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15)),
+    ),
+  );
+}
+
 // --- Step Widgets ---
 
 class _Step1Account extends StatelessWidget {
@@ -542,185 +434,29 @@ class _Step1Account extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Step 1', style: TextStyle(color: Colors.white54, fontSize: 14)),
+          Text(
+            'Create Account',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
           const SizedBox(height: 8),
-          const Text('Create Account', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(
+            'Enter your credentials to get started.',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
           const SizedBox(height: 32),
-          _buildTextField('Email', Icons.email_outlined, controller: emailController),
+          _buildStyledTextField('Email', LucideIcons.mail, controller: emailController),
           const SizedBox(height: 16),
-          _buildTextField('Password', Icons.lock_outline, obscureText: true, controller: passwordController),
+          _buildStyledTextField('Password', LucideIcons.lock, obscureText: true, controller: passwordController),
           const SizedBox(height: 16),
-          _buildTextField('Confirm Password', Icons.lock_outline, obscureText: true, controller: confirmPasswordController),
+          _buildStyledTextField('Confirm Password', LucideIcons.lock, obscureText: true, controller: confirmPasswordController),
           const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(onPressed: nextStep, child: const Text('Next')),
-          ),
+          _buildStyledButton(label: 'Next', onPressed: nextStep),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, IconData icon, {bool obscureText = false, TextEditingController? controller}) {
-    return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      ),
-    );
-  }
-}
-
-class _Step2IdentityVerification extends StatelessWidget {
-  final VoidCallback nextStep;
-  final Function(String?) onIdUploaded;
-  final Function(String?) onSelfieUploaded;
-  final String? idDocumentUrl;
-  final String? selfieUrl;
-  final bool isUploadingId;
-  final bool isUploadingSelfie;
-  final VoidCallback onUploadId;
-  final VoidCallback onTakeSelfie;
-
-  const _Step2IdentityVerification({
-    required this.nextStep,
-    required this.onIdUploaded,
-    required this.onSelfieUploaded,
-    required this.idDocumentUrl,
-    required this.selfieUrl,
-    required this.isUploadingId,
-    required this.isUploadingSelfie,
-    required this.onUploadId,
-    required this.onTakeSelfie,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool canProceed = idDocumentUrl != null && selfieUrl != null;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Step 2', style: TextStyle(color: Colors.white54, fontSize: 14)),
-          const SizedBox(height: 8),
-          const Text('Verify Your Identity', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('Upload your ID and a selfie to verify you are who you say you are', style: TextStyle(color: Colors.white70, fontSize: 16)),
-          const SizedBox(height: 32),
-          Row(
-            children: [
-              Expanded(
-                child: _IdentityUploadSection(
-                  title: 'Government ID',
-                  icon: Icons.credit_card,
-                  buttonText: 'Upload ID',
-                  description: 'Passport, Driver\'s License, or National ID',
-                  isUploaded: idDocumentUrl != null,
-                  isUploading: isUploadingId,
-                  onTap: onUploadId,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _IdentityUploadSection(
-                  title: 'Selfie with ID',
-                  icon: Icons.camera_alt,
-                  buttonText: 'Take Selfie',
-                  description: 'Hold your ID next to your face',
-                  isUploaded: selfieUrl != null,
-                  isUploading: isUploadingSelfie,
-                  onTap: onTakeSelfie,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: const Color(0xFF6366F1), borderRadius: BorderRadius.circular(12)),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Why do we need this?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                SizedBox(height: 8),
-                Text('Identity verification helps keep our community safe and ensures brands can trust the models they work with.', style: TextStyle(fontSize: 14, color: Colors.white)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: canProceed ? nextStep : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6366F1),
-                disabledBackgroundColor: Colors.grey[800],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: const Text('Continue'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IdentityUploadSection extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final String buttonText;
-  final String description;
-  final bool isUploaded;
-  final bool isUploading;
-  final VoidCallback onTap;
-
-  const _IdentityUploadSection({
-    required this.title, required this.icon, required this.buttonText, required this.description,
-    required this.isUploaded, required this.isUploading, required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isUploading ? null : onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          border: Border.all(color: isUploaded ? Colors.green : Colors.white24, width: 2),
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.transparent,
-        ),
-        child: Column(
-          children: [
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
-            const SizedBox(height: 16),
-            Container(
-              width: 80, height: 80,
-              decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
-              child: isUploading
-                  ? const Center(child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-                  : Icon(icon, size: 40, color: Colors.white70),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(color: isUploaded ? Colors.green : Colors.white24, borderRadius: BorderRadius.circular(20)),
-              child: Text(isUploaded ? 'Uploaded' : buttonText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
-            ),
-            const SizedBox(height: 8),
-            Text(description, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: Colors.white54)),
-          ],
-        ),
       ),
     );
   }
@@ -745,8 +481,21 @@ class _Step3InterestsState extends State<_Step3Interests> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('What are your interests?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 24),
+          Text(
+            'What are your interests?',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Select the categories that match your style.',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
+          const SizedBox(height: 32),
           Wrap(
             spacing: 12,
             runSpacing: 12,
@@ -762,20 +511,29 @@ class _Step3InterestsState extends State<_Step3Interests> {
                     }
                   });
                 },
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF6366F1) : const Color(0xFF1A1A1A),
+                    color: isSelected ? AppTheme.gold : AppTheme.white,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: isSelected ? const Color(0xFF6366F1) : Colors.white10),
+                    border: Border.all(
+                      color: isSelected ? AppTheme.gold : const Color(0xFFE0DCD5),
+                    ),
                   ),
-                  child: Text(cat, style: TextStyle(color: Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                  child: Text(
+                    cat,
+                    style: GoogleFonts.montserrat(
+                      color: isSelected ? AppTheme.black : AppTheme.grey,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
                 ),
               );
             }).toList(),
           ),
           const Spacer(),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: widget.nextStep, child: const Text('Next'))),
+          _buildStyledButton(label: 'Next', onPressed: widget.nextStep),
         ],
       ),
     );
@@ -796,9 +554,20 @@ class _Step4ProfilePhoto extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Upload your profile picture', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('1 required photo', style: TextStyle(color: Colors.white54)),
+          Text(
+            'Profile Picture',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '1 required photo',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
           const SizedBox(height: 48),
           Center(
             child: GestureDetector(
@@ -808,21 +577,26 @@ class _Step4ProfilePhoto extends StatelessWidget {
                   Container(
                     height: 200, width: 200,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A),
+                      color: AppTheme.white,
                       borderRadius: BorderRadius.circular(100),
-                      border: Border.all(color: Colors.white10, style: BorderStyle.solid),
+                      border: Border.all(color: const Color(0xFFE0DCD5), width: 2),
                       image: imageBytes != null ? DecorationImage(image: MemoryImage(imageBytes!), fit: BoxFit.cover) : null,
                     ),
-                    child: imageBytes == null ? const Icon(LucideIcons.camera, size: 48, color: Colors.white24) : null,
+                    child: imageBytes == null
+                        ? Icon(LucideIcons.camera, size: 48, color: AppTheme.grey.withOpacity(0.4))
+                        : null,
                   ),
                   const SizedBox(height: 16),
-                  const Text('Select file from your device', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                  Text(
+                    'Tap to select a photo',
+                    style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
+                  ),
                 ],
               ),
             ),
           ),
           const Spacer(),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: nextStep, child: const Text('Next'))),
+          _buildStyledButton(label: 'Next', onPressed: nextStep),
         ],
       ),
     );
@@ -844,11 +618,30 @@ class _Step5Portfolio extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Build your portfolio', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('Upload 4 photos (required) and 1 video (optional)', style: TextStyle(color: Colors.white54)),
+          Text(
+            'Build Your Portfolio',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Upload 4 photos (required) and 1 video (optional)',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
           const SizedBox(height: 32),
-          Text('UPLOAD FILES', style: GoogleFonts.inter(color: const Color(0xFF6366F1), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+          Text(
+            'UPLOAD FILES',
+            style: GoogleFonts.montserrat(
+              color: AppTheme.gold,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+            ),
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 12, runSpacing: 12,
@@ -860,7 +653,11 @@ class _Step5Portfolio extends StatelessWidget {
                    children: [
                      Container(
                        width: 100, height: 100,
-                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), image: DecorationImage(image: MemoryImage(bytes), fit: BoxFit.cover)),
+                       decoration: BoxDecoration(
+                         borderRadius: BorderRadius.circular(12),
+                         border: Border.all(color: const Color(0xFFE0DCD5)),
+                         image: DecorationImage(image: MemoryImage(bytes), fit: BoxFit.cover),
+                       ),
                      ),
                      Positioned(
                        top: -8, right: -8,
@@ -868,7 +665,11 @@ class _Step5Portfolio extends StatelessWidget {
                          onTap: () => onRemove(index),
                          child: Container(
                            padding: const EdgeInsets.all(4),
-                           decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 1.5)),
+                           decoration: BoxDecoration(
+                             color: Colors.red.shade400,
+                             shape: BoxShape.circle,
+                             border: Border.all(color: AppTheme.white, width: 1.5),
+                           ),
                            child: const Icon(LucideIcons.x, size: 12, color: Colors.white),
                          ),
                        ),
@@ -880,14 +681,25 @@ class _Step5Portfolio extends StatelessWidget {
                 onTap: pickImages,
                 child: Container(
                   width: 100, height: 100,
-                  decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
-                  child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(LucideIcons.plus, color: Colors.white24, size: 28), SizedBox(height: 4), Text('Add', style: TextStyle(color: Colors.white24, fontSize: 10))]),
+                  decoration: BoxDecoration(
+                    color: AppTheme.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE0DCD5)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.plus, color: AppTheme.grey.withOpacity(0.4), size: 28),
+                      const SizedBox(height: 4),
+                      Text('Add', style: GoogleFonts.montserrat(color: AppTheme.grey.withOpacity(0.5), fontSize: 10)),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 80),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: nextStep, child: const Text('Next'))),
+          _buildStyledButton(label: 'Next', onPressed: nextStep),
           const SizedBox(height: 24),
         ],
       ),
@@ -915,7 +727,20 @@ class _Step6Measurements extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Your measurements', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(
+            'Your Measurements',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Industry-standard measurements.',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
           const SizedBox(height: 32),
           _buildMeasureField('Height (cm)', heightController),
           const SizedBox(height: 16),
@@ -927,7 +752,7 @@ class _Step6Measurements extends StatelessWidget {
           const SizedBox(height: 16),
           _buildMeasureField('Shoe size', shoeController),
           const SizedBox(height: 48),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: nextStep, child: const Text('Next'))),
+          _buildStyledButton(label: 'Next', onPressed: nextStep),
         ],
       ),
     );
@@ -937,8 +762,25 @@ class _Step6Measurements extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.number,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(labelText: label, filled: true, fillColor: const Color(0xFF1A1A1A), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
+      style: GoogleFonts.montserrat(color: AppTheme.black),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+        filled: true,
+        fillColor: AppTheme.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
+        ),
+      ),
     );
   }
 }
@@ -958,11 +800,26 @@ class _Step7Location extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Where are you based?', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(
+            'Where Are You Based?',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
           const SizedBox(height: 32),
-          _buildLocationField('Base city / country', LucideIcons.mapPin, locationController),
+          _buildStyledTextField('Base city / country', LucideIcons.mapPin, controller: locationController),
           const SizedBox(height: 32),
-          const Text('Willing to travel?', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(
+            'Willing to travel?',
+            style: GoogleFonts.montserrat(
+              color: AppTheme.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -972,17 +829,9 @@ class _Step7Location extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: nextStep, child: const Text('Next'))),
+          _buildStyledButton(label: 'Next', onPressed: nextStep),
         ],
       ),
-    );
-  }
-
-  Widget _buildLocationField(String label, IconData icon, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(labelText: label, prefixIcon: Icon(icon, color: Colors.white54), filled: true, fillColor: const Color(0xFF1A1A1A), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
     );
   }
 
@@ -990,10 +839,23 @@ class _Step7Location extends StatelessWidget {
     final isSelected = willingToTravel == value;
     return GestureDetector(
       onTap: () => onTravelChanged(value),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-        decoration: BoxDecoration(color: isSelected ? const Color(0xFF6366F1) : const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(12)),
-        child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.gold : AppTheme.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppTheme.gold : const Color(0xFFE0DCD5),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.montserrat(
+            color: isSelected ? AppTheme.black : AppTheme.grey,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
@@ -1038,20 +900,35 @@ class _StepSocialMediaState extends State<_StepSocialMedia> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Online Influence', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('Share your social media profiles', style: TextStyle(color: Colors.white54)),
+          Text(
+            'Online Influence',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Share your social media profiles',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
           const SizedBox(height: 32),
           Row(
             children: [
               Container(
-                decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                  color: AppTheme.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0DCD5)),
+                ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _selectedPlatform,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: Colors.white),
+                    dropdownColor: AppTheme.white,
+                    style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14),
                     items: _platforms.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
                     onChanged: (val) => setState(() => _selectedPlatform = val!),
                   ),
@@ -1061,32 +938,54 @@ class _StepSocialMediaState extends State<_StepSocialMedia> {
               Expanded(
                 child: TextField(
                   controller: _usernameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(hintText: 'Username / Link', hintStyle: const TextStyle(color: Colors.white24), filled: true, fillColor: const Color(0xFF1A1A1A), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 16)),
+                  style: GoogleFonts.montserrat(color: AppTheme.black),
+                  decoration: InputDecoration(
+                    hintText: 'Username / Link',
+                    hintStyle: GoogleFonts.montserrat(color: AppTheme.grey.withOpacity(0.5)),
+                    filled: true,
+                    fillColor: AppTheme.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
-              IconButton(onPressed: _addLink, icon: const Icon(LucideIcons.plusCircle, color: Color(0xFF6366F1))),
+              IconButton(onPressed: _addLink, icon: const Icon(LucideIcons.plusCircle, color: AppTheme.gold)),
             ],
           ),
           const SizedBox(height: 24),
           if (widget.socialLinks.isNotEmpty)
             Container(
-              decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                color: AppTheme.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE0DCD5)),
+              ),
               child: Column(
                 children: widget.socialLinks.asMap().entries.map((entry) {
                   final index = entry.key; final item = entry.value;
                   return ListTile(
                     dense: true,
-                    title: Text(item['platform']!, style: const TextStyle(color: Colors.white70)),
-                    subtitle: Text(item['url']!, style: const TextStyle(color: Colors.white30), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    trailing: IconButton(icon: const Icon(LucideIcons.trash2, color: Colors.white24, size: 18), onPressed: () => _removeLink(index)),
+                    title: Text(item['platform']!, style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.w500)),
+                    subtitle: Text(item['url']!, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    trailing: IconButton(icon: Icon(LucideIcons.trash2, color: AppTheme.grey.withOpacity(0.5), size: 18), onPressed: () => _removeLink(index)),
                   );
                 }).toList(),
               ),
             ),
           const Spacer(),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: widget.nextStep, child: const Text('Next'))),
+          _buildStyledButton(label: 'Next', onPressed: widget.nextStep),
         ],
       ),
     );
@@ -1119,12 +1018,31 @@ class _Step9Summary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Review Information', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('Review your automatic Z-Card and standard details.', style: TextStyle(color: Colors.white54)),
+          Text(
+            'Review Information',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Review your automatic Z-Card and standard details.',
+            style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+          ),
           const SizedBox(height: 32),
           
-          const Text('YOUR Z-CARD', style: TextStyle(color: Color(0xFF6366F1), fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(
+            'YOUR Z-CARD',
+            style: GoogleFonts.montserrat(
+              color: AppTheme.gold,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+            ),
+          ),
           const SizedBox(height: 8),
           ZCardWidget(
             allImages: allPortfolioImages,
@@ -1140,9 +1058,11 @@ class _Step9Summary extends StatelessWidget {
           Center(
             child: CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.grey[800],
+              backgroundColor: AppTheme.lightGold.withOpacity(0.3),
               backgroundImage: profileImage != null ? MemoryImage(profileImage!) : null,
-              child: profileImage == null ? const Icon(LucideIcons.user, size: 40, color: Colors.white54) : null,
+              child: profileImage == null
+                  ? const Icon(LucideIcons.user, size: 40, color: AppTheme.grey)
+                  : null,
             ),
           ),
           const SizedBox(height: 24),
@@ -1157,9 +1077,17 @@ class _Step9Summary extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: isLoading ? null : onSubmit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.gold,
+                foregroundColor: AppTheme.black,
+                disabledBackgroundColor: AppTheme.grey.withOpacity(0.3),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
               child: isLoading 
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) 
-                  : const Text('Confirm & Submit'),
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black)) 
+                  : Text('Confirm & Submit', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15)),
             ),
           ),
         ],
@@ -1172,15 +1100,30 @@ class _Step9Summary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
-        Text(title.toUpperCase(), style: const TextStyle(color: Color(0xFF6366F1), fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(
+          title.toUpperCase(),
+          style: GoogleFonts.montserrat(
+            color: AppTheme.gold,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: AppTheme.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE0DCD5)),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: items.map((item) => Padding(padding: const EdgeInsets.only(bottom: 4), child: Text(item, style: const TextStyle(color: Colors.white)))).toList(),
+            children: items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(item, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14)),
+            )).toList(),
           ),
         ),
       ],

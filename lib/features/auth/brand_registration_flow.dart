@@ -6,7 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/auth/registration_success_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 
@@ -35,7 +37,6 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
   final _taxIdController = TextEditingController();
   final _websiteController = TextEditingController();
 
-  // removed simple _socialController in favor of list
   final _phoneNumberController = TextEditingController();
   List<Map<String, String>> _socialMediaLinks = [];
 
@@ -51,7 +52,7 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-        withData: true, // Needed for web or direct byte access
+        withData: true,
       );
 
       if (result != null) {
@@ -80,7 +81,6 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
     try {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Starting submission...'), duration: Duration(milliseconds: 500)));
       
-      // 1. Create/Get User
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
           if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Creating account...'), duration: Duration(milliseconds: 500)));
@@ -93,8 +93,6 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
       
       if (user == null) throw Exception("Failed to create user");
 
-      // 2. Upload Profile/Docs
-      // 2. Upload Profile/Docs - CLOUDINARY
       String? proofUrl;
       if (_proofOfAddressFile != null) {
           final ext = _proofOfAddressFile!.extension ?? 'jpg';
@@ -130,12 +128,10 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
              print('Upload successful: $proofUrl');
           } catch (e) {
              print('Proof upload failed: $e');
-             // Consider if this should blocking or not. For now logging errors.
              if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Proof upload failed: $e')));
           }
       }
 
-      // 3. Save to Firestore
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saving profile data...'), duration: Duration(milliseconds: 500)));
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'uid': user.uid,
@@ -220,19 +216,19 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.black),
           onPressed: _previousStep,
         ),
         title: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
             value: (_currentStep + 1) / _totalSteps,
-            backgroundColor: Colors.white.withOpacity(0.1),
-            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+            backgroundColor: AppTheme.grey.withOpacity(0.15),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.gold),
             minHeight: 6,
           ),
         ),
@@ -303,6 +299,68 @@ class _BrandRegistrationFlowState extends State<BrandRegistrationFlow> {
   }
 }
 
+// ── Shared helpers ──
+
+Widget _buildBrandTextField(String label, IconData icon, TextEditingController controller, {
+  bool obscureText = false,
+  String? Function(String?)? validator,
+  bool readOnly = false,
+  VoidCallback? onTap,
+  Widget? suffixIcon,
+}) {
+  return TextFormField(
+    controller: controller,
+    obscureText: obscureText,
+    readOnly: readOnly,
+    onTap: onTap,
+    validator: validator ?? (v) => v == null || v.isEmpty ? 'Required' : null,
+    style: GoogleFonts.montserrat(color: AppTheme.black),
+    decoration: InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+      prefixIcon: Icon(icon, color: AppTheme.grey, size: 20),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: AppTheme.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red.shade300),
+      ),
+    ),
+  );
+}
+
+Widget _buildBrandButton({required String label, required VoidCallback onPressed}) {
+  return SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.gold,
+        foregroundColor: AppTheme.black,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
+      ),
+      child: Text(label, style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15)),
+    ),
+  );
+}
+
+// --- Step Widgets ---
+
 class _Step1BusinessAccount extends StatefulWidget {
   final VoidCallback nextStep;
   final TextEditingController emailController;
@@ -338,18 +396,29 @@ class _Step1BusinessAccountState extends State<_Step1BusinessAccount> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Step 1', style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              'Create Account',
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: AppTheme.black,
+              ),
+            ),
             const SizedBox(height: 8),
-            const Text('Create Business Account', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text(
+              'Set up your business credentials.',
+              style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),
+            ),
             const SizedBox(height: 32),
-            _buildTextField(
+            _buildBrandTextField(
               'Business Email', 
               LucideIcons.mail, 
               widget.emailController,
               validator: (v) => v == null || v.isEmpty ? 'Email required' : null,
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildBrandTextField(
               'Password', 
               LucideIcons.lock, 
               widget.passwordController, 
@@ -357,7 +426,7 @@ class _Step1BusinessAccountState extends State<_Step1BusinessAccount> {
               validator: (v) => v == null || v.length < 6 ? 'Min 6 chars' : null,
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildBrandTextField(
               'Confirm Password', 
               LucideIcons.lock, 
               widget.confirmPasswordController, 
@@ -369,33 +438,9 @@ class _Step1BusinessAccountState extends State<_Step1BusinessAccount> {
               },
             ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(onPressed: _validateAndContinue, child: const Text('Next')),
-            ),
+            _buildBrandButton(label: 'Next', onPressed: _validateAndContinue),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    String label, 
-    IconData icon, 
-    TextEditingController controller, 
-    {bool obscureText = false, String? Function(String?)? validator}
-  ) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      validator: validator,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
@@ -438,87 +483,68 @@ class _Step2BusinessInfoState extends State<_Step2BusinessInfo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Business Information', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 32),
-            _buildTextField('Business Name', LucideIcons.building, widget.nameController),
-            const SizedBox(height: 16),
-            _buildCountryField(widget.countryController),
-            const SizedBox(height: 16),
-            _buildTextField('Business Registration Number', LucideIcons.fileText, widget.regNumController),
-            const SizedBox(height: 16),
-            _buildTextField('Phone Number', LucideIcons.phone, widget.phoneController),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(onPressed: _validateAndContinue, child: const Text('Next')),
+            Text(
+              'Business Information',
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: AppTheme.black,
+              ),
             ),
+            const SizedBox(height: 32),
+            _buildBrandTextField('Business Name', LucideIcons.building, widget.nameController),
+            const SizedBox(height: 16),
+            _buildCountryField(context, widget.countryController),
+            const SizedBox(height: 16),
+            _buildBrandTextField('Business Registration Number', LucideIcons.fileText, widget.regNumController),
+            const SizedBox(height: 16),
+            _buildBrandTextField('Phone Number', LucideIcons.phone, widget.phoneController),
+            const Spacer(),
+            _buildBrandButton(label: 'Next', onPressed: _validateAndContinue),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildCountryField(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () {
-        showCountryPicker(
-          context: context,
-          countryListTheme: CountryListThemeData(
-            flagSize: 25,
-            backgroundColor: const Color(0xFF1A1A1A),
-            textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-            bottomSheetHeight: 500,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20.0),
-              topRight: Radius.circular(20.0),
-            ),
-            inputDecoration: InputDecoration(
-              labelText: 'Search',
-              hintText: 'Start typing to search',
-              prefixIcon: const Icon(LucideIcons.search, color: Colors.white54),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-              ),
-              labelStyle: const TextStyle(color: Colors.white54),
-              hintStyle: const TextStyle(color: Colors.white54),
-            ),
+Widget _buildCountryField(BuildContext context, TextEditingController controller) {
+  return _buildBrandTextField(
+    'Country',
+    LucideIcons.globe,
+    controller,
+    readOnly: true,
+    suffixIcon: const Icon(LucideIcons.chevronDown, color: AppTheme.grey, size: 20),
+    onTap: () {
+      showCountryPicker(
+        context: context,
+        countryListTheme: CountryListThemeData(
+          flagSize: 25,
+          backgroundColor: AppTheme.white,
+          textStyle: GoogleFonts.montserrat(fontSize: 16, color: AppTheme.black),
+          bottomSheetHeight: 500,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20.0),
+            topRight: Radius.circular(20.0),
           ),
-          onSelect: (Country country) {
-            setState(() {
-              controller.text = country.name;
-            });
-          },
-        );
-      },
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: 'Country',
-        prefixIcon: const Icon(LucideIcons.globe, color: Colors.white54, size: 20),
-        suffixIcon: const Icon(LucideIcons.chevronDown, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, IconData icon, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      ),
-    );
-  }
+          inputDecoration: InputDecoration(
+            labelText: 'Search',
+            hintText: 'Start typing to search',
+            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.grey),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(color: AppTheme.grey.withOpacity(0.2)),
+            ),
+            labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+            hintStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+          ),
+        ),
+        onSelect: (Country country) {
+          controller.text = country.name;
+        },
+      );
+    },
+  );
 }
 
 class _Step3BusinessAddress extends StatefulWidget {
@@ -545,8 +571,6 @@ class _Step3BusinessAddressState extends State<_Step3BusinessAddress> {
 
   void _validateAndContinue() {
     if (_formKey.currentState!.validate()) {
-      // Ideally also check if file is picked? 
-      // if (widget.pickedFile == null) { snackbar... return; }
       widget.nextStep();
     }
   }
@@ -560,15 +584,33 @@ class _Step3BusinessAddressState extends State<_Step3BusinessAddress> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Business Address', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text(
+              'Business Address',
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: AppTheme.black,
+              ),
+            ),
             const SizedBox(height: 32),
-            _buildTextField('Address', LucideIcons.mapPin, widget.addressController),
+            _buildBrandTextField('Address', LucideIcons.mapPin, widget.addressController),
             const SizedBox(height: 16),
-            _buildCountryField(widget.countryController),
+            _buildCountryField(context, widget.countryController),
             const SizedBox(height: 32),
-            const Text('Upload proof of address', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+            Text(
+              'Upload proof of address',
+              style: GoogleFonts.montserrat(
+                color: AppTheme.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 8),
-            const Text('Utility bill or lease agreement', style: TextStyle(color: Colors.white54, fontSize: 14)),
+            Text(
+              'Utility bill or lease agreement',
+              style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 14),
+            ),
             const SizedBox(height: 16),
             GestureDetector(
               onTap: widget.pickFile,
@@ -576,91 +618,35 @@ class _Step3BusinessAddressState extends State<_Step3BusinessAddress> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white10, style: BorderStyle.solid),
+                  border: Border.all(
+                    color: widget.pickedFile != null ? Colors.green.shade300 : const Color(0xFFE0DCD5),
+                    style: BorderStyle.solid,
+                  ),
                 ),
                 child: Column(
                   children: [
-                    Icon(LucideIcons.upload, color: widget.pickedFile != null ? Colors.green : Colors.white24, size: 32),
+                    Icon(
+                      LucideIcons.upload,
+                      color: widget.pickedFile != null ? Colors.green : AppTheme.grey.withOpacity(0.4),
+                      size: 32,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       widget.pickedFile != null ? widget.pickedFile!.name : 'Tap to upload document', 
-                      style: TextStyle(color: widget.pickedFile != null ? Colors.green : Colors.white24)
+                      style: GoogleFonts.montserrat(
+                        color: widget.pickedFile != null ? Colors.green : AppTheme.grey.withOpacity(0.5),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(onPressed: _validateAndContinue, child: const Text('Next')),
-            ),
+            _buildBrandButton(label: 'Next', onPressed: _validateAndContinue),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCountryField(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: () {
-        showCountryPicker(
-          context: context,
-          countryListTheme: CountryListThemeData(
-            flagSize: 25,
-            backgroundColor: const Color(0xFF1A1A1A),
-            textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-            bottomSheetHeight: 500,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20.0),
-              topRight: Radius.circular(20.0),
-            ),
-            inputDecoration: InputDecoration(
-              labelText: 'Search',
-              hintText: 'Start typing to search',
-              prefixIcon: const Icon(LucideIcons.search, color: Colors.white54),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
-              ),
-              labelStyle: const TextStyle(color: Colors.white54),
-              hintStyle: const TextStyle(color: Colors.white54),
-            ),
-          ),
-          onSelect: (Country country) {
-            setState(() {
-              controller.text = country.name;
-            });
-          },
-        );
-      },
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: 'Country',
-        prefixIcon: const Icon(LucideIcons.globe, color: Colors.white54, size: 20),
-        suffixIcon: const Icon(LucideIcons.chevronDown, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, IconData icon, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
@@ -699,39 +685,39 @@ class _Step4TaxInfoState extends State<_Step4TaxInfo> {
           children: [
             Row(
               children: [
-                const Icon(LucideIcons.shieldCheck, color: Color(0xFF6366F1), size: 28),
+                const Icon(LucideIcons.shieldCheck, color: AppTheme.gold, size: 28),
                 const SizedBox(width: 12),
-                const Text('Secure Verification', style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold)),
+                Text(
+                  'Secure Verification',
+                  style: GoogleFonts.montserrat(
+                    color: AppTheme.gold,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
-            const Text('Tax Information', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 12),
-            const Text('Your information is encrypted and securely stored.', style: TextStyle(color: Colors.white54)),
-            const SizedBox(height: 32),
-            _buildTextField('Tax ID / Business tax info', LucideIcons.hash, widget.taxIdController),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(onPressed: _validateAndContinue, child: const Text('Next')),
+            Text(
+              'Tax Information',
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: AppTheme.black,
+              ),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Your information is encrypted and securely stored.',
+              style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 14),
+            ),
+            const SizedBox(height: 32),
+            _buildBrandTextField('Tax ID / Business tax info', LucideIcons.hash, widget.taxIdController),
+            const Spacer(),
+            _buildBrandButton(label: 'Next', onPressed: _validateAndContinue),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, IconData icon, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
@@ -764,7 +750,6 @@ class _Step5OnlinePresenceState extends State<_Step5OnlinePresence> {
     final link = _linkController.text.trim();
     if (link.isEmpty) return;
 
-    // Simple validation
     if (!link.contains('.')) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid URL')));
       return;
@@ -789,29 +774,65 @@ class _Step5OnlinePresenceState extends State<_Step5OnlinePresence> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Online Presence', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('Where can we find you?', style: TextStyle(color: Colors.white54)),
+          Text(
+            'Online Presence',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Where can we find you?',
+            style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 14),
+          ),
           const SizedBox(height: 32),
-          _buildTextField('Website', LucideIcons.globe, widget.websiteController),
+          TextFormField(
+            controller: widget.websiteController,
+            style: GoogleFonts.montserrat(color: AppTheme.black),
+            decoration: InputDecoration(
+              labelText: 'Website',
+              labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+              prefixIcon: const Icon(LucideIcons.globe, color: AppTheme.grey, size: 20),
+              filled: true,
+              fillColor: AppTheme.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
-          const Text('Social Media', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          Text(
+            'Social Media',
+            style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 12),
           
-          // Input Row
           Row(
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0DCD5)),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: _selectedPlatform,
-                    dropdownColor: const Color(0xFF2A2A2A),
-                    style: const TextStyle(color: Colors.white),
+                    dropdownColor: AppTheme.white,
+                    style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14),
                     items: _platforms.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
                     onChanged: (val) => setState(() => _selectedPlatform = val!),
                   ),
@@ -821,13 +842,24 @@ class _Step5OnlinePresenceState extends State<_Step5OnlinePresence> {
               Expanded(
                 child: TextField(
                   controller: _linkController,
-                  style: const TextStyle(color: Colors.white),
+                  style: GoogleFonts.montserrat(color: AppTheme.black),
                   decoration: InputDecoration(
                     hintText: 'Link / Username',
-                    hintStyle: const TextStyle(color: Colors.white24),
+                    hintStyle: GoogleFonts.montserrat(color: AppTheme.grey.withOpacity(0.5)),
                     filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    fillColor: AppTheme.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
@@ -835,19 +867,19 @@ class _Step5OnlinePresenceState extends State<_Step5OnlinePresence> {
               const SizedBox(width: 8),
               IconButton(
                 onPressed: _addLink,
-                icon: const Icon(LucideIcons.plusCircle, color: Color(0xFF6366F1)),
+                icon: const Icon(LucideIcons.plusCircle, color: AppTheme.gold),
               ),
             ],
           ),
           
           const SizedBox(height: 16),
           
-          // List
           if (widget.socialLinks.isNotEmpty)
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: AppTheme.white,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE0DCD5)),
               ),
               child: Column(
                 children: widget.socialLinks.asMap().entries.map((entry) {
@@ -855,10 +887,10 @@ class _Step5OnlinePresenceState extends State<_Step5OnlinePresence> {
                   final item = entry.value;
                   return ListTile(
                     dense: true,
-                    title: Text(item['platform']!, style: const TextStyle(color: Colors.white70)),
-                    subtitle: Text(item['url']!, style: const TextStyle(color: Colors.white30), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    title: Text(item['platform']!, style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.w500)),
+                    subtitle: Text(item['url']!, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
                     trailing: IconButton(
-                      icon: const Icon(LucideIcons.trash2, color: Colors.white24, size: 18),
+                      icon: Icon(LucideIcons.trash2, color: AppTheme.grey.withOpacity(0.5), size: 18),
                       onPressed: () => _removeLink(index),
                     ),
                   );
@@ -867,25 +899,8 @@ class _Step5OnlinePresenceState extends State<_Step5OnlinePresence> {
             ),
 
           const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(onPressed: widget.nextStep, child: const Text('Next')),
-          ),
+          _buildBrandButton(label: 'Next', onPressed: widget.nextStep),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, IconData icon, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
@@ -926,44 +941,26 @@ class _Step6AuthorizedRepState extends State<_Step6AuthorizedRep> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Authorized Representative', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-            const SizedBox(height: 32),
-            _buildTextField('Full Name', LucideIcons.user, widget.nameController),
-            const SizedBox(height: 16),
-            _buildTextField('Role', LucideIcons.briefcase, widget.roleController),
-            const SizedBox(height: 16),
-            _buildTextField('Contact Email', LucideIcons.mail, widget.emailController,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _validateAndContinue,
-                child: const Text('Next'),
+            Text(
+              'Authorized Representative',
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: AppTheme.black,
               ),
             ),
+            const SizedBox(height: 32),
+            _buildBrandTextField('Full Name', LucideIcons.user, widget.nameController),
+            const SizedBox(height: 16),
+            _buildBrandTextField('Role', LucideIcons.briefcase, widget.roleController),
+            const SizedBox(height: 16),
+            _buildBrandTextField('Contact Email', LucideIcons.mail, widget.emailController,
+              validator: (v) => v == null || v.isEmpty ? 'Required' : null),
+            const Spacer(),
+            _buildBrandButton(label: 'Next', onPressed: _validateAndContinue),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    String label, 
-    IconData icon, 
-    TextEditingController controller, 
-    {String? Function(String?)? validator}
-  ) {
-    return TextFormField(
-      controller: controller,
-      validator: validator ?? (v) => v == null || v.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.white54, size: 20),
-        filled: true,
-        fillColor: const Color(0xFF1A1A1A),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
       ),
     );
   }
@@ -1003,9 +1000,20 @@ class _Step7Summary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Review Information', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 12),
-          const Text('Please verify your business details before submitting.', style: TextStyle(color: Colors.white54)),
+          Text(
+            'Review Information',
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.black,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please verify your business details before submitting.',
+            style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 14),
+          ),
           const SizedBox(height: 32),
           
           _buildSummarySection('Business', [
@@ -1030,21 +1038,29 @@ class _Step7Summary extends StatelessWidget {
 
           if (proofFile != null) ...[
              const SizedBox(height: 24),
-             const Text('Proof of Address', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
+             Text(
+               'PROOF OF ADDRESS',
+               style: GoogleFonts.montserrat(
+                 color: AppTheme.gold,
+                 fontSize: 11,
+                 fontWeight: FontWeight.w700,
+                 letterSpacing: 1.5,
+               ),
+             ),
              const SizedBox(height: 8),
              Container(
                width: double.infinity,
                padding: const EdgeInsets.all(16),
                decoration: BoxDecoration(
-                 color: const Color(0xFF1A1A1A),
+                 color: AppTheme.white,
                  borderRadius: BorderRadius.circular(12),
-                 border: Border.all(color: Colors.green.withOpacity(0.5)),
+                 border: Border.all(color: Colors.green.shade300),
                ),
                child: Row(
                  children: [
                    const Icon(LucideIcons.check, color: Colors.green, size: 20),
                    const SizedBox(width: 12),
-                   Expanded(child: Text(proofFile!.name, style: const TextStyle(color: Colors.green))),
+                   Expanded(child: Text(proofFile!.name, style: GoogleFonts.montserrat(color: Colors.green, fontSize: 14))),
                  ],
                ),
              ),
@@ -1055,9 +1071,17 @@ class _Step7Summary extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: isLoading ? null : onSubmit,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.gold,
+                foregroundColor: AppTheme.black,
+                disabledBackgroundColor: AppTheme.grey.withOpacity(0.3),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+              ),
               child: isLoading 
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) 
-                  : const Text('Confirm & Submit'),
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black)) 
+                  : Text('Confirm & Submit', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15)),
             ),
           ),
         ],
@@ -1070,20 +1094,29 @@ class _Step7Summary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
-        Text(title.toUpperCase(), style: const TextStyle(color: Color(0xFF6366F1), fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(
+          title.toUpperCase(),
+          style: GoogleFonts.montserrat(
+            color: AppTheme.gold,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
+            color: AppTheme.white,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE0DCD5)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: items.map((item) => Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text(item, style: const TextStyle(color: Colors.white)),
+              child: Text(item, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14)),
             )).toList(),
           ),
         ),

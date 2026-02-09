@@ -4,10 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/auth/signup_screen.dart';
 import 'package:flutter_application_1/features/dashboard/dashboard_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
-  final String userType; // 'model' or 'brand'
+  final String userType;
 
   const LoginScreen({super.key, required this.userType});
 
@@ -24,7 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill in all fields')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill in all fields')));
       return;
     }
 
@@ -36,12 +38,11 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
 
-      // Navigate back to root (AuthWrapper) which will handle the routing
       if (!mounted) return;
       Navigator.of(context).popUntil((route) => route.isFirst);
-
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Login Failed: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -50,9 +51,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
+        backgroundColor: AppTheme.cream,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft),
+          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -64,18 +67,19 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Text(
                 'Welcome back.',
-                style: GoogleFonts.tinos(
+                style: GoogleFonts.cormorantGaramond(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
+                  color: AppTheme.black,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Log in as a ${widget.userType == 'model' ? 'Model' : 'Brand Owner'}.',
-                style: const TextStyle(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: AppTheme.grey,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -97,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixIcon: const Icon(LucideIcons.lock, size: 20),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? LucideIcons.eye : LucideIcons.eyeOff,
+                      _obscurePassword
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       size: 20,
                     ),
                     onPressed: () {
@@ -113,9 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
-                  child: _isLoading 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) 
-                    : const Text('Log In'),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text('Log In'),
                 ),
               ),
               const SizedBox(height: 16),
@@ -124,10 +133,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     // TODO: Forgot Password
                   },
-                  child: const Text(
+                  child: Text(
                     'Forgot Password?',
-                          style: TextStyle(
-                      color: Colors.white,
+                    style: GoogleFonts.montserrat(
+                      color: AppTheme.black,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -137,22 +146,24 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "Don't have an account? ",
-                          style: TextStyle(color: Colors.white70),
+                    style: GoogleFonts.montserrat(color: AppTheme.grey),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignupScreen(userType: widget.userType),
+                          builder: (context) =>
+                              SignupScreen(userType: widget.userType),
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'Sign Up',
-                            style: TextStyle(
+                      style: GoogleFonts.montserrat(
+                        color: AppTheme.black,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),

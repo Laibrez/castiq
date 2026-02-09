@@ -5,9 +5,10 @@ import 'package:flutter_application_1/features/auth/login_screen.dart';
 import 'package:flutter_application_1/features/auth/id_verification_screen.dart';
 import 'package:flutter_application_1/features/auth/account_setup_screen.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class SignupScreen extends StatefulWidget {
-  final String userType; // 'model' or 'brand'
+  final String userType;
 
   const SignupScreen({super.key, required this.userType});
 
@@ -25,13 +26,17 @@ class _SignupScreenState extends State<SignupScreen> {
   final AuthService _authService = AuthService();
 
   void _handleSignup() async {
-    if (_nameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill in all fields')));
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill in all fields')));
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')));
       return;
     }
 
@@ -51,19 +56,22 @@ class _SignupScreenState extends State<SignupScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => IdVerificationScreen(userType: widget.userType),
+            builder: (context) =>
+                IdVerificationScreen(userType: widget.userType),
           ),
         );
       } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => AccountSetupScreen(userType: widget.userType),
+            builder: (context) =>
+                AccountSetupScreen(userType: widget.userType),
           ),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Signup Failed: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Signup Failed: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -72,9 +80,11 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
+        backgroundColor: AppTheme.cream,
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft),
+          icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -86,18 +96,19 @@ class _SignupScreenState extends State<SignupScreen> {
             children: [
               Text(
                 'Create Account.',
-                style: GoogleFonts.tinos(
+                style: GoogleFonts.cormorantGaramond(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
+                  color: AppTheme.black,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Sign up as a ${widget.userType == 'model' ? 'Model' : 'Brand Owner'} to get started.',
-                style: const TextStyle(
+                style: GoogleFonts.montserrat(
                   fontSize: 16,
-                  color: Colors.white70,
+                  color: AppTheme.grey,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -105,7 +116,9 @@ class _SignupScreenState extends State<SignupScreen> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: widget.userType == 'brand' ? 'Company Name' : 'Full Name',
+                  labelText: widget.userType == 'brand'
+                      ? 'Company Name'
+                      : 'Full Name',
                   prefixIcon: const Icon(LucideIcons.user, size: 20),
                 ),
               ),
@@ -127,7 +140,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   prefixIcon: const Icon(LucideIcons.lock, size: 20),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? LucideIcons.eye : LucideIcons.eyeOff,
+                      _obscurePassword
+                          ? LucideIcons.eye
+                          : LucideIcons.eyeOff,
                       size: 20,
                     ),
                     onPressed: () {
@@ -152,31 +167,36 @@ class _SignupScreenState extends State<SignupScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleSignup,
-                  child: _isLoading 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2)) 
-                    : const Text('Sign Up'),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Text('Sign Up'),
                 ),
               ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "Already have an account? ",
-                          style: TextStyle(color: Colors.white70),
+                    style: GoogleFonts.montserrat(color: AppTheme.grey),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => LoginScreen(userType: widget.userType),
+                          builder: (context) =>
+                              LoginScreen(userType: widget.userType),
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'Log In',
-                            style: TextStyle(
+                      style: GoogleFonts.montserrat(
+                        color: AppTheme.black,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),

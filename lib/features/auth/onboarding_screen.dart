@@ -3,14 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/auth/role_selection_screen.dart';
 import 'package:flutter_application_1/features/matchmaker/browse_talent_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 /// ONBOARDING SCREEN
-/// This screen provides a 3-page introduction to the platform.
-/// 
-/// STYLING OVERVIEW:
-/// - Titles: Lora font (Elegant, high-end)
-/// - Body/Subtitles: Inter font (Clean, legible)
-/// - Action Buttons: Inter font (Standard, functional)
+/// Luxury minimal aesthetic — Cream background, Gold accents, Editorial typography.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -25,37 +21,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingData> _pages = [
     OnboardingData(
       title: 'Premium\nTalent Booking',
-      subtitle: 'The platform for brands, agencies,\nand production companies seeking\nexceptional models and creators.',
-      isTitleItalic: true, // Page 1 is italicized
+      subtitle:
+          'The platform for brands, agencies,\nand production companies seeking\nexceptional models and creators.',
+      isTitleItalic: true,
     ),
     OnboardingData(
       title: 'Global Excellence',
-      subtitle: 'Premium talent standards met with\nseamless technology.',
+      subtitle:
+          'Premium talent standards met with\nseamless technology.',
       features: [
         FeatureData(
           title: 'Curated Talent',
-          subtitle: 'Every model is vetted for quality,\nprofessionalism, and reliability.',
+          subtitle:
+              'Every model is vetted for quality,\nprofessionalism, and reliability.',
         ),
         FeatureData(
           title: 'Seamless Booking',
-          subtitle: 'Contracts, payments, and logistics\nhandled in one place.',
+          subtitle:
+              'Contracts, payments, and logistics\nhandled in one place.',
         ),
         FeatureData(
           title: 'Global Reach',
-          subtitle: 'Access talent across major cities and\ninternational markets.',
+          subtitle:
+              'Access talent across major cities and\ninternational markets.',
         ),
       ],
     ),
     OnboardingData(
       title: 'Elevate Your\nProduction',
-      subtitle: 'Join leading brands and agencies who\ntrust Caztiq for their talent\nbooking needs.',
+      subtitle:
+          'Join leading brands and agencies who\ntrust Caztiq for their talent\nbooking needs.',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       body: Stack(
         children: [
           PageView.builder(
@@ -70,7 +72,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               return _OnboardingPage(data: _pages[index], index: index);
             },
           ),
-          
           Positioned(
             bottom: 60,
             left: 24,
@@ -86,27 +87,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 const SizedBox(height: 48),
-                
                 if (_currentPage == 0)
                   _buildActionButton(
                     label: 'Browse Talent',
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const BrowseTalentScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const BrowseTalentScreen()),
                       );
                     },
                   ),
-                
                 if (_currentPage == _pages.length - 1) ...[
-                  _buildActionButton(
+                  _buildPrimaryButton(
                     label: 'Apply',
                     icon: LucideIcons.arrowRight,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const RoleSelectionScreen(isLogin: false),
+                          builder: (context) =>
+                              const RoleSelectionScreen(isLogin: false),
                         ),
                       );
                     },
@@ -118,7 +119,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const RoleSelectionScreen(isLogin: true),
+                          builder: (context) =>
+                              const RoleSelectionScreen(isLogin: true),
                         ),
                       );
                     },
@@ -128,8 +130,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onPressed: () => _showStatusModal(context),
                     child: Text(
                       'Application Status',
-                      style: GoogleFonts.inter(
-                        color: Colors.white54,
+                      style: GoogleFonts.montserrat(
+                        color: AppTheme.grey,
                         fontSize: 14,
                       ),
                     ),
@@ -143,14 +145,56 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildActionButton({required String label, IconData? icon, required VoidCallback onTap}) {
+  /// Gold primary button (for main CTA)
+  Widget _buildPrimaryButton(
+      {required String label, IconData? icon, required VoidCallback onTap}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: AppTheme.gold,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(30),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.montserrat(
+                    color: AppTheme.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                if (icon != null) ...[
+                  const SizedBox(width: 8),
+                  Icon(icon, color: AppTheme.black, size: 20),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Subtle outline button
+  Widget _buildActionButton(
+      {required String label, IconData? icon, required VoidCallback onTap}) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: Colors.white.withOpacity(0.15),
+          color: AppTheme.black.withOpacity(0.15),
           width: 1,
         ),
       ),
@@ -166,15 +210,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
+                  style: GoogleFonts.montserrat(
+                    color: AppTheme.black,
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
+                    letterSpacing: 0.5,
                   ),
                 ),
                 if (icon != null) ...[
                   const SizedBox(width: 8),
-                  Icon(icon, color: Colors.white, size: 20),
+                  Icon(icon, color: AppTheme.black, size: 20),
                 ],
               ],
             ),
@@ -191,7 +236,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: 4,
       width: _currentPage == index ? 24 : 8,
       decoration: BoxDecoration(
-        color: _currentPage == index ? Colors.white : Colors.white24,
+        color: _currentPage == index ? AppTheme.gold : AppTheme.black.withOpacity(0.15),
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -200,7 +245,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _showStatusModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: AppTheme.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -211,27 +256,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             Text(
               'Application Status',
-              style: GoogleFonts.tinos(
+              style: GoogleFonts.cormorantGaramond(
                 fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.black,
               ),
             ),
             const SizedBox(height: 16),
             Text(
               'Check the progress of your onboarding application.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(color: Colors.white70),
+              style: GoogleFonts.montserrat(color: AppTheme.grey),
             ),
             const SizedBox(height: 24),
             TextField(
               decoration: InputDecoration(
                 hintText: 'Email address',
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
+                fillColor: AppTheme.cream,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                  borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
                 ),
               ),
             ),
@@ -239,14 +288,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: AppTheme.gold,
+                foregroundColor: AppTheme.black,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: const Text('Check Now'),
+              child: Text(
+                'Check Now',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         ),
@@ -263,9 +315,8 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // PAGE IDENTIFIERS
     final bool isPage1 = index == 0;
-    final bool isPage2 = index == 1; // Features page
+    final bool isPage2 = index == 1;
     final bool isPage3 = index == 2;
 
     return Container(
@@ -274,18 +325,11 @@ class _OnboardingPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // TOP SPACER: 
-          // Page 1: 3 flex (Centered)
-          // Page 2: 2 flex (Balanced)
-          // Page 3: 1 flex (Elevated)
           if (isPage1) const Spacer(flex: 3),
           if (isPage2) const Spacer(flex: 2),
           if (isPage3) const Spacer(flex: 1),
-          
-          // TITLE FORMATTING
-          // PAGE 1 STYLE: "Premium" is Lora Bold/Italic, rest is Inter
-          // PAGE 2 STYLE: Lora font, 40px, balanced
-          // PAGE 3 STYLE: Lora font, 48px, elevated
+
+          // TITLE
           if (isPage1)
             RichText(
               textAlign: TextAlign.center,
@@ -293,21 +337,21 @@ class _OnboardingPage extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Premium\n',
-                    style: GoogleFonts.tinos(
+                    style: GoogleFonts.cormorantGaramond(
                       fontSize: 48,
-                      fontWeight: FontWeight.w700, // Bold
-                      fontStyle: FontStyle.italic, // Premium is italic
-                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontStyle: FontStyle.italic,
+                      color: AppTheme.black,
                       height: 1.2,
                       letterSpacing: -0.5,
                     ),
                   ),
                   TextSpan(
                     text: 'Talent Booking',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.montserrat(
                       fontSize: 48,
                       fontWeight: FontWeight.w300,
-                      color: Colors.white,
+                      color: AppTheme.black,
                       height: 1.2,
                       letterSpacing: -0.5,
                     ),
@@ -319,69 +363,63 @@ class _OnboardingPage extends StatelessWidget {
             Text(
               data.title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.tinos(
+              style: GoogleFonts.cormorantGaramond(
                 fontSize: isPage2 ? 40 : 48,
                 fontWeight: FontWeight.w300,
-                // Page 3/2 etc use theme-based italic or normal
-                fontStyle: data.isTitleItalic ? FontStyle.italic : FontStyle.normal,
-                color: Colors.white,
+                fontStyle:
+                    data.isTitleItalic ? FontStyle.italic : FontStyle.normal,
+                color: AppTheme.black,
                 height: 1.2,
                 letterSpacing: -0.5,
               ),
             ),
-          
-          // SUBTITLE SPACING
-          // Page 2: 20px, Others: 24px
-          SizedBox(height: isPage2 ? 20 : 24), 
-          
+
+          SizedBox(height: isPage2 ? 20 : 24),
+
           Text(
             data.subtitle,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.montserrat(
               fontSize: 15,
-              color: Colors.white.withOpacity(0.7),
+              color: AppTheme.grey,
               height: 1.5,
               letterSpacing: 0.1,
               fontWeight: FontWeight.w400,
             ),
           ),
-          
-          // FEATURES SECTION (Page 2 specific)
+
+          // Features section (Page 2)
           if (data.features != null) ...[
-            const SizedBox(height: 48), 
+            const SizedBox(height: 48),
             ...data.features!.map((f) => Padding(
-              padding: const EdgeInsets.only(bottom: 32),
-              child: Column(
-                children: [
-                  Text(
-                    f.title,
-                    style: GoogleFonts.inter(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: 0.3,
-                    ),
+                  padding: const EdgeInsets.only(bottom: 32),
+                  child: Column(
+                    children: [
+                      Text(
+                        f.title,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.black,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        f.subtitle,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: AppTheme.grey,
+                          height: 1.5,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8), 
-                  Text(
-                    f.subtitle,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(0.65),
-                      height: 1.5,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ],
-              ),
-            )),
+                )),
           ],
-          
-          // BOTTOM SPACER:
-          // Page 1: 3 flex (Symmetric)
-          // Page 2: 2 flex (Symmetric)
-          // Page 3: 5 flex (Room for actions)
+
           if (isPage1) const Spacer(flex: 3),
           if (isPage2) const Spacer(flex: 2),
           if (isPage3) const Spacer(flex: 5),

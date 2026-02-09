@@ -19,6 +19,7 @@ import 'package:flutter_application_1/features/jobs/job_offers_screen.dart';
 import 'package:flutter_application_1/features/payments/work_history_screen.dart';
 import 'package:flutter_application_1/features/admin/admin_brand_applications_screen.dart';
 import 'package:flutter_application_1/features/admin/admin_dashboard_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String userType;
@@ -41,31 +42,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     if (widget.userType == 'model') {
       _pages = [
-        const JobOffersScreen(), // Offers
-        const PortfolioScreen(), // Portfolio (This will likely need updates too if it displays profile)
-        const BookingsScreen(userType: 'model'), // Bookings
-        const WorkHistoryScreen(), // Work & Balance
+        const JobOffersScreen(),
+        const PortfolioScreen(),
+        const BookingsScreen(userType: 'model'),
+        const WorkHistoryScreen(),
       ];
       _destinations = const [
-        NavigationDestination(icon: Icon(LucideIcons.briefcase), label: 'Offers'),
-        NavigationDestination(icon: Icon(LucideIcons.user), label: 'Portfolio'),
-        NavigationDestination(icon: Icon(LucideIcons.calendarCheck), label: 'Bookings'),
-        NavigationDestination(icon: Icon(LucideIcons.wallet), label: 'Work'), // Use Wallet icon for Work/Balance
+        NavigationDestination(
+            icon: Icon(LucideIcons.briefcase), label: 'Offers'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.user), label: 'Portfolio'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.calendarCheck), label: 'Bookings'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.wallet), label: 'Work'),
       ];
     } else {
       _pages = [
-        BrandProfileScreen(), // My Brand
-        ModelDiscoveryScreen(), // Models
-        BrandJobsScreen(), // Jobs
-        BookingsScreen(userType: 'brand'), // Bookings
-        PaymentsScreen(), // Payments
+        BrandProfileScreen(),
+        ModelDiscoveryScreen(),
+        BrandJobsScreen(),
+        BookingsScreen(userType: 'brand'),
+        PaymentsScreen(),
       ];
       _destinations = const [
-        NavigationDestination(icon: Icon(LucideIcons.briefcase), label: 'My Brand'),
-        NavigationDestination(icon: Icon(LucideIcons.users), label: 'Models'),
-        NavigationDestination(icon: Icon(LucideIcons.list), label: 'Jobs'),
-        NavigationDestination(icon: Icon(LucideIcons.calendarCheck), label: 'Bookings'),
-        NavigationDestination(icon: Icon(LucideIcons.creditCard), label: 'Payments'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.briefcase), label: 'My Brand'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.users), label: 'Models'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.list), label: 'Jobs'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.calendarCheck), label: 'Bookings'),
+        NavigationDestination(
+            icon: Icon(LucideIcons.creditCard), label: 'Payments'),
       ];
     }
   }
@@ -82,10 +92,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text('Are you sure you want to delete your account? This action is irreversible.'),
+        title: Text(
+          'Delete Account',
+          style: GoogleFonts.cormorantGaramond(
+            fontWeight: FontWeight.bold,
+            color: AppTheme.black,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete your account? This action is irreversible.',
+          style: GoogleFonts.montserrat(color: AppTheme.grey),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -104,7 +125,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete account: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to delete account: $e')));
       }
     }
   }
@@ -112,20 +134,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _getPageTitle() {
     if (widget.userType == 'model') {
       switch (_selectedIndex) {
-        case 0: return 'Job Offers';
-        case 1: return 'Portfolio';
-        case 2: return 'Bookings';
-        case 3: return 'Work & Balance';
-        default: return 'CAZTIQ';
+        case 0:
+          return 'Job Offers';
+        case 1:
+          return 'Portfolio';
+        case 2:
+          return 'Bookings';
+        case 3:
+          return 'Work & Balance';
+        default:
+          return 'CAZTIQ';
       }
     } else {
       switch (_selectedIndex) {
-        case 0: return 'My Brand';
-        case 1: return 'Models';
-        case 2: return 'Jobs';
-        case 3: return 'Bookings';
-        case 4: return 'Payments';
-        default: return 'CAZTIQ';
+        case 0:
+          return 'My Brand';
+        case 1:
+          return 'Models';
+        case 2:
+          return 'Jobs';
+        case 3:
+          return 'Bookings';
+        case 4:
+          return 'Payments';
+        default:
+          return 'CAZTIQ';
       }
     }
   }
@@ -133,27 +166,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
+        backgroundColor: AppTheme.cream,
         title: Text(
           _getPageTitle(),
           style: GoogleFonts.cormorantGaramond(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
+            color: AppTheme.black,
           ),
         ),
       ),
       drawer: Drawer(
+        backgroundColor: AppTheme.white,
         child: Column(
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.black),
+              decoration: const BoxDecoration(color: AppTheme.cream),
               child: Center(
                 child: Text(
                   'CAZTIQ',
                   style: GoogleFonts.cormorantGaramond(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.black,
                   ),
                 ),
               ),
@@ -163,7 +200,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               title: const Text('Comments & Feedback'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const FeedbackScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const FeedbackScreen()));
               },
             ),
             ListTile(
@@ -171,7 +209,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               title: const Text('Support'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const SupportScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const SupportScreen()));
               },
             ),
             ListTile(
@@ -179,10 +218,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               title: const Text('Account Settings'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const SettingsScreen()));
               },
             ),
-            // Admin section (only show for admin users - you can add role check)
             ListTile(
               leading: const Icon(LucideIcons.shield),
               title: const Text('Admin Dashboard'),
@@ -190,7 +229,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const AdminDashboardScreen()),
                 );
               },
             ),
@@ -201,21 +241,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AdminBrandApplicationsScreen()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const AdminBrandApplicationsScreen()),
                 );
               },
             ),
             ListTile(
               leading: const Icon(LucideIcons.refreshCw),
-              title: Text('Switch to ${widget.userType == 'model' ? 'Brand Owner' : 'Model'}'),
+              title: Text(
+                  'Switch to ${widget.userType == 'model' ? 'Brand Owner' : 'Model'}'),
               onTap: () async {
-                final newRole = widget.userType == 'model' ? 'brand' : 'model';
-                await FirebaseFirestore.instance.collection('users').doc(_authService.currentUser!.uid).update({
+                final newRole =
+                    widget.userType == 'model' ? 'brand' : 'model';
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(_authService.currentUser!.uid)
+                    .update({
                   'role': newRole,
                 });
                 if (!mounted) return;
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => DashboardScreen(userType: newRole)),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          DashboardScreen(userType: newRole)),
                 );
               },
             ),
@@ -230,7 +279,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             ListTile(
               leading: const Icon(LucideIcons.trash2, color: Colors.red),
-              title: const Text('Delete Account', style: TextStyle(color: Colors.red)),
+              title: const Text('Delete Account',
+                  style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _handleDeleteAccount();
