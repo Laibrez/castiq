@@ -21,27 +21,46 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final AuthService _authService = AuthService();
   final BookingService bookingService = BookingService();
 
+  // ── Luxury Color Palette (matching AppTheme) ──
+  static const Color _cream = Color(0xFFF8F6F3);
+  static const Color _white = Color(0xFFFFFFFF);
+  static const Color _black = Color(0xFF1A1A1A);
+  static const Color _gold = Color(0xFFD4AF37);
+  static const Color _lightGold = Color(0xFFE8D7A8);
+  static const Color _grey = Color(0xFF6B6B6B);
+  static const Color _border = Color(0xFFE8E4DE);
+
   @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
     if (user == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(child: Text('Please log in', style: TextStyle(color: Colors.white))),
+      return Scaffold(
+        backgroundColor: _cream,
+        body: Center(
+          child: Text(
+            'Please log in',
+            style: GoogleFonts.montserrat(color: _black),
+          ),
+        ),
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _cream,
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.white));
+            return const Center(child: CircularProgressIndicator(color: _gold));
           }
 
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('User data not found', style: TextStyle(color: Colors.white70)));
+            return Center(
+              child: Text(
+                'User data not found',
+                style: GoogleFonts.montserrat(color: _grey),
+              ),
+            );
           }
 
           final userData = UserModel.fromMap(snapshot.data!.data() as Map<String, dynamic>, snapshot.data!.id);
@@ -62,8 +81,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           Container(
                             padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: _white,
                               borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(18),
@@ -89,8 +115,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                         userData.name,
                                         style: GoogleFonts.cormorantGaramond(
                                           fontSize: 28,
-                                          fontWeight: FontWeight.w400,
-                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          color: _black,
                                         ),
                                       ),
                                     ),
@@ -109,10 +135,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${stats['age'] ?? '24'} • ${userData.location ?? 'Miami, Florida'}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white.withOpacity(0.5),
+                                  '${stats['age'] ?? '24'} · ${userData.location ?? 'Miami, Florida'}',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 14,
+                                    color: _grey,
                                   ),
                                 ),
                                 const SizedBox(height: 12),
@@ -130,21 +156,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF6366F1).withOpacity(0.1),
+                                          color: _gold.withValues(alpha: 0.1),
                                           borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.3)),
+                                          border: Border.all(color: _gold.withValues(alpha: 0.3)),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Icon(LucideIcons.contact, size: 14, color: Color(0xFF818CF8)),
+                                            const Icon(LucideIcons.contact, size: 14, color: _gold),
                                             const SizedBox(width: 8),
-                                            const Text(
+                                            Text(
                                               'My Z-Card',
-                                              style: TextStyle(
+                                              style: GoogleFonts.montserrat(
                                                 fontSize: 12,
-                                                color: Color(0xFF818CF8),
-                                                fontWeight: FontWeight.bold,
+                                                color: _gold,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                           ],
@@ -155,15 +181,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.05),
+                                        color: _black.withValues(alpha: 0.04),
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                        border: Border.all(color: _border),
                                       ),
                                       child: Text(
                                         '${stats['experience'] ?? '3'}y exp',
-                                        style: const TextStyle(
+                                        style: GoogleFonts.montserrat(
                                           fontSize: 12,
-                                          color: Colors.white70,
+                                          color: _grey,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -185,8 +211,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    // MEDIA UPLOAD WIDGET REMOVED PER USER REQUEST
-                    // Uploads are now handled in EditPortfolioScreen
                     const SizedBox(height: 16),
 
                     // ABOUT CARD
@@ -194,9 +218,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       title: 'About',
                       child: Text(
                         userData.bio ?? 'Professional model based in Miami. Specialized in high-fashion editorial and runway. Open to travel for exceptional opportunities.',
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          color: Colors.white.withOpacity(0.65),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 14,
+                          color: _grey,
                           height: 1.6,
                         ),
                       ),
@@ -238,13 +262,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 20),
-                            child: Divider(color: Colors.white10),
+                            child: Divider(color: _border),
                           ),
                           Text(
                             'Categories',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white.withOpacity(0.4),
+                            style: GoogleFonts.montserrat(
+                              fontSize: 11,
+                              color: _grey,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 1,
                             ),
@@ -257,13 +281,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.05),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.white10),
+                                  color: _cream,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: _border),
                                 ),
                                 child: Text(
                                   cat.trim(),
-                                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                  style: GoogleFonts.montserrat(
+                                    color: _black,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -276,7 +304,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 ),
               ),
 
-              // 3. Booking History (NEW)
+              // 3. Booking History
               StreamBuilder<List<BookingModel>>(
                 stream: bookingService.getUserBookings(user.uid, 'model'),
                 builder: (context, snapshot) {
@@ -292,8 +320,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           'Experience History',
                           style: GoogleFonts.cormorantGaramond(
                             fontSize: 24,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            color: _black,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -301,19 +329,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.03),
+                            color: _white,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withOpacity(0.05)),
+                            border: Border.all(color: _border),
                           ),
                           child: Row(
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
+                                  color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(LucideIcons.check, size: 14, color: Colors.green),
+                                child: const Icon(LucideIcons.check, size: 14, color: Color(0xFF2E7D32)),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
@@ -322,17 +350,24 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                   children: [
                                     Text(
                                       booking.jobTitle ?? 'Model Booking',
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                      style: GoogleFonts.montserrat(
+                                        color: _black,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       DateFormat('MMMM yyyy').format(booking.date ?? booking.createdAt),
-                                      style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                                      style: GoogleFonts.montserrat(
+                                        color: _grey,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const Icon(LucideIcons.externalLink, size: 14, color: Colors.white24),
+                              Icon(LucideIcons.externalLink, size: 14, color: _grey.withValues(alpha: 0.5)),
                             ],
                           ),
                         )).toList(),
@@ -341,7 +376,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
                               '+ ${history.length - 3} more completed bookings',
-                              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12, fontStyle: FontStyle.italic),
+                              style: GoogleFonts.montserrat(
+                                color: _grey,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
                             ),
                           ),
                       ]),
@@ -360,8 +399,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       'Featured Work',
                       style: GoogleFonts.cormorantGaramond(
                         fontSize: 24,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        color: _black,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -390,11 +429,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       
                       if (index >= images.length) return null;
 
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.network(
-                          images[index],
-                          fit: BoxFit.cover,
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(
+                            images[index],
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       );
                     },
@@ -416,9 +467,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.4),
+          style: GoogleFonts.montserrat(
+            fontSize: 11,
+            color: _grey,
             fontWeight: FontWeight.w600,
             letterSpacing: 1,
           ),
@@ -426,9 +477,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.montserrat(
             fontSize: 16,
-            color: Colors.white,
+            color: _black,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -443,25 +494,36 @@ class _Card extends StatelessWidget {
 
   const _Card({required this.title, required this.child});
 
+  static const Color _white = Color(0xFFFFFFFF);
+  static const Color _gold = Color(0xFFD4AF37);
+  static const Color _border = Color(0xFFE8E4DE);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        color: _white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title.toUpperCase(),
-            style: GoogleFonts.cormorantGaramond(
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF6366F1),
+            style: GoogleFonts.montserrat(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: _gold,
               letterSpacing: 1.5,
             ),
           ),
@@ -477,6 +539,9 @@ class _IconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
+  static const Color _cream = Color(0xFFF8F6F3);
+  static const Color _grey = Color(0xFF6B6B6B);
+
   const _IconButton({required this.icon, required this.onTap});
 
   @override
@@ -485,11 +550,11 @@ class _IconButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+        decoration: const BoxDecoration(
+          color: _cream,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 16, color: Colors.white.withOpacity(0.6)),
+        child: Icon(icon, size: 16, color: _grey),
       ),
     );
   }

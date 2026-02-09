@@ -64,7 +64,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 12),
-
+                  
                   // Search & Filter
                   Row(
                     children: [
@@ -106,7 +106,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-
+                  
                   // Filter Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -150,7 +150,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
+            
             // Job Listings
             Expanded(
               child: _buildJobListings(),
@@ -236,10 +236,10 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                     border: Border.all(color: AppTheme.white, width: 2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: CircleAvatar(
+                child: CircleAvatar(
                     backgroundColor: AppTheme.black,
-                    radius: 20,
-                    backgroundImage: NetworkImage(job['brandLogo']),
+                  radius: 20,
+                  backgroundImage: NetworkImage(job['brandLogo']),
                   ),
                 ),
               ),
@@ -265,19 +265,19 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
               ),
             ],
           ),
-
+          
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  job['jobName'],
-                  style: GoogleFonts.cormorantGaramond(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  children: [
+                    Text(
+                      job['jobName'],
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                     color: AppTheme.black,
-                  ),
+                    ),
                 ),
                 const SizedBox(height: 8),
                 Row(

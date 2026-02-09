@@ -27,7 +27,7 @@ class ApplicationConfirmationModal {
               ),
             ),
             const SizedBox(height: 48),
-
+            
             // Success Icon
             Container(
               padding: const EdgeInsets.all(24),
@@ -42,7 +42,7 @@ class ApplicationConfirmationModal {
               ),
             ),
             const SizedBox(height: 32),
-
+            
             // Message
             Text(
               'Application submitted',
@@ -63,7 +63,7 @@ class ApplicationConfirmationModal {
               ),
             ),
             const SizedBox(height: 48),
-
+            
             // Action
             SizedBox(
               width: double.infinity,

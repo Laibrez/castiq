@@ -44,7 +44,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context),
                       icon: const Icon(LucideIcons.arrowLeft, size: 16),
                       label: const Text('Back'),
                       style: TextButton.styleFrom(
@@ -66,7 +66,7 @@ class RoleSelectionScreen extends StatelessWidget {
             child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
-                child: ConstrainedBox(
+            child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 640),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -116,29 +116,29 @@ class RoleSelectionScreen extends StatelessWidget {
                       LayoutBuilder(
                         builder: (context, constraints) {
                           final modelCard = _RoleCard(
-                            icon: LucideIcons.user,
+                        icon: LucideIcons.user,
                             title: "I'm a Model",
                             description:
                                 'Showcase your portfolio, receive bookings, and connect with brands looking for talent like you.',
-                            onTap: () {
-                              if (isLogin) {
-                                Navigator.push(
-                                  context,
+                        onTap: () {
+                          if (isLogin) {
+                            Navigator.push(
+                              context,
                                   MaterialPageRoute(
                                     builder: (_) =>
                                         const LoginScreen(userType: 'model'),
                                   ),
-                                );
-                              } else {
-                                Navigator.push(
-                                  context,
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
                                   MaterialPageRoute(
                                     builder: (_) =>
                                         const ModelRegistrationFlow(),
                                   ),
-                                );
-                              }
-                            },
+                            );
+                          }
+                        },
                           );
 
                           final brandCard = _RoleCard(
@@ -146,10 +146,10 @@ class RoleSelectionScreen extends StatelessWidget {
                             title: "I'm a Brand",
                             description:
                                 'Find and book talented models for your campaigns, productions, and creative projects.',
-                            onTap: () {
-                              if (isLogin) {
-                                Navigator.push(
-                                  context,
+                        onTap: () {
+                          if (isLogin) {
+                            Navigator.push(
+                              context,
                                   MaterialPageRoute(
                                     builder: (_) =>
                                         const LoginScreen(userType: 'brand'),
@@ -195,19 +195,19 @@ class RoleSelectionScreen extends StatelessWidget {
 
                       // ── Footer link ──
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
                             MaterialPageRoute(
                               builder: (_) =>
                                   RoleSelectionScreen(isLogin: !isLogin),
                             ),
-                          );
-                        },
-                        child: Padding(
+                            );
+                          },
+                          child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: RichText(
-                            text: TextSpan(
+                            child: RichText(
+                              text: TextSpan(
                               text: isLogin
                                   ? "Don't have an account? "
                                   : 'Already have an account? ',
@@ -215,15 +215,15 @@ class RoleSelectionScreen extends StatelessWidget {
                                 color: AppTheme.grey,
                                 fontSize: 14,
                               ),
-                              children: [
-                                TextSpan(
+                                children: [
+                                  TextSpan(
                                   text: isLogin ? 'Join Now' : 'Sign in',
                                   style: GoogleFonts.montserrat(
                                     color: AppTheme.gold,
                                     fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
                             ),
                           ),
                         ),
@@ -273,9 +273,9 @@ class _RoleCardState extends State<_RoleCard> {
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeOut,
           padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
+        decoration: BoxDecoration(
             color: AppTheme.white,
-            borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: _isHovered
                   ? AppTheme.gold.withOpacity(0.3)
@@ -290,10 +290,10 @@ class _RoleCardState extends State<_RoleCard> {
                     ),
                   ]
                 : [],
-          ),
+        ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          children: [
               // Icon container
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
@@ -319,8 +319,8 @@ class _RoleCardState extends State<_RoleCard> {
                   fontWeight: FontWeight.w600,
                   fontStyle: FontStyle.italic,
                   color: AppTheme.black,
-                ),
               ),
+            ),
               const SizedBox(height: 8),
 
               // Description
@@ -332,7 +332,7 @@ class _RoleCardState extends State<_RoleCard> {
                   height: 1.6,
                 ),
               ),
-            ],
+          ],
           ),
         ),
       ),
