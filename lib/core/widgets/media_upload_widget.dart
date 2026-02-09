@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/services/media_upload_service.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class MediaUploadWidget extends StatefulWidget {
   final VoidCallback? onUploadComplete;
@@ -115,8 +115,8 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
   void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
+        content: Text(message, style: GoogleFonts.montserrat(color: AppTheme.white)),
+        backgroundColor: AppTheme.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -125,8 +125,8 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+        content: Text(message, style: GoogleFonts.montserrat(color: AppTheme.white)),
+        backgroundColor: AppTheme.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -137,25 +137,32 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Upload Media',
-            style: GoogleFonts.tinos(
-              fontSize: 20,
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppTheme.black,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Add photos and videos to your portfolio',
-            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+            style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
           ),
           const SizedBox(height: 24),
 
@@ -189,8 +196,8 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
                 value: _uploadProgress,
-                backgroundColor: Colors.white.withOpacity(0.1),
-                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                backgroundColor: AppTheme.cream,
+                valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.gold),
                 minHeight: 8,
               ),
             ),
@@ -203,13 +210,13 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
                   height: 16,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Color(0xFF818CF8),
+                    color: AppTheme.gold,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   _uploadStatus,
-                  style: const TextStyle(color: Color(0xFF818CF8), fontSize: 13),
+                  style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
                 ),
               ],
             ),
@@ -222,8 +229,8 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: _uploadStatus.contains('success') 
-                    ? Colors.green.withOpacity(0.1) 
-                    : Colors.red.withOpacity(0.1),
+                    ? AppTheme.success.withOpacity(0.1) 
+                    : AppTheme.error.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -232,14 +239,14 @@ class _MediaUploadWidgetState extends State<MediaUploadWidget> {
                     _uploadStatus.contains('success') 
                         ? LucideIcons.checkCircle2 
                         : LucideIcons.alertCircle,
-                    color: _uploadStatus.contains('success') ? Colors.green : Colors.red,
+                    color: _uploadStatus.contains('success') ? AppTheme.success : AppTheme.error,
                     size: 18,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     _uploadStatus,
-                    style: TextStyle(
-                      color: _uploadStatus.contains('success') ? Colors.green : Colors.red,
+                    style: GoogleFonts.montserrat(
+                      color: _uploadStatus.contains('success') ? AppTheme.success : AppTheme.error,
                       fontSize: 13,
                     ),
                   ),
@@ -274,47 +281,54 @@ class _UploadButton extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: onTap == null 
-              ? Colors.white.withOpacity(0.02) 
-              : Colors.white.withOpacity(0.05),
+              ? AppTheme.cream 
+              : AppTheme.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: onTap == null 
-                ? Colors.white.withOpacity(0.02) 
-                : Colors.white.withOpacity(0.1),
+                ? Colors.transparent 
+                : const Color(0xFFE0DCD5),
           ),
+          boxShadow: onTap != null ? [
+            BoxShadow(
+              color: AppTheme.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            )
+          ] : null,
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withOpacity(0.1),
+                color: onTap == null ? AppTheme.grey.withOpacity(0.1) : AppTheme.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
                 color: onTap == null 
-                    ? Colors.white.withOpacity(0.3) 
-                    : const Color(0xFF818CF8),
+                    ? AppTheme.grey.withOpacity(0.5) 
+                    : AppTheme.gold,
                 size: 24,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.montserrat(
                 color: onTap == null 
-                    ? Colors.white.withOpacity(0.3) 
-                    : Colors.white,
-                fontWeight: FontWeight.bold,
+                    ? AppTheme.grey.withOpacity(0.5) 
+                    : AppTheme.black,
+                fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.3),
+              style: GoogleFonts.montserrat(
+                color: AppTheme.grey.withOpacity(0.7),
                 fontSize: 11,
               ),
             ),

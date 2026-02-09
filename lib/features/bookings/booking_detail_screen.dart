@@ -11,6 +11,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_application_1/core/widgets/share_modal.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class BookingDetailScreen extends StatefulWidget {
   final String userType;
@@ -65,31 +66,35 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       stream: FirebaseFirestore.instance.collection('bookings').doc(widget.bookingId).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(backgroundColor: Colors.black, body: Center(child: CircularProgressIndicator(color: Colors.white)));
+          return const Scaffold(backgroundColor: AppTheme.cream, body: Center(child: CircularProgressIndicator(color: AppTheme.gold)));
         }
 
         if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Scaffold(backgroundColor: Colors.black, body: Center(child: Text('Booking not found', style: TextStyle(color: Colors.white))));
+          return const Scaffold(backgroundColor: AppTheme.cream, body: Center(child: Text('Booking not found', style: TextStyle(color: AppTheme.black))));
         }
 
         final booking = BookingModel.fromMap(snapshot.data!.data() as Map<String, dynamic>, snapshot.data!.id);
 
         return Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: AppTheme.cream,
           appBar: AppBar(
-            backgroundColor: Colors.black,
+            backgroundColor: AppTheme.cream,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
+              icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.black),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
               'Booking Detail',
-              style: GoogleFonts.tinos(fontWeight: FontWeight.bold, fontSize: 20),
+              style: GoogleFonts.cormorantGaramond(
+                fontWeight: FontWeight.w400,
+                fontSize: 24,
+                color: AppTheme.black,
+              ),
             ),
             actions: [
               IconButton(
-                icon: const Icon(LucideIcons.share, color: Colors.white),
+                icon: const Icon(LucideIcons.share, color: AppTheme.black),
                 onPressed: () {
                   ShareModal.show(
                     context,
@@ -102,12 +107,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             bottom: TabBar(
               controller: _tabController,
               isScrollable: true,
-              indicatorColor: const Color(0xFF6366F1),
+              indicatorColor: AppTheme.gold,
+              labelColor: AppTheme.black,
+              unselectedLabelColor: AppTheme.grey,
               indicatorWeight: 3,
               labelPadding: const EdgeInsets.symmetric(horizontal: 20),
+              labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+              unselectedLabelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w500),
               tabs: const [
                 Tab(text: 'Overview'),
-
                 Tab(text: 'Requirements'),
                 Tab(text: 'Payment'),
                 Tab(text: 'Contracts'),
@@ -119,7 +127,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             controller: _tabController,
             children: [
               _buildOverviewTab(booking),
-
               _buildRequirementsTab(booking),
               _buildPaymentTab(booking),
               _buildContractsTab(booking),
@@ -155,7 +162,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
           const SizedBox(height: 32),
           Text(
             'Production Status',
-            style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black),
           ),
           const SizedBox(height: 16),
           _buildStatusTimeline(booking.status),
@@ -164,10 +171,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             title: 'About the Project',
             child: Text(
               booking.description ?? 'No project description available.',
-              style: TextStyle(color: Colors.white.withOpacity(0.5), height: 1.6),
+              style: GoogleFonts.montserrat(color: AppTheme.black.withOpacity(0.8), height: 1.6, fontSize: 14),
             ),
           ),
-          const SizedBox(height: 32),
           const SizedBox(height: 32),
           _infoCard(
             title: 'Call Times',
@@ -194,8 +200,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       ),
     );
   }
-
-
 
   Widget _buildRequirementsTab(BookingModel booking) {
     return SingleChildScrollView(
@@ -247,7 +251,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               children: [
                 _paymentRow('Model Payment', '\$${rate.toStringAsFixed(2)}'),
                 _paymentRow('Platform Fee (10%)', '\$${platformFee.toStringAsFixed(2)}'),
-                const Divider(color: Colors.white10, height: 32),
+                const Divider(color: Color(0xFFE0DCD5), height: 32),
                 _paymentRow('Total Amount', '\$${total.toStringAsFixed(2)}', isTotal: true),
               ],
             ),
@@ -256,9 +260,9 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppTheme.cream,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white10),
+              border: Border.all(color: const Color(0xFFE0DCD5)),
             ),
             child: Row(
               children: [
@@ -268,14 +272,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Escrow Protection Active',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Payments are protected until jobs are completed.',
-                        style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                        style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12),
                       ),
                     ],
                   ),
@@ -296,7 +300,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             onPressed: () => _startScanning(booking.id),
             icon: const Icon(LucideIcons.camera, size: 20),
             label: const Text('Scan Model QR to Check-in', style: TextStyle(fontWeight: FontWeight.bold)),
-            style: _btnStyle(const Color(0xFF6366F1), Colors.white),
+            style: _btnStyle(AppTheme.black, AppTheme.white),
           ),
         );
       } else if (booking.status == 'job_in_progress' || booking.status == 'in_progress' || booking.status == 'awaiting_confirmation') {
@@ -312,16 +316,16 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    side: const BorderSide(color: Colors.white10),
+                    side: const BorderSide(color: Color(0xFFE0DCD5)),
                   ),
-                  child: const Text('View Photo Proof', style: TextStyle(color: Colors.white)),
+                  child: Text('View Photo Proof', style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () => _updateStatus('completed'),
-                  style: _btnStyle(Colors.white, Colors.black),
+                  style: _btnStyle(AppTheme.black, AppTheme.white),
                   child: const Text('Release Payment', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
@@ -366,7 +370,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             onPressed: () => _showPersonalQR(booking),
             icon: const Icon(LucideIcons.qrCode, size: 20),
             label: const Text('Show My QR to Brand', style: TextStyle(fontWeight: FontWeight.bold)),
-            style: _btnStyle(const Color(0xFF6366F1), Colors.white),
+            style: _btnStyle(AppTheme.black, AppTheme.white),
           ),
         );
       } else if (booking.status == 'job_in_progress' || booking.status == 'in_progress') {
@@ -375,7 +379,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             onPressed: () => _completeJobWithPhoto(booking.id),
             icon: const Icon(LucideIcons.camera, size: 20),
             label: const Text('Upload Photo Proof to End', style: TextStyle(fontWeight: FontWeight.bold)),
-            style: _btnStyle(Colors.white, Colors.black),
+            style: _btnStyle(AppTheme.black, AppTheme.white),
           ),
         );
       }
@@ -389,17 +393,24 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(title, style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black)),
           if (subtitle != null) ...[
             const SizedBox(height: 4),
-            Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13)),
+            Text(subtitle, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12)),
           ],
           const SizedBox(height: 24),
           child,
@@ -413,14 +424,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withOpacity(0.2)),
+          Icon(icon, size: 16, color: AppTheme.grey),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 11)),
+              Text(label, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 11)),
               const SizedBox(height: 2),
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 14)),
+              Text(value, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14, fontWeight: FontWeight.w500)),
             ],
           ),
         ],
@@ -434,8 +445,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: isTotal ? Colors.white : Colors.white38, fontSize: isTotal ? 16 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
-          Text(value, style: TextStyle(color: Colors.white, fontSize: isTotal ? 20 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.w600)),
+          Text(label, style: GoogleFonts.montserrat(color: isTotal ? AppTheme.black : AppTheme.grey, fontSize: isTotal ? 16 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.w500)),
+          Text(value, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: isTotal ? 20 : 14, fontWeight: isTotal ? FontWeight.bold : FontWeight.w600)),
         ],
       ),
     );
@@ -449,10 +460,10 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
         children: [
           const Padding(
             padding: EdgeInsets.only(top: 8.0),
-            child: Icon(Icons.circle, size: 4, color: Color(0xFF6366F1)),
+            child: Icon(Icons.circle, size: 4, color: AppTheme.gold),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(text, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14, height: 1.5))),
+          Expanded(child: Text(text, style: GoogleFonts.montserrat(color: AppTheme.black.withOpacity(0.8), fontSize: 14, height: 1.5))),
         ],
       ),
     );
@@ -462,8 +473,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
       decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+        color: AppTheme.white,
+        border: Border(top: BorderSide(color: const Color(0xFFE0DCD5))),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: child,
     );
@@ -508,19 +526,20 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                   Container(
                     width: 12, height: 12,
                     decoration: BoxDecoration(
-                      color: isActive ? const Color(0xFF6366F1) : Colors.white12,
+                      color: isActive ? AppTheme.gold : AppTheme.cream,
                       shape: BoxShape.circle,
-                      boxShadow: isActive ? [BoxShadow(color: const Color(0xFF6366F1).withOpacity(0.3), blurRadius: 10)] : null,
+                      border: Border.all(color: isActive ? AppTheme.gold : AppTheme.grey.withOpacity(0.3)),
+                      boxShadow: isActive ? [BoxShadow(color: AppTheme.gold.withOpacity(0.3), blurRadius: 10)] : null,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(steps[index], style: TextStyle(fontSize: 8, color: isActive ? Colors.white : Colors.white24, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+                  Text(steps[index], style: GoogleFonts.montserrat(fontSize: 8, color: isActive ? AppTheme.black : AppTheme.grey, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
                 ],
               ),
               if (index < steps.length - 1)
                 Expanded(child: Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: Container(height: 1, color: index < currentIdx ? const Color(0xFF6366F1) : Colors.white12),
+                  child: Container(height: 1, color: index < currentIdx ? AppTheme.gold : AppTheme.cream),
                 )),
             ],
           ),
@@ -534,7 +553,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     final result = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.white,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
@@ -544,8 +563,8 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Scan Model QR', style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                  IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(LucideIcons.x, color: Colors.white)),
+                  Text('Scan Model QR', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black)),
+                  IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(LucideIcons.x, color: AppTheme.black)),
                 ],
               ),
             ),
@@ -575,20 +594,20 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   void _showPersonalQR(BookingModel booking) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF161618),
+      backgroundColor: AppTheme.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('My Check-in QR', style: GoogleFonts.tinos(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text('My Check-in QR', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w400, color: AppTheme.black)),
             const SizedBox(height: 12),
-            Text('Show this to the brand to start the job', style: TextStyle(color: Colors.white.withOpacity(0.4))),
+            Text('Show this to the brand to start the job', style: GoogleFonts.montserrat(color: AppTheme.grey)),
             const SizedBox(height: 48),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE0DCD5))),
               child: QrImageView(data: booking.id, version: QrVersions.auto, size: 200),
             ),
             const SizedBox(height: 48),
@@ -612,21 +631,21 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
               padding: const EdgeInsets.all(24),
-              child: Text('Check-out Photo Proof', style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+              child: Text('Check-out Photo Proof', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black)),
             ),
             Container(
               height: 400,
               width: double.infinity,
               margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: Colors.white12,
+                color: AppTheme.cream,
                 borderRadius: BorderRadius.circular(16),
                 image: const DecorationImage(image: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop'), fit: BoxFit.cover),
               ),
@@ -636,7 +655,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                style: _btnStyle(Colors.white, Colors.black),
+                style: _btnStyle(AppTheme.black, AppTheme.white),
                 child: const Center(child: Text('Close Proof')),
               ),
             ),
@@ -649,7 +668,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     return FutureBuilder<DocumentSnapshot>(
       future: FirebaseFirestore.instance.collection('jobs').doc(booking.jobId).get(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.white));
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: AppTheme.gold));
         
         final jobData = snapshot.data!.data() as Map<String, dynamic>?;
         final documents = jobData?['documents'] != null ? Map<String, String>.from(jobData!['documents']) : <String, String>{};
@@ -674,7 +693,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                         children: [
                           Icon(
                             isSigned ? LucideIcons.checkCircle2 : (isUploaded ? LucideIcons.fileText : LucideIcons.fileX),
-                            color: isSigned ? Colors.green : (isUploaded ? Colors.white70 : Colors.white10),
+                            color: isSigned ? Colors.green : (isUploaded ? AppTheme.black : AppTheme.grey),
                             size: 20,
                           ),
                           const SizedBox(width: 16),
@@ -682,23 +701,23 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(type, style: TextStyle(color: isUploaded ? Colors.white : Colors.white24, fontWeight: isSigned ? FontWeight.bold : FontWeight.normal)),
+                                Text(type, style: GoogleFonts.montserrat(color: isUploaded ? AppTheme.black : AppTheme.grey, fontWeight: isSigned ? FontWeight.bold : FontWeight.normal)),
                                 if (isSigned)
                                   const Text('Signed Digitally', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold))
                                 else if (isUploaded)
-                                  Text('Pending Signature', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11))
+                                  Text('Pending Signature', style: TextStyle(color: AppTheme.grey, fontSize: 11))
                                 else
-                                  Text('Not Uploaded by Brand', style: TextStyle(color: Colors.white.withOpacity(0.1), fontSize: 11)),
+                                  Text('Not Uploaded by Brand', style: TextStyle(color: AppTheme.grey.withOpacity(0.5), fontSize: 11)),
                               ],
                             ),
                           ),
                           if (widget.userType == 'model' && isUploaded && !isSigned)
                             TextButton(
                               onPressed: () => _showSignaturePad(booking, type),
-                              child: const Text('Sign Now', style: TextStyle(color: Color(0xFF818CF8), fontWeight: FontWeight.bold)),
+                              child: const Text('Sign Now', style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold)),
                             )
                           else if (isUploaded)
-                            const Icon(LucideIcons.eye, size: 16, color: Colors.white24),
+                            const Icon(LucideIcons.eye, size: 16, color: AppTheme.grey),
                         ],
                       ),
                     );
@@ -710,18 +729,18 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: AppTheme.cream,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: const Color(0xFFE0DCD5)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(LucideIcons.info, color: Color(0xFF818CF8), size: 20),
+                      const Icon(LucideIcons.info, color: AppTheme.gold, size: 20),
                       const SizedBox(width: 16),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Upload documents in the Job Management dashboard to make them available for signature.',
-                          style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.5),
+                          style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12, height: 1.5),
                         ),
                       ),
                     ],
@@ -738,7 +757,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(32),
@@ -746,29 +765,29 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Digital Signature', style: GoogleFonts.tinos(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+            Text('Digital Signature', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black)),
             const SizedBox(height: 8),
-            Text('Signing: $docType', style: TextStyle(color: Colors.white.withOpacity(0.4))),
+            Text('Signing: $docType', style: GoogleFonts.montserrat(color: AppTheme.grey)),
             const SizedBox(height: 32),
             Container(
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFF161618),
+                color: AppTheme.cream,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: const Color(0xFFE0DCD5)),
               ),
               child: Center(
                 child: Text(
                   'Signature Pad Placeholder',
-                  style: TextStyle(color: Colors.white.withOpacity(0.1)),
+                  style: GoogleFonts.montserrat(color: AppTheme.grey),
                 ),
               ),
             ),
             const SizedBox(height: 32),
-            const Text(
+            Text(
               'By signing, you agree to the terms and conditions outlined in the document and the platform service agreement.',
-              style: TextStyle(color: Colors.white24, fontSize: 12, height: 1.5),
+              style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12, height: 1.5),
             ),
             const SizedBox(height: 32),
             SizedBox(
@@ -783,7 +802,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$docType signed successfully!')));
                 },
-                style: _btnStyle(const Color(0xFF6366F1), Colors.white),
+                style: _btnStyle(AppTheme.black, AppTheme.white),
                 child: const Text('Confirm & Sign', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),

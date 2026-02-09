@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/models/job_model.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:flutter_application_1/core/services/booking_service.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class GroupBookingDashboard extends StatefulWidget {
@@ -27,30 +28,30 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
+          icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           children: [
             Text(
               widget.job.title,
-              style: GoogleFonts.tinos(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.black),
             ),
             const SizedBox(height: 2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withOpacity(0.1),
+                color: AppTheme.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Text(
                 'GROUP PROJECT',
-                style: TextStyle(color: Color(0xFF818CF8), fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                style: TextStyle(color: AppTheme.gold, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
               ),
             ),
           ],
@@ -85,15 +86,22 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                 margin: const EdgeInsets.only(right: 12),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.white : Colors.white.withOpacity(0.05),
+                  color: isSelected ? AppTheme.black : AppTheme.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isSelected ? Colors.white : Colors.white10),
+                  border: Border.all(color: isSelected ? AppTheme.black : const Color(0xFFE0DCD5)),
+                  boxShadow: isSelected ? null : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Text(
                   entry.value,
-                  style: TextStyle(
-                    color: isSelected ? Colors.black : Colors.white60,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  style: GoogleFonts.montserrat(
+                    color: isSelected ? AppTheme.white : AppTheme.grey,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     fontSize: 13,
                   ),
                 ),
@@ -136,7 +144,7 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
           
           Text(
             'Confirmed Models',
-            style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black),
           ),
           const SizedBox(height: 16),
           ...widget.bookings.map((booking) => _modelListItem(booking)),
@@ -153,28 +161,36 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF161618),
+              color: AppTheme.white,
               shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE0DCD5)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: const Icon(LucideIcons.messagesSquare, color: Color(0xFF6366F1), size: 48),
+            child: const Icon(LucideIcons.messagesSquare, color: AppTheme.gold, size: 48),
           ),
           const SizedBox(height: 24),
           Text(
             'Group Production Chat',
-            style: GoogleFonts.tinos(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black),
           ),
           const SizedBox(height: 8),
           Text(
             'Unified communication for all team members.\nActivated for this project.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withOpacity(0.3), height: 1.5),
+            style: GoogleFonts.montserrat(color: AppTheme.grey, height: 1.5),
           ),
           const SizedBox(height: 40),
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: AppTheme.black,
+              foregroundColor: AppTheme.white,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -207,7 +223,7 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                       children: [
                         Icon(
                           isUploaded ? LucideIcons.fileCheck : LucideIcons.filePlus,
-                          color: isUploaded ? Colors.green : Colors.white24,
+                          color: isUploaded ? Colors.green : AppTheme.grey,
                           size: 20,
                         ),
                         const SizedBox(width: 16),
@@ -215,9 +231,9 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(type, style: TextStyle(color: isUploaded ? Colors.white : Colors.white38, fontWeight: isUploaded ? FontWeight.bold : FontWeight.normal)),
+                              Text(type, style: GoogleFonts.montserrat(color: isUploaded ? AppTheme.black : AppTheme.grey, fontWeight: isUploaded ? FontWeight.bold : FontWeight.w500)),
                               if (isUploaded)
-                                Text('Uploaded ${DateFormat('MMM d').format(widget.job.createdAt)}', style: TextStyle(color: Colors.white24, fontSize: 11)),
+                                Text('Uploaded ${DateFormat('MMM d').format(widget.job.createdAt)}', style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 11)),
                             ],
                           ),
                         ),
@@ -227,10 +243,10 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                               // Simulate Upload
                               _simulateUpload(type);
                             },
-                            child: const Text('Upload', style: TextStyle(color: Color(0xFF818CF8), fontSize: 12, fontWeight: FontWeight.bold)),
+                            child: const Text('Upload', style: TextStyle(color: AppTheme.gold, fontSize: 12, fontWeight: FontWeight.bold)),
                           )
                         else
-                          const Icon(LucideIcons.download, size: 16, color: Colors.white24),
+                          const Icon(LucideIcons.download, size: 16, color: AppTheme.grey),
                       ],
                     ),
                   );
@@ -244,15 +260,22 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
           // 2. Signature Status Matrix
           Text(
             'Signature Tracking',
-            style: GoogleFonts.tinos(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black),
           ),
           const SizedBox(height: 16),
           
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF161618),
+              color: AppTheme.white,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
+              border: Border.all(color: const Color(0xFFE0DCD5)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -262,9 +285,9 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                 horizontalMargin: 24,
                 columnSpacing: 40,
                 columns: [
-                  DataColumn(label: Text('Model', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11, fontWeight: FontWeight.bold))),
+                  DataColumn(label: Text('Model', style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 11, fontWeight: FontWeight.bold))),
                   ...docTypes.map((type) => DataColumn(
-                    label: Text(type.split(' ').first, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11, fontWeight: FontWeight.bold))
+                    label: Text(type.split(' ').first, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 11, fontWeight: FontWeight.bold))
                   )),
                 ],
                 rows: widget.bookings.map((booking) {
@@ -273,9 +296,9 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                       DataCell(
                         Row(
                           children: [
-                            const CircleAvatar(radius: 12, backgroundColor: Colors.white10, child: Icon(LucideIcons.user, size: 12, color: Colors.white38)),
+                            const CircleAvatar(radius: 12, backgroundColor: AppTheme.cream, child: Icon(LucideIcons.user, size: 12, color: AppTheme.grey)),
                             const SizedBox(width: 12),
-                            Text('Model #${booking.modelId.substring(0, 4)}', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                            Text('Model #${booking.modelId.substring(0, 4)}', style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 13, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -284,7 +307,7 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
                         return DataCell(
                           Icon(
                             isSigned ? LucideIcons.checkCircle2 : LucideIcons.clock,
-                            color: isSigned ? Colors.green : Colors.white10,
+                            color: isSigned ? Colors.green : AppTheme.grey.withOpacity(0.3),
                             size: 18,
                           ),
                         );
@@ -305,8 +328,8 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
   void _simulateUpload(String type) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: const Color(0xFF161618),
-        content: Text('Uploading $type... (Simulated)', style: const TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.black,
+        content: Text('Uploading $type... (Simulated)', style: const TextStyle(color: AppTheme.white)),
       ),
     );
   }
@@ -321,24 +344,31 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFF161618),
+            color: AppTheme.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: const Color(0xFFE0DCD5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             children: [
               const CircleAvatar(
-                backgroundColor: Colors.white12,
-                child: Icon(LucideIcons.user, color: Colors.white38, size: 20),
+                backgroundColor: AppTheme.cream,
+                child: Icon(LucideIcons.user, color: AppTheme.grey, size: 20),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Model #${booking.modelId.substring(0, 5)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('Model #${booking.modelId.substring(0, 5)}', style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
-                    Text('\$${booking.rate?.toInt() ?? 0}', style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13)),
+                    Text('\$${booking.rate?.toInt() ?? 0}', style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13)),
                   ],
                 ),
               ),
@@ -365,14 +395,21 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.tinos(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(title, style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w400, color: AppTheme.black)),
           const SizedBox(height: 24),
           child,
         ],
@@ -385,14 +422,14 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withOpacity(0.3)),
+          Icon(icon, size: 16, color: AppTheme.grey),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+              Text(label, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 11)),
               const SizedBox(height: 2),
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 14)),
+              Text(value, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14, fontWeight: FontWeight.w500)),
             ],
           ),
         ],
@@ -405,18 +442,25 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          const CircleAvatar(backgroundColor: Colors.white10),
+          const CircleAvatar(backgroundColor: AppTheme.cream),
           const SizedBox(width: 16),
           Expanded(
-            child: Text('Model ID: ${booking.modelId.substring(0, 8)}...', style: const TextStyle(color: Colors.white)),
+            child: Text('Model ID: ${booking.modelId.substring(0, 8)}...', style: GoogleFonts.montserrat(color: AppTheme.black)),
           ),
-          const Icon(LucideIcons.chevronRight, color: Colors.white24, size: 16),
+          const Icon(LucideIcons.chevronRight, color: AppTheme.grey, size: 16),
         ],
       ),
     );
@@ -427,19 +471,19 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          const Icon(LucideIcons.fileText, color: Color(0xFF818CF8), size: 20),
+          const Icon(LucideIcons.fileText, color: AppTheme.gold, size: 20),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                Text(name, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14)),
                 const SizedBox(height: 2),
-                Text(date, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+                Text(date, style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 11)),
               ],
             ),
           ),
-          IconButton(onPressed: () {}, icon: const Icon(LucideIcons.download, size: 16, color: Colors.white24)),
+          IconButton(onPressed: () {}, icon: const Icon(LucideIcons.download, size: 16, color: AppTheme.grey)),
         ],
       ),
     );

@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/services/media_upload_service.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class EditPortfolioScreen extends StatefulWidget {
   final UserModel userData;
@@ -257,20 +258,20 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.x, color: Colors.white),
+          icon: const Icon(LucideIcons.x, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Edit Portfolio',
-          style: GoogleFonts.tinos(
-            fontSize: 20,
+          style: GoogleFonts.cormorantGaramond(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.black,
           ),
         ),
         centerTitle: true,
@@ -281,11 +282,15 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF818CF8)),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.gold),
                   )
-                : const Text('Save', style: TextStyle(color: Color(0xFF818CF8), fontWeight: FontWeight.bold)),
+                : Text('Save', style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold)),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: const Color(0xFFE0DCD5), height: 1),
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -300,7 +305,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                 decoration: BoxDecoration(
                   color: _saveStatus.contains('success') || _saveStatus.contains('added') || _saveStatus.contains('uploaded') || _saveStatus.contains('updated')
                       ? Colors.green.withOpacity(0.1)
-                      : const Color(0xFF6366F1).withOpacity(0.1),
+                      : AppTheme.gold.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -309,7 +314,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                       const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF818CF8)),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black),
                       )
                     else
                       Icon(
@@ -318,7 +323,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                         size: 18,
                       ),
                     const SizedBox(width: 12),
-                    Text(_saveStatus, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                    Text(_saveStatus, style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 13)),
                   ],
                 ),
               ),
@@ -332,7 +337,8 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.1),
+                      color: AppTheme.white,
+                      border: Border.all(color: const Color(0xFFE0DCD5)),
                       image: _profileImageUrl != null
                           ? DecorationImage(
                               image: NetworkImage(_profileImageUrl!),
@@ -341,7 +347,7 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                           : null,
                     ),
                     child: _profileImageUrl == null
-                        ? const Icon(LucideIcons.user, size: 40, color: Colors.white54)
+                        ? const Icon(LucideIcons.user, size: 40, color: AppTheme.grey)
                         : null,
                   ),
                   Positioned(
@@ -352,11 +358,11 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF818CF8),
+                          color: AppTheme.black,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 2),
+                          border: Border.all(color: AppTheme.white, width: 2),
                         ),
-                        child: const Icon(LucideIcons.camera, size: 16, color: Colors.white),
+                        child: const Icon(LucideIcons.camera, size: 16, color: AppTheme.white),
                       ),
                     ),
                   ),
@@ -394,16 +400,16 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF6366F1).withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                      color: isSelected ? AppTheme.black : AppTheme.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF6366F1) : Colors.white.withOpacity(0.1),
+                        color: isSelected ? AppTheme.black : const Color(0xFFE0DCD5),
                       ),
                     ),
                     child: Text(
                       cat,
-                      style: TextStyle(
-                        color: isSelected ? const Color(0xFF818CF8) : Colors.white60,
+                      style: GoogleFonts.montserrat(
+                        color: isSelected ? AppTheme.white : AppTheme.grey,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -472,11 +478,11 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
+                              color: AppTheme.black.withOpacity(0.7),
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1),
+                              border: Border.all(color: AppTheme.white, width: 1),
                             ),
-                            child: const Icon(LucideIcons.x, size: 14, color: Colors.white),
+                            child: const Icon(LucideIcons.x, size: 14, color: AppTheme.white),
                           ),
                         ),
                       ),
@@ -500,15 +506,16 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0DCD5)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.video, color: Color(0xFF818CF8)),
+                    const Icon(LucideIcons.video, color: AppTheme.black),
                     const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text('Video uploaded', style: TextStyle(color: Colors.white70)),
+                    Expanded(
+                      child: Text('Video uploaded', style: GoogleFonts.montserrat(color: AppTheme.black)),
                     ),
                     GestureDetector(
                       onTap: () => setState(() => _portfolioVideo = null),
@@ -536,10 +543,10 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
         title,
-        style: GoogleFonts.tinos(
-          fontSize: 18,
+        style: GoogleFonts.cormorantGaramond(
+          fontSize: 22,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: AppTheme.black,
         ),
       ),
     );
@@ -552,19 +559,23 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
         controller: controller,
         maxLines: maxLines,
         validator: validator,
-        style: const TextStyle(color: Colors.white),
+        style: GoogleFonts.montserrat(color: AppTheme.black),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+          labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
           filled: true,
-          fillColor: Colors.white.withOpacity(0.05),
+          fillColor: AppTheme.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFE0DCD5)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF6366F1)),
+            borderSide: const BorderSide(color: AppTheme.black),
           ),
         ),
       ),
@@ -577,19 +588,19 @@ class _EditPortfolioScreenState extends State<EditPortfolioScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: AppTheme.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: const Color(0xFFE0DCD5)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: onTap == null ? Colors.white30 : const Color(0xFF818CF8)),
+            Icon(icon, color: onTap == null ? AppTheme.grey : AppTheme.black),
             const SizedBox(width: 12),
             Text(
               label,
-              style: TextStyle(
-                color: onTap == null ? Colors.white30 : Colors.white,
+              style: GoogleFonts.montserrat(
+                color: onTap == null ? AppTheme.grey : AppTheme.black,
                 fontWeight: FontWeight.bold,
               ),
             ),

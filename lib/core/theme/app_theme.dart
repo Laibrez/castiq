@@ -9,6 +9,8 @@ class AppTheme {
   static const Color gold = Color(0xFFD4AF37);
   static const Color lightGold = Color(0xFFE8D7A8);
   static const Color grey = Color(0xFF6B6B6B);
+  static const Color success = Color(0xFF2E7D32); // Dark Green for Success
+  static const Color error = Color(0xFFC62828);   // Dark Red for Error
 
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
@@ -22,7 +24,7 @@ class AppTheme {
       onSecondary: black,
       surface: white,
       onSurface: black,
-      error: Color(0xFFC62828),
+      error: error,
       onError: white,
       background: cream,
       onBackground: black,

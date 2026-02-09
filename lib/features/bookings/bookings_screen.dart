@@ -7,6 +7,7 @@ import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class BookingsScreen extends StatefulWidget {
   final String userType;
@@ -38,14 +39,14 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
     if (user == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(child: Text('Please log in', style: TextStyle(color: Colors.white))),
+      return Scaffold(
+        backgroundColor: AppTheme.cream,
+        body: Center(child: Text('Please log in', style: GoogleFonts.montserrat(color: AppTheme.black))),
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       body: Column(
         children: [
           // Custom Tab Bar for Brands
@@ -55,20 +56,22 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
               child: Container(
                 height: 50,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF161618),
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0DCD5)),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   indicatorPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                   indicator: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: AppTheme.cream,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: const Color(0xFFE0DCD5)),
                   ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white38,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  labelColor: AppTheme.black,
+                  unselectedLabelColor: AppTheme.grey,
+                  labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13),
+                  dividerColor: Colors.transparent,
                   tabs: const [
                     Tab(text: 'Upcoming'),
                     Tab(text: 'Completed'),
@@ -83,7 +86,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
               stream: _bookingService.getUserBookings(user.uid, widget.userType),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                  return const Center(child: CircularProgressIndicator(color: AppTheme.gold));
                 }
 
                 final allBookings = snapshot.data ?? [];
@@ -126,11 +129,11 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.calendarX, size: 48, color: Colors.white10),
+            Icon(LucideIcons.calendarX, size: 48, color: AppTheme.grey.withOpacity(0.3)),
             const SizedBox(height: 16),
             Text(
               'No $filter bookings',
-              style: TextStyle(color: Colors.white.withOpacity(0.2)),
+              style: GoogleFonts.montserrat(color: AppTheme.grey),
             ),
           ],
         ),
@@ -159,9 +162,16 @@ class _BookingCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -194,6 +204,7 @@ class _BookingCard extends StatelessWidget {
                         final userData = snapshot.data?.data() as Map<String, dynamic>?;
                         final name = userData?['name'] ?? (userType == 'brand' ? 'Model' : 'Brand');
                         final photoUrl = userData?['profileImageUrl'];
+                        final companyName = userData?['companyName'];
 
                         return Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,32 +213,33 @@ class _BookingCard extends StatelessWidget {
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
+                                color: AppTheme.cream,
                                 borderRadius: BorderRadius.circular(12),
                                 image: photoUrl != null 
                                   ? DecorationImage(image: NetworkImage(photoUrl), fit: BoxFit.cover)
                                   : null,
+                                border: Border.all(color: const Color(0xFFE0DCD5)),
                               ),
-                              child: photoUrl == null ? const Icon(LucideIcons.user, color: Colors.white24, size: 24) : null,
+                              child: photoUrl == null ? const Icon(LucideIcons.user, color: AppTheme.grey, size: 24) : null,
                             ),
                             const SizedBox(width: 16),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  name,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
+                                  companyName ?? name,
+                                  style: GoogleFonts.cormorantGaramond(
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: AppTheme.black,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   booking.jobTitle ?? 'Model Booking',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white.withOpacity(0.4),
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 13,
+                                    color: AppTheme.grey,
                                   ),
                                 ),
                               ],
@@ -257,15 +269,15 @@ class _BookingCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6366F1).withOpacity(0.1),
+                          color: AppTheme.gold.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: Text(
                           'INVITATION',
-                          style: TextStyle(
-                            color: Color(0xFF818CF8),
+                          style: GoogleFonts.montserrat(
+                            color: AppTheme.gold,
                             fontSize: 10,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -283,29 +295,29 @@ class _BookingCard extends StatelessWidget {
   Widget _statusBadge(String status) {
     Color color;
     switch (status) {
-      case 'pending': color = Colors.orange; break;
-      case 'confirmed': color = Colors.blue; break;
-      case 'signed': color = Colors.indigo; break;
-      case 'in_progress': color = Colors.amber; break;
-      case 'completed': color = Colors.green; break;
-      case 'paid': color = Colors.green; break;
+      case 'pending': color = AppTheme.gold; break;
+      case 'confirmed': color = AppTheme.black; break;
+      case 'signed': color = AppTheme.black; break;
+      case 'in_progress': color = AppTheme.gold; break;
+      case 'completed': 
+      case 'paid': color = AppTheme.success; break;
       case 'declined':
-      case 'canceled': color = Colors.red; break;
-      default: color = Colors.grey;
+      case 'canceled': color = AppTheme.error; break;
+      default: color = AppTheme.grey;
     }
     
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color == AppTheme.black ? AppTheme.black : color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(
-          color: color,
+        style: GoogleFonts.montserrat(
+          color: color == AppTheme.black ? AppTheme.white : color,
           fontSize: 10,
-          fontWeight: FontWeight.w900,
+          fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
         ),
       ),
@@ -315,13 +327,13 @@ class _BookingCard extends StatelessWidget {
   Widget _infoItem(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: Colors.white24),
+        Icon(icon, size: 14, color: AppTheme.grey),
         const SizedBox(width: 8),
         Text(
           text,
-          style: TextStyle(
+          style: GoogleFonts.montserrat(
             fontSize: 13,
-            color: Colors.white.withOpacity(0.4),
+            color: AppTheme.grey,
           ),
         ),
       ],

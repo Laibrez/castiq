@@ -6,6 +6,7 @@ import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
 import 'package:flutter_application_1/features/jobs/job_detail_screen.dart';
 import 'package:flutter_application_1/features/brands/edit_brand_profile_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class BrandProfileScreen extends StatefulWidget {
   final String? brandId; // Optional: If null, shows the current user's brand profile
@@ -24,9 +25,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
     final targetId = widget.brandId ?? _authService.currentUser?.uid;
 
     if (targetId == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(child: Text('Please log in', style: TextStyle(color: Colors.white))),
+      return Scaffold(
+        backgroundColor: AppTheme.cream,
+        body: Center(child: Text('Please log in', style: GoogleFonts.montserrat(color: AppTheme.black))),
       );
     }
 
@@ -35,22 +36,22 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            backgroundColor: Colors.black,
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
+            backgroundColor: AppTheme.cream,
+            body: Center(child: CircularProgressIndicator(color: AppTheme.gold)),
           );
         }
 
         if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Scaffold(
-            backgroundColor: Colors.black,
-            body: Center(child: Text('Brand not found', style: TextStyle(color: Colors.white))),
+          return Scaffold(
+            backgroundColor: AppTheme.cream,
+            body: Center(child: Text('Brand not found', style: GoogleFonts.montserrat(color: AppTheme.black))),
           );
         }
 
         final userData = UserModel.fromMap(snapshot.data!.data() as Map<String, dynamic>, snapshot.data!.id);
 
         return Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: AppTheme.cream,
           body: CustomScrollView(
             slivers: [
               // 1. LinkedIn-style Header (Banner + Logo)
@@ -77,23 +78,23 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                                 style: GoogleFonts.cormorantGaramond(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppTheme.black,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Row(
                                 children: [
-                                  Icon(LucideIcons.mapPin, size: 14, color: Colors.white.withOpacity(0.5)),
+                                  Icon(LucideIcons.mapPin, size: 14, color: AppTheme.grey),
                                   const SizedBox(width: 6),
                                   Text(
                                     userData.location ?? 'Global',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.5),
+                                    style: GoogleFonts.montserrat(
+                                      color: AppTheme.grey,
                                       fontSize: 14,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Icon(LucideIcons.badgeCheck, color: Color(0xFF6366F1), size: 16),
+                                  const Icon(LucideIcons.badgeCheck, color: AppTheme.gold, size: 16),
                                 ],
                               ),
                             ],
@@ -108,7 +109,7 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                                   ),
                                 ).then((_) => setState(() {})); // Refresh on return
                               },
-                              icon: const Icon(LucideIcons.edit3, color: Colors.white54, size: 20),
+                              icon: const Icon(LucideIcons.edit3, color: AppTheme.grey, size: 20),
                             ),
                         ],
                       ),
@@ -123,8 +124,8 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                       const SizedBox(height: 12),
                       Text(
                         userData.bio ?? 'A premium brand on Caztiq dedicated to finding the worlds top talent for high-end fashion and commercial projects.',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                        style: GoogleFonts.montserrat(
+                          color: AppTheme.grey,
                           fontSize: 15,
                           height: 1.6,
                         ),
@@ -218,9 +219,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.4),
+                  AppTheme.black.withOpacity(0.2),
                   Colors.transparent,
-                  Colors.black.withOpacity(0.2),
+                  AppTheme.black.withOpacity(0.1),
                 ],
               ),
             ),
@@ -233,13 +234,20 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: AppTheme.white,
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Container(
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.white,
                 borderRadius: BorderRadius.circular(18),
               ),
               child: ClipRRect(
@@ -260,9 +268,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
             top: 50,
             left: 20,
             child: CircleAvatar(
-              backgroundColor: Colors.black54,
+              backgroundColor: AppTheme.white,
               child: IconButton(
-                icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
+                icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.black),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -272,9 +280,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
           top: 50,
           right: 20,
           child: CircleAvatar(
-            backgroundColor: Colors.black54,
+            backgroundColor: AppTheme.white,
             child: IconButton(
-              icon: const Icon(LucideIcons.share, color: Colors.white, size: 20),
+              icon: const Icon(LucideIcons.share, color: AppTheme.black, size: 20),
               onPressed: () {},
             ),
           ),
@@ -287,9 +295,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -309,18 +317,18 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
       children: [
         Text(
           value,
-          style: GoogleFonts.inter(
-            fontSize: 20,
+          style: GoogleFonts.cormorantGaramond(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.black,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.montserrat(
             fontSize: 11,
-            color: Colors.white.withOpacity(0.4),
+            color: AppTheme.grey,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -332,7 +340,7 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
     return Container(
       width: 1,
       height: 30,
-      color: Colors.white.withOpacity(0.05),
+      color: const Color(0xFFE0DCD5),
     );
   }
 
@@ -340,9 +348,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
     return Text(
       title,
       style: GoogleFonts.cormorantGaramond(
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: AppTheme.black,
       ),
     );
   }
@@ -351,13 +359,13 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
       ),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white70, fontSize: 13),
+        style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
       ),
     );
   }
@@ -366,24 +374,24 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.03)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppTheme.cream,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 16, color: Colors.white60),
+            child: Icon(icon, size: 16, color: AppTheme.grey),
           ),
           const SizedBox(width: 16),
-          Text(text, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+          Text(text, style: GoogleFonts.montserrat(color: AppTheme.black.withOpacity(0.8), fontSize: 14)),
           const Spacer(),
-          const Icon(LucideIcons.externalLink, size: 14, color: Colors.white24),
+          const Icon(LucideIcons.externalLink, size: 14, color: AppTheme.grey),
         ],
       ),
     );
@@ -394,23 +402,23 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
       margin: const EdgeInsets.only(bottom: 40),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF6366F1).withOpacity(0.05),
+        color: AppTheme.gold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.1)),
+        border: Border.all(color: AppTheme.gold.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          const Icon(LucideIcons.lock, color: Color(0xFF818CF8), size: 28),
+          const Icon(LucideIcons.lock, color: AppTheme.gold, size: 28),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Password Protected',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            style: GoogleFonts.cormorantGaramond(color: AppTheme.black, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           const SizedBox(height: 8),
           Text(
             'This brand requires a password to view their full creative portfolio.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13),
+            style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -418,11 +426,11 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
             child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6366F1),
-                foregroundColor: Colors.white,
+                backgroundColor: AppTheme.gold,
+                foregroundColor: AppTheme.black,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Enter Password'),
+              child: Text('Enter Password', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600)),
             ),
           ),
         ],
@@ -450,9 +458,9 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF161618),
+          color: AppTheme.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: const Color(0xFFE0DCD5)),
         ),
         child: Row(
           children: [
@@ -463,23 +471,23 @@ class _BrandProfileScreenState extends State<BrandProfileScreen> {
                   Text(
                     title,
                     style: GoogleFonts.cormorantGaramond(
-                      color: Colors.white,
+                      color: AppTheme.black,
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                    style: GoogleFonts.montserrat(
+                      color: AppTheme.grey,
                       fontSize: 13,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight, color: Colors.white24, size: 20),
+            const Icon(LucideIcons.chevronRight, color: AppTheme.grey, size: 20),
           ],
         ),
       ),

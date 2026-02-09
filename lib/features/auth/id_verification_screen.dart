@@ -9,6 +9,9 @@ import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_application_1/core/theme/app_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 class IdVerificationScreen extends StatefulWidget {
   final String userType;
 
@@ -129,19 +132,19 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         leading: Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Step 3 of 10',
-                style: TextStyle(
-                  color: Colors.white70,
+                style: GoogleFonts.montserrat(
+                  color: AppTheme.grey,
                   fontSize: 12,
                 ),
               ),
@@ -150,8 +153,8 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
                   value: 3 / 10,
-                  backgroundColor: Colors.white.withOpacity(0.1),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                  backgroundColor: AppTheme.black.withOpacity(0.05),
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.gold),
                   minHeight: 6,
                 ),
               ),
@@ -159,11 +162,12 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
           ),
         ),
         leadingWidth: 120,
-        title: const Text(
+        title: Text(
           'Verify Identity',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+          style: GoogleFonts.cormorantGaramond(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.black,
+            fontSize: 24,
           ),
         ),
         centerTitle: false,
@@ -174,28 +178,30 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
+              color: AppTheme.white,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE0DCD5)),
             ),
             padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Verify Your Identity',
-                  style: TextStyle(
+                  style: GoogleFonts.cormorantGaramond(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.black,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Upload your ID and a selfie to verify you are who you say you are',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 15,
+                    color: AppTheme.grey,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -231,26 +237,28 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1),
+                    color: AppTheme.cream,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE0DCD5)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Why do we need this?',
-                        style: TextStyle(
-                          fontSize: 18,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppTheme.black,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Identity verification helps keep our community safe and ensures brands can trust the models they work with.',
-                        style: TextStyle(
+                        style: GoogleFonts.montserrat(
                           fontSize: 14,
-                          color: Colors.white,
+                          color: AppTheme.grey,
+                          height: 1.5,
                         ),
                       ),
                     ],
@@ -265,18 +273,23 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
                         : null,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: const Color(0xFF6366F1),
-                      disabledBackgroundColor: Colors.grey[800],
+                      backgroundColor: AppTheme.gold,
+                      foregroundColor: AppTheme.black,
+                      disabledBackgroundColor: AppTheme.black.withOpacity(0.05),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: _isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black),
                           )
-                        : const Text(
+                        : Text(
                             'Continue',
-                            style: TextStyle(
+                            style: GoogleFonts.montserrat(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -317,20 +330,20 @@ class _UploadSection extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isUploaded ? Colors.green : Colors.white24,
-            width: 2,
+            color: isUploaded ? Colors.green : const Color(0xFFE0DCD5),
+            width: isUploaded ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: Colors.transparent,
+          color: AppTheme.white,
         ),
         child: Column(
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 16,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppTheme.black,
               ),
             ),
             const SizedBox(height: 16),
@@ -338,28 +351,28 @@ class _UploadSection extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: AppTheme.cream,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: 40,
-                color: Colors.white70,
+                color: AppTheme.grey.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: isUploaded ? Colors.green : Colors.white24,
+                color: isUploaded ? Colors.green : AppTheme.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 isUploaded ? 'Uploaded' : buttonText,
-                style: TextStyle(
-                  color: Colors.white,
+                style: GoogleFonts.montserrat(
+                  color: isUploaded ? Colors.white : AppTheme.black,
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -367,9 +380,10 @@ class _UploadSection extends StatelessWidget {
             Text(
               description,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.white54,
+              style: GoogleFonts.montserrat(
+                fontSize: 11,
+                color: AppTheme.grey,
+                height: 1.3,
               ),
             ),
           ],

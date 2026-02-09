@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
 import 'package:flutter_application_1/features/auth/role_selection_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class BrowseTalentScreen extends StatelessWidget {
   const BrowseTalentScreen({super.key});
@@ -113,17 +115,17 @@ class BrowseTalentScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.cream,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'CAZTIQ',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
+          style: GoogleFonts.cormorantGaramond(
+            fontWeight: FontWeight.bold,
             letterSpacing: 2,
-            fontSize: 20,
-            color: Colors.white,
+            fontSize: 24,
+            color: AppTheme.black,
           ),
         ),
         actions: [
@@ -134,10 +136,10 @@ class BrowseTalentScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
               );
             },
-            child: const Text(
+            child: Text(
               'Apply',
-              style: TextStyle(
-                color: Color(0xFF6366F1),
+              style: GoogleFonts.montserrat(
+                color: AppTheme.gold,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -168,10 +170,10 @@ class BrowseTalentScreen extends StatelessWidget {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: AppTheme.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withOpacity(0.05),
+              color: AppTheme.black.withOpacity(0.05),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -185,16 +187,16 @@ class BrowseTalentScreen extends StatelessWidget {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: AppTheme.black,
+            foregroundColor: AppTheme.white,
             padding: const EdgeInsets.symmetric(vertical: 18),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30), // Consistent pill style
             ),
           ),
-          child: const Text(
+          child: Text(
             'Apply to Join Caztiq',
-            style: TextStyle(
+            style: GoogleFonts.montserrat(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
@@ -219,15 +221,16 @@ class BrowseTalentScreen extends StatelessWidget {
             margin: const EdgeInsets.only(right: 12),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.05),
+              color: isSelected ? AppTheme.black : AppTheme.white,
               borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: isSelected ? Colors.transparent : const Color(0xFFE0DCD5)),
             ),
             child: Center(
               child: Text(
                 categories[index],
-                style: TextStyle(
-                  color: isSelected ? Colors.black : Colors.white70,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                style: GoogleFonts.montserrat(
+                  color: isSelected ? AppTheme.white : AppTheme.grey,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   fontSize: 14,
                 ),
               ),
@@ -255,6 +258,13 @@ class _ReadOnlyModelCard extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                   image: DecorationImage(
                     image: NetworkImage(model.profileImageUrl ??
                         'https://ui-avatars.com/api/?name=${model.name}&background=random'),
@@ -268,10 +278,10 @@ class _ReadOnlyModelCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3),
+                    color: AppTheme.white.withOpacity(0.9),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(LucideIcons.lock, size: 16, color: Colors.white70),
+                  child: const Icon(LucideIcons.lock, size: 14, color: AppTheme.black),
                 ),
               ),
             ],
@@ -280,27 +290,28 @@ class _ReadOnlyModelCard extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           model.name,
-          style: const TextStyle(
+          style: GoogleFonts.cormorantGaramond(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.white,
+            fontSize: 18,
+            color: AppTheme.black,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           model.location ?? 'Global',
-          style: const TextStyle(
+          style: GoogleFonts.montserrat(
             fontSize: 12,
-            color: Colors.white54,
+            color: AppTheme.grey,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           (model.categories?.isNotEmpty == true ? model.categories!.first : 'Fashion'),
-          style: const TextStyle(
+          style: GoogleFonts.montserrat(
             fontSize: 12,
-            color: Color(0xFF6366F1),
+            color: AppTheme.gold,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ],

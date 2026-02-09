@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/models/user_model.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/services.dart';
 
@@ -34,7 +35,7 @@ class ZCardScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Z-Card link copied to clipboard!'),
-        backgroundColor: Color(0xFF6366F1),
+        backgroundColor: AppTheme.black,
       ),
     );
   }
@@ -49,18 +50,18 @@ class ZCardScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cream,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.black),
+          icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'MY Z-CARD',
-          style: GoogleFonts.inter(
-            color: Colors.black,
+          style: GoogleFonts.montserrat(
+            color: AppTheme.black,
             fontSize: 14,
             fontWeight: FontWeight.w800,
             letterSpacing: 2,
@@ -69,8 +70,8 @@ class ZCardScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(LucideIcons.share2, color: Colors.black, size: 20),
-            color: Colors.white,
+            icon: const Icon(LucideIcons.share2, color: AppTheme.black, size: 20),
+            color: AppTheme.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onSelected: (value) {
               if (value == 'share') {
@@ -84,9 +85,9 @@ class ZCardScreen extends StatelessWidget {
                 value: 'share',
                 child: Row(
                   children: [
-                    Icon(LucideIcons.share2, size: 18, color: Colors.black.withOpacity(0.7)),
+                    Icon(LucideIcons.share2, size: 18, color: AppTheme.black.withOpacity(0.7)),
                     const SizedBox(width: 12),
-                    const Text('Share Z-Card'),
+                    Text('Share Z-Card', style: GoogleFonts.montserrat(color: AppTheme.black)),
                   ],
                 ),
               ),
@@ -94,9 +95,9 @@ class ZCardScreen extends StatelessWidget {
                 value: 'copy',
                 child: Row(
                   children: [
-                    Icon(LucideIcons.copy, size: 18, color: Colors.black.withOpacity(0.7)),
+                    Icon(LucideIcons.copy, size: 18, color: AppTheme.black.withOpacity(0.7)),
                     const SizedBox(width: 12),
-                    const Text('Copy Link'),
+                    Text('Copy Link', style: GoogleFonts.montserrat(color: AppTheme.black)),
                   ],
                 ),
               ),
@@ -114,9 +115,9 @@ class ZCardScreen extends StatelessWidget {
               child: Text(
                 'Professional Z-Card showcasing your best images and measurements. Share with agencies or brands.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
-                  color: Colors.black54,
+                  color: AppTheme.grey,
                   height: 1.5,
                 ),
               ),
@@ -127,11 +128,11 @@ class ZCardScreen extends StatelessWidget {
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(4),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: AppTheme.black.withOpacity(0.15),
                       blurRadius: 30,
                       offset: const Offset(0, 15),
                     ),
@@ -157,7 +158,7 @@ class ZCardScreen extends StatelessWidget {
                           child: Container(
                             height: 150,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: AppTheme.white, width: 2),
                             ),
                             child: Image.network(img, fit: BoxFit.cover),
                           ),
@@ -179,19 +180,19 @@ class ZCardScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     userData.name.toUpperCase(),
-                                    style: GoogleFonts.tinos(
+                                    style: GoogleFonts.cormorantGaramond(
                                       fontSize: 28,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black,
+                                      color: AppTheme.black,
                                       letterSpacing: -0.5,
                                     ),
                                   ),
                                   Text(
                                     userData.location ?? 'MIAMI, FL',
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.montserrat(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black45,
+                                      color: AppTheme.grey,
                                       letterSpacing: 1,
                                     ),
                                   ),
@@ -203,10 +204,10 @@ class ZCardScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     'CAZTIQ',
-                                    style: GoogleFonts.inter(
+                                    style: GoogleFonts.montserrat(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w900,
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: AppTheme.black.withOpacity(0.1),
                                     ),
                                   ),
                                 ],
@@ -243,17 +244,18 @@ class ZCardScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.03),
+                  color: AppTheme.white,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0DCD5)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.mousePointer2, size: 18, color: Colors.black45),
+                    const Icon(LucideIcons.mousePointer2, size: 18, color: AppTheme.grey),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Tip: Your Z-Card uses the first 3 photos from your portfolio. Reorder your gallery to change them.',
-                        style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.5)),
+                        style: GoogleFonts.montserrat(fontSize: 13, color: AppTheme.black.withOpacity(0.7)),
                       ),
                     ),
                   ],
@@ -273,20 +275,20 @@ class ZCardScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.montserrat(
             fontSize: 10,
             fontWeight: FontWeight.w800,
-            color: Colors.black38,
+            color: AppTheme.black.withOpacity(0.4),
             letterSpacing: 1.2,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           value.toString().toUpperCase(),
-          style: GoogleFonts.inter(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppTheme.black,
           ),
         ),
       ],

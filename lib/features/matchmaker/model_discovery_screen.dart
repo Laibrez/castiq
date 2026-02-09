@@ -7,6 +7,7 @@ import 'package:flutter_application_1/core/services/auth_service.dart';
 import 'package:flutter_application_1/core/services/job_service.dart';
 import 'package:flutter_application_1/core/models/job_model.dart';
 import 'package:flutter_application_1/features/profile/model_profile_screen.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class ModelDiscoveryScreen extends StatefulWidget {
   const ModelDiscoveryScreen({super.key});
@@ -52,7 +53,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.cream,
       body: Column(
         children: [
           // Search & Filter Header
@@ -63,17 +64,17 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF161618),
+                      color: AppTheme.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      border: Border.all(color: const Color(0xFFE0DCD5)),
                     ),
                     child: TextField(
                       controller: _searchController,
-                      style: const TextStyle(color: Colors.white),
+                      style: GoogleFonts.montserrat(color: AppTheme.black),
                       decoration: InputDecoration(
                         hintText: 'Search models...',
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-                        prefixIcon: const Icon(LucideIcons.search, size: 20, color: Colors.white24),
+                        hintStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+                        prefixIcon: const Icon(LucideIcons.search, size: 20, color: AppTheme.grey),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -89,14 +90,14 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF161618),
+                      color: AppTheme.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: (_selectedCategories.isNotEmpty || _selectedLocation != null) 
-                        ? const Color(0xFF6366F1) : Colors.white.withOpacity(0.05)),
+                        ? AppTheme.gold : const Color(0xFFE0DCD5)),
                     ),
                     child: Icon(LucideIcons.slidersHorizontal, size: 20, 
                       color: (_selectedCategories.isNotEmpty || _selectedLocation != null) 
-                        ? const Color(0xFF818CF8) : Colors.white),
+                        ? AppTheme.gold : AppTheme.black),
                   ),
                 ),
               ],
@@ -146,20 +147,20 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Results', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 13)),
+                Text('Results', style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF161618),
+                    color: AppTheme.white,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: const Color(0xFFE0DCD5)),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _sortOption,
-                      dropdownColor: const Color(0xFF1a1a1a),
-                      icon: const Icon(LucideIcons.chevronDown, size: 16, color: Colors.white54),
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      dropdownColor: AppTheme.white,
+                      icon: const Icon(LucideIcons.chevronDown, size: 16, color: AppTheme.grey),
+                      style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 13),
                       isDense: true,
                       items: ['Newest', 'Highest Rated'].map((opt) => DropdownMenuItem(
                         value: opt,
@@ -183,7 +184,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
               stream: _buildQuery().snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                  return const Center(child: CircularProgressIndicator(color: AppTheme.gold));
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -191,9 +192,9 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.users, size: 48, color: Colors.white.withOpacity(0.1)),
+                        Icon(LucideIcons.users, size: 48, color: AppTheme.grey.withOpacity(0.3)),
                         const SizedBox(height: 16),
-                        Text('No models match your filters', style: TextStyle(color: Colors.white.withOpacity(0.3))),
+                        Text('No models match your filters', style: GoogleFonts.montserrat(color: AppTheme.grey)),
                         if (_selectedCategories.isNotEmpty || _selectedLocation != null) 
                           TextButton(
                             onPressed: () {
@@ -203,7 +204,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                                 _ageRange = const RangeValues(18, 45);
                               });
                             },
-                            child: const Text('Clear Filters', style: TextStyle(color: Color(0xFF818CF8))),
+                            child: Text('Clear Filters', style: GoogleFonts.montserrat(color: AppTheme.gold, fontWeight: FontWeight.bold)),
                           ),
                       ],
                     ),
@@ -254,15 +255,16 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.white.withOpacity(0.05),
+          color: isSelected ? AppTheme.black : AppTheme.white,
           borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: isSelected ? Colors.transparent : const Color(0xFFE0DCD5)),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.white60,
+          style: GoogleFonts.montserrat(
+            color: isSelected ? AppTheme.white : AppTheme.grey,
             fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
         ),
       ),
@@ -272,7 +274,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
   void _showFilterSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: AppTheme.white,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -292,7 +294,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: AppTheme.grey.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -300,18 +302,18 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
               const SizedBox(height: 32),
               Text(
                 'Filters',
-                style: GoogleFonts.tinos(
+                style: GoogleFonts.cormorantGaramond(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.black,
                 ),
               ),
               const SizedBox(height: 32),
               _filterSection('Category', ['Fashion', 'Commercial', 'Editorial', 'Runway', 'Fitness'], isMulti: true),
               
-              const Text(
+              Text(
                 'Age Range',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 12),
               StatefulBuilder(
@@ -320,8 +322,8 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('${_ageRange.start.toInt()} years', style: const TextStyle(color: Color(0xFF818CF8), fontSize: 13)),
-                        Text('${_ageRange.end.toInt()} years', style: const TextStyle(color: Color(0xFF818CF8), fontSize: 13)),
+                        Text('${_ageRange.start.toInt()} years', style: GoogleFonts.montserrat(color: AppTheme.gold, fontSize: 13, fontWeight: FontWeight.bold)),
+                        Text('${_ageRange.end.toInt()} years', style: GoogleFonts.montserrat(color: AppTheme.gold, fontSize: 13, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     RangeSlider(
@@ -329,8 +331,8 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                       min: 16,
                       max: 65,
                       divisions: 49,
-                      activeColor: const Color(0xFF6366F1),
-                      inactiveColor: Colors.white10,
+                      activeColor: AppTheme.gold,
+                      inactiveColor: AppTheme.grey.withOpacity(0.2),
                       onChanged: (values) {
                         setSheetState(() => _ageRange = values);
                         setState(() {});
@@ -352,12 +354,12 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppTheme.black,
+                    foregroundColor: AppTheme.white,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Apply Filters', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('Apply Filters', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -373,7 +375,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold, fontSize: 16),
         ),
         const SizedBox(height: 12),
         Wrap(
@@ -416,18 +418,18 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF6366F1).withOpacity(0.1) : Colors.transparent,
+            color: isSelected ? AppTheme.gold.withOpacity(0.1) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? const Color(0xFF6366F1) : Colors.white10,
+              color: isSelected ? AppTheme.gold : const Color(0xFFE0DCD5),
             ),
           ),
           child: Text(
             label,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF818CF8) : Colors.white60,
+            style: GoogleFonts.montserrat(
+              color: isSelected ? AppTheme.gold : AppTheme.grey,
               fontSize: 13,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
           ),
         ),
@@ -438,7 +440,7 @@ class _ModelDiscoveryScreenState extends State<ModelDiscoveryScreen> {
   void _showInviteDialog(BuildContext context, UserModel model) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF141414),
+      backgroundColor: AppTheme.white,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -458,9 +460,16 @@ class _ModelFlashcard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF161618),
+        color: AppTheme.white,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -483,13 +492,13 @@ class _ModelFlashcard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: AppTheme.white.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '\$800 - \$2,500 / day',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: GoogleFonts.montserrat(
+                        color: AppTheme.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -503,8 +512,8 @@ class _ModelFlashcard extends StatelessWidget {
                   child: GestureDetector(
                     onTap: onInvite,
                     child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: const Icon(LucideIcons.mail, color: Colors.black, size: 20),
+                      backgroundColor: AppTheme.white,
+                      child: const Icon(LucideIcons.mail, color: AppTheme.black, size: 20),
                     ),
                   ),
                 ),
@@ -525,26 +534,26 @@ class _ModelFlashcard extends StatelessWidget {
                       children: [
                         Text(
                           model.name,
-                          style: GoogleFonts.tinos(
+                          style: GoogleFonts.cormorantGaramond(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: AppTheme.black,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(LucideIcons.mapPin, size: 12, color: Colors.white.withOpacity(0.5)),
+                            Icon(LucideIcons.mapPin, size: 12, color: AppTheme.grey),
                             const SizedBox(width: 4),
                             Text(
                               model.location ?? 'Global',
-                              style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13),
+                              style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
                             ),
                             if (model.age != null) ...[
                               const SizedBox(width: 12),
                               Text(
                                 '${model.age} yrs',
-                                style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13),
+                                style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 13),
                               ),
                             ],
                           ],
@@ -568,12 +577,12 @@ class _ModelFlashcard extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.05),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.black,
+                      foregroundColor: AppTheme.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: const Text('View Profile'),
+                    child: Text('View Profile', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -588,15 +597,15 @@ class _ModelFlashcard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF6366F1).withOpacity(0.1),
+        color: AppTheme.gold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: Color(0xFF818CF8),
+        style: GoogleFonts.montserrat(
+          color: AppTheme.gold,
           fontSize: 10,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -631,15 +640,15 @@ class _InviteBottomSheetState extends State<_InviteBottomSheet> {
             children: [
               Text(
                 'Invite to Job',
-                style: GoogleFonts.tinos(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.black),
               ),
-              IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(LucideIcons.x, color: Colors.white38)),
+              IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(LucideIcons.x, color: AppTheme.grey)),
             ],
           ),
           const SizedBox(height: 24),
           Text(
             'Select Job for ${widget.model.name}',
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 14),
           ),
           const SizedBox(height: 12),
           
@@ -651,10 +660,11 @@ class _InviteBottomSheetState extends State<_InviteBottomSheet> {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: AppTheme.cream,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE0DCD5)),
                   ),
-                  child: const Center(child: Text('No active jobs to invite to', style: TextStyle(color: Colors.white38))),
+                  child: Center(child: Text('No active jobs to invite to', style: GoogleFonts.montserrat(color: AppTheme.grey))),
                 );
               }
               return Container(
@@ -671,11 +681,11 @@ class _InviteBottomSheetState extends State<_InviteBottomSheet> {
                         margin: const EdgeInsets.only(right: 12),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF6366F1).withOpacity(0.1) : Colors.white.withOpacity(0.05),
+                          color: isSelected ? AppTheme.black : AppTheme.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isSelected ? const Color(0xFF6366F1) : Colors.transparent),
+                          border: Border.all(color: isSelected ? Colors.transparent : const Color(0xFFE0DCD5)),
                         ),
-                        child: Center(child: Text(job.title, style: TextStyle(color: isSelected ? const Color(0xFF818CF8) : Colors.white70))),
+                        child: Center(child: Text(job.title, style: GoogleFonts.montserrat(color: isSelected ? AppTheme.white : AppTheme.grey, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500))),
                       ),
                     );
                   }
@@ -687,17 +697,19 @@ class _InviteBottomSheetState extends State<_InviteBottomSheet> {
           const SizedBox(height: 32),
           Text(
             'Invitation Message',
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 14),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _msgController,
             maxLines: 3,
-            style: const TextStyle(color: Colors.white),
+            style: GoogleFonts.montserrat(color: AppTheme.black),
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white.withOpacity(0.05),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              fillColor: AppTheme.white,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE0DCD5))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFFE0DCD5))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppTheme.black)),
             ),
           ),
           const SizedBox(height: 40),
@@ -706,12 +718,12 @@ class _InviteBottomSheetState extends State<_InviteBottomSheet> {
             child: ElevatedButton(
               onPressed: _selectedJob == null ? null : () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: AppTheme.black,
+                foregroundColor: AppTheme.white,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('Send Invitation', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text('Send Invitation', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
             ),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter_application_1/core/services/job_service.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_application_1/core/models/job_model.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_application_1/core/theme/app_theme.dart';
 
 class MatchmakerScreen extends StatefulWidget {
   const MatchmakerScreen({super.key});
@@ -22,29 +24,30 @@ class _MatchmakerScreenState extends State<MatchmakerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.cream,
       body: StreamBuilder<List<JobModel>>(
         stream: _jobService.getOpenJobs(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppTheme.gold));
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error: ${snapshot.error}', style: GoogleFonts.montserrat(color: AppTheme.black)));
           }
 
           final jobs = snapshot.data ?? [];
 
           if (jobs.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(LucideIcons.briefcase, size: 48, color: Colors.white24),
-                  SizedBox(height: 16),
+                  Icon(LucideIcons.briefcase, size: 48, color: AppTheme.grey.withOpacity(0.3)),
+                  const SizedBox(height: 16),
                   Text(
                     'No jobs available yet.',
-                    style: TextStyle(color: Colors.white54, fontSize: 18),
+                    style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 18),
                   ),
                 ],
               ),
@@ -52,7 +55,7 @@ class _MatchmakerScreenState extends State<MatchmakerScreen> {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             itemCount: jobs.length,
             itemBuilder: (context, index) {
               return _JobCard(job: jobs[index]);
@@ -72,12 +75,19 @@ class _JobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-        borderRadius: BorderRadius.circular(12),
+        color: AppTheme.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,82 +95,88 @@ class _JobCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppTheme.cream,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE0DCD5)),
                 ),
                 child: Center(
                   child: Text(
                     job.brandName.isNotEmpty ? job.brandName[0].toUpperCase() : 'B',
-                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.cormorantGaramond(
+                      color: AppTheme.black, 
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     job.brandName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      color: AppTheme.black,
                     ),
                   ),
                   Text(
                     '${job.location} • ${DateFormat('MMM d').format(job.date)}',
-                    style: const TextStyle(
+                    style: GoogleFonts.montserrat(
                       fontSize: 12,
-                      color: Colors.white70,
+                      color: AppTheme.grey,
                     ),
                   ),
                 ],
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.3)),
+                  color: AppTheme.gold.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '\$${job.rate.toInt()}/day',
-                  style: const TextStyle(
+                  style: GoogleFonts.montserrat(
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF818CF8),
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.gold,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             job.title,
-            style: const TextStyle(
-              fontSize: 18,
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 22,
               fontWeight: FontWeight.bold,
+              color: AppTheme.black,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             job.description,
-            style: const TextStyle(
+            style: GoogleFonts.montserrat(
               fontSize: 14,
-              color: Colors.white70,
-              height: 1.4,
+              color: AppTheme.grey,
+              height: 1.5,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: job.requirements.take(3).map((req) => _Tag(text: req)).toList(),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -207,12 +223,13 @@ class _JobCard extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('Application Sent'),
-                      content: const Text('Your profile has been sent to the brand.'),
+                      backgroundColor: AppTheme.white,
+                      title: Text('Application Sent', style: GoogleFonts.cormorantGaramond(fontWeight: FontWeight.bold, fontSize: 24)),
+                      content: Text('Your profile has been sent to the brand.', style: GoogleFonts.montserrat()),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('OK'),
+                          child: Text('OK', style: GoogleFonts.montserrat(color: AppTheme.black, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -225,10 +242,12 @@ class _JobCard extends StatelessWidget {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: AppTheme.black,
+                foregroundColor: AppTheme.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Apply Now'),
+              child: Text('Apply Now', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -245,16 +264,18 @@ class _Tag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
+        color: AppTheme.cream,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE0DCD5)),
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: GoogleFonts.montserrat(
           fontSize: 12,
-          color: Colors.white70,
+          color: AppTheme.black.withOpacity(0.7),
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
