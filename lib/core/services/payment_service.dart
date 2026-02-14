@@ -65,4 +65,18 @@ class PaymentService {
             .map((doc) => PaymentModel.fromMap(doc.data(), doc.id))
             .toList());
   }
+  Stream<List<PaymentModel>> getUserPayments(String userId) {
+    return _firestore
+        .collection('payments')
+        .where(Filter.or(
+          Filter('brandId', isEqualTo: userId),
+          Filter('modelId', isEqualTo: userId),
+        ))
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => PaymentModel.fromMap(doc.data(), doc.id))
+            .toList());
+  }
 }
+
