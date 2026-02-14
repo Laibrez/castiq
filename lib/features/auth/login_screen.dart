@@ -119,12 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
-                  child: _isLoading
+                  child: _isLoading 
                       ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Log In'),
+                    : const Text('Log In'),
                 ),
               ),
               const SizedBox(height: 16),

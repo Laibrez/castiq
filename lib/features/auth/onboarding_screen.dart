@@ -328,7 +328,7 @@ class _OnboardingPage extends StatelessWidget {
           if (isPage1) const Spacer(flex: 3),
           if (isPage2) const Spacer(flex: 2),
           if (isPage3) const Spacer(flex: 1),
-
+          
           // TITLE
           if (isPage1)
             RichText(
@@ -373,9 +373,9 @@ class _OnboardingPage extends StatelessWidget {
                 letterSpacing: -0.5,
               ),
             ),
-
-          SizedBox(height: isPage2 ? 20 : 24),
-
+          
+          SizedBox(height: isPage2 ? 20 : 24), 
+          
           Text(
             data.subtitle,
             textAlign: TextAlign.center,
@@ -387,39 +387,39 @@ class _OnboardingPage extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-
+          
           // Features section (Page 2)
           if (data.features != null) ...[
-            const SizedBox(height: 48),
+            const SizedBox(height: 48), 
             ...data.features!.map((f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 32),
-                  child: Column(
-                    children: [
-                      Text(
-                        f.title,
+              padding: const EdgeInsets.only(bottom: 32),
+              child: Column(
+                children: [
+                  Text(
+                    f.title,
                         style: GoogleFonts.montserrat(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
                           color: AppTheme.black,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        f.subtitle,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 14,
-                          color: AppTheme.grey,
-                          height: 1.5,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                    ],
+                      letterSpacing: 0.3,
+                    ),
                   ),
-                )),
+                  const SizedBox(height: 8), 
+                  Text(
+                    f.subtitle,
+                    textAlign: TextAlign.center,
+                        style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                          color: AppTheme.grey,
+                      height: 1.5,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ],
-
+          
           if (isPage1) const Spacer(flex: 3),
           if (isPage2) const Spacer(flex: 2),
           if (isPage3) const Spacer(flex: 5),

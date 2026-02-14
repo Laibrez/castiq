@@ -368,16 +368,16 @@ Widget _buildStyledTextField(String label, IconData icon, {
   TextEditingController? controller,
   TextInputType? keyboardType,
 }) {
-  return TextField(
-    controller: controller,
-    obscureText: obscureText,
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
     keyboardType: keyboardType,
     style: GoogleFonts.montserrat(color: AppTheme.black),
-    decoration: InputDecoration(
-      labelText: label,
+      decoration: InputDecoration(
+        labelText: label,
       labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
       prefixIcon: Icon(icon, color: AppTheme.grey, size: 20),
-      filled: true,
+        filled: true,
       fillColor: AppTheme.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -391,26 +391,26 @@ Widget _buildStyledTextField(String label, IconData icon, {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppTheme.gold, width: 1.5),
       ),
-    ),
+                ),
   );
 }
 
 Widget _buildStyledButton({required String label, required VoidCallback onPressed}) {
   return SizedBox(
-    width: double.infinity,
-    child: ElevatedButton(
+            width: double.infinity,
+            child: ElevatedButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
         backgroundColor: AppTheme.gold,
         foregroundColor: AppTheme.black,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
-      ),
+              ),
       child: Text(label, style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 15)),
-    ),
-  );
-}
+      ),
+    );
+  }
 
 // --- Step Widgets ---
 
@@ -431,9 +431,9 @@ class _Step1Account extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+          children: [
           Text(
             'Create Account',
             style: GoogleFonts.cormorantGaramond(
@@ -442,8 +442,8 @@ class _Step1Account extends StatelessWidget {
               fontStyle: FontStyle.italic,
               color: AppTheme.black,
             ),
-          ),
-          const SizedBox(height: 8),
+            ),
+            const SizedBox(height: 8),
           Text(
             'Enter your credentials to get started.',
             style: GoogleFonts.montserrat(fontSize: 14, color: AppTheme.grey),

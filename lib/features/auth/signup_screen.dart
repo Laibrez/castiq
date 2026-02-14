@@ -167,12 +167,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleSignup,
-                  child: _isLoading
+                  child: _isLoading 
                       ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Sign Up'),
+                    : const Text('Sign Up'),
                 ),
               ),
               const SizedBox(height: 24),

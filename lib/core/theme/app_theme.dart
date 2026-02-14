@@ -54,7 +54,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
         color: black,
       ),
-
+      
       // Titles, Body, & Labels → Montserrat (Clean sans-serif)
       titleLarge: GoogleFonts.montserrat(
         fontSize: 20,
@@ -168,7 +168,7 @@ class AppTheme {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: black,
-          );
+  );
         }
         return GoogleFonts.montserrat(
           fontSize: 12,

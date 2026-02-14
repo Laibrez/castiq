@@ -239,7 +239,7 @@ class JobDetailScreen extends StatelessWidget {
           color: AppTheme.cream,
           border: Border(
             top: BorderSide(color: AppTheme.black.withOpacity(0.06)),
-          ),
+            ),
         ),
         child: ElevatedButton(
           onPressed: () {
@@ -331,10 +331,10 @@ class JobDetailScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              text,
+            text,
               style: GoogleFonts.montserrat(
                 color: AppTheme.grey,
-                fontSize: 14,
+              fontSize: 14,
               ),
             ),
           ),

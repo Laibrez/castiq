@@ -514,36 +514,36 @@ Widget _buildCountryField(BuildContext context, TextEditingController controller
     'Country',
     LucideIcons.globe,
     controller,
-    readOnly: true,
+      readOnly: true,
     suffixIcon: const Icon(LucideIcons.chevronDown, color: AppTheme.grey, size: 20),
-    onTap: () {
-      showCountryPicker(
-        context: context,
-        countryListTheme: CountryListThemeData(
-          flagSize: 25,
+      onTap: () {
+        showCountryPicker(
+          context: context,
+          countryListTheme: CountryListThemeData(
+            flagSize: 25,
           backgroundColor: AppTheme.white,
           textStyle: GoogleFonts.montserrat(fontSize: 16, color: AppTheme.black),
-          bottomSheetHeight: 500,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
-          ),
-          inputDecoration: InputDecoration(
-            labelText: 'Search',
-            hintText: 'Start typing to search',
-            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.grey),
-            border: OutlineInputBorder(
-              borderSide: BorderSide(color: AppTheme.grey.withOpacity(0.2)),
+            bottomSheetHeight: 500,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20.0),
+              topRight: Radius.circular(20.0),
             ),
+            inputDecoration: InputDecoration(
+              labelText: 'Search',
+              hintText: 'Start typing to search',
+            prefixIcon: const Icon(LucideIcons.search, color: AppTheme.grey),
+              border: OutlineInputBorder(
+              borderSide: BorderSide(color: AppTheme.grey.withOpacity(0.2)),
+              ),
             labelStyle: GoogleFonts.montserrat(color: AppTheme.grey),
             hintStyle: GoogleFonts.montserrat(color: AppTheme.grey),
+            ),
           ),
-        ),
-        onSelect: (Country country) {
-          controller.text = country.name;
-        },
-      );
-    },
+          onSelect: (Country country) {
+              controller.text = country.name;
+          },
+        );
+      },
   );
 }
 
