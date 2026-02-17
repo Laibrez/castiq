@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-// import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_application_1/core/models/payment_model.dart';
 
 class PaymentService {
@@ -16,8 +16,6 @@ class PaymentService {
       final data = result.data;
 
       // 2. Initialize the payment sheet
-      /*
-      // Requires flutter_stripe import
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: data['paymentIntent'],
@@ -27,8 +25,6 @@ class PaymentService {
           style: ThemeMode.dark,
         ),
       );
-      */
-      // NOTE: Uncomment above when flutter_stripe is fully configured with native setups
     } catch (e) {
       throw e;
     }
@@ -36,7 +32,7 @@ class PaymentService {
 
   Future<void> presentPaymentSheet() async {
     try {
-      // await Stripe.instance.presentPaymentSheet();
+      await Stripe.instance.presentPaymentSheet();
       // On success, the server webhook should update the booking status.
       // For now, we can optimistically update or poll.
     } catch (e) {

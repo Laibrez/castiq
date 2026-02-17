@@ -4,11 +4,45 @@ import 'package:flutter_application_1/core/widgets/application_confirmation_moda
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/features/brands/brand_profile_screen.dart';
 import 'package:flutter_application_1/core/theme/app_theme.dart';
+import 'package:flutter_application_1/core/models/job_model.dart';
+import 'package:flutter_application_1/core/services/auth_service.dart';
+import 'package:flutter_application_1/core/services/job_service.dart';
+import 'package:intl/intl.dart';
 
-class JobDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> job;
+class JobDetailScreen extends StatefulWidget {
+  final JobModel job;
 
   const JobDetailScreen({super.key, required this.job});
+
+  @override
+  State<JobDetailScreen> createState() => _JobDetailScreenState();
+}
+
+class _JobDetailScreenState extends State<JobDetailScreen> {
+  final AuthService _authService = AuthService();
+  final JobService _jobService = JobService();
+  bool _isApplying = false;
+
+  void _handleApply() async {
+    final user = _authService.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please log in to apply')));
+      return;
+    }
+
+    setState(() => _isApplying = true);
+
+    try {
+      await _jobService.applyToJob(widget.job.id, user.uid, widget.job.brandId);
+      if (!mounted) return;
+      ApplicationConfirmationModal.show(context, jobName: widget.job.title);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to apply: $e')));
+    } finally {
+      if (mounted) setState(() => _isApplying = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +59,7 @@ class JobDetailScreen extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: AppTheme.white.withOpacity(0.9),
                 child: IconButton(
-                  icon: const Icon(LucideIcons.chevronLeft,
-                      color: AppTheme.black),
+                  icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.black),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -35,10 +68,9 @@ class JobDetailScreen extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    job['coverImage'],
-                    fit: BoxFit.cover,
-                  ),
+                   widget.job.images.isNotEmpty 
+                    ? Image.network(widget.job.images.first, fit: BoxFit.cover)
+                    : Container(color: AppTheme.grey), // Fallback
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -74,12 +106,7 @@ class JobDetailScreen extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            job['brandLogo'],
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                          ),
+                          child: Container(width: 60, height: 60, color: AppTheme.grey.withOpacity(0.1), child: const Icon(LucideIcons.user, color: AppTheme.grey)), // Fallback for brand logo if not in JobModel
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -88,7 +115,7 @@ class JobDetailScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              job['brandName'],
+                              widget.job.brandName,
                               style: GoogleFonts.cormorantGaramond(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -96,7 +123,7 @@ class JobDetailScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Premium Partner',
+                              'Premium Partner', // Placeholder or fetch brand details
                               style: GoogleFonts.montserrat(
                                 fontSize: 13,
                                 color: AppTheme.gold,
@@ -113,15 +140,14 @@ class JobDetailScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => BrandProfileScreen(
-                                brandId: job['brandId'],
+                                brandId: widget.job.brandId,
                               ),
                             ),
                           );
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: AppTheme.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: const BorderSide(color: Color(0xFFE8E4DE)),
@@ -142,7 +168,7 @@ class JobDetailScreen extends StatelessWidget {
 
                   // 3. Job Title
                   Text(
-                    job['jobName'],
+                    widget.job.title,
                     style: GoogleFonts.cormorantGaramond(
                       fontSize: 36,
                       fontWeight: FontWeight.w400,
@@ -162,25 +188,17 @@ class JobDetailScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _infoRow(LucideIcons.mapPin, 'Location',
-                            '${job['location']} – Miami Beach Convention Center'),
+                        _infoRow(LucideIcons.mapPin, 'Location', widget.job.location),
                         Padding(
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 16),
-                          child: Divider(
-                              color: AppTheme.black.withOpacity(0.06)),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: AppTheme.black.withOpacity(0.06)),
                         ),
-                        _infoRow(
-                            LucideIcons.calendar, 'Dates', job['date']),
+                        _infoRow(LucideIcons.calendar, 'Dates', DateFormat('MMM d, yyyy').format(widget.job.shootDate)),
                         Padding(
-                          padding:
-                              const EdgeInsets.symmetric(vertical: 16),
-                          child: Divider(
-                              color: AppTheme.black.withOpacity(0.06)),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Divider(color: AppTheme.black.withOpacity(0.06)),
                         ),
-                        _infoRow(LucideIcons.dollarSign, 'Total Payment',
-                            '${job['payment']} USD',
-                            isHighlight: true),
+                        _infoRow(LucideIcons.dollarSign, 'Total Payment', '\$${widget.job.payRate.toStringAsFixed(0)} USD', isHighlight: true),
                       ],
                     ),
                   ),
@@ -190,7 +208,7 @@ class JobDetailScreen extends StatelessWidget {
                   _sectionHeader('Description'),
                   const SizedBox(height: 12),
                   Text(
-                    'Join Vogue Miami for the most anticipated runway event of the season. Featuring a global cast of exceptional talent, Miami Swim Week 2024 represents a pinnacle of fashion and high-energy performance. Models will be showcasing our lead swim collection across a 4-day intensive schedule.',
+                    widget.job.description,
                     style: GoogleFonts.montserrat(
                       fontSize: 15,
                       color: AppTheme.grey,
@@ -201,31 +219,18 @@ class JobDetailScreen extends StatelessWidget {
 
                   _sectionHeader('Requirements'),
                   const SizedBox(height: 12),
-                  _requirementItem('Height: 5\'9" – 6\'0"'),
-                  _requirementItem(
-                      'Strong runway walk with personality'),
-                  _requirementItem(
-                      'Available for casting and rehearsals March 12-14'),
-                  _requirementItem(
-                      'Professional attitude and reliability'),
+                  _requirementItem('Height: ${widget.job.heightMin}cm – ${widget.job.heightMax}cm'),
+                  _requirementItem('Gender: ${widget.job.genderRequirement}'),
+                  _requirementItem('Experience: ${widget.job.experienceRequired} years'), 
+                  _requirementItem('Contract: ${widget.job.contractType}'),
+                   if (widget.job.isUrgent) _requirementItem('Urgent Casting'),
+                   if (widget.job.isInstantPayoutAvailable) _requirementItem('Instant Payout Available'),
+
                   const SizedBox(height: 32),
 
-                  _sectionHeader('Past Events'),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 180,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _mediaCard(
-                            'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=400&auto=format&fit=crop'),
-                        _mediaCard(
-                            'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=400&auto=format&fit=crop'),
-                        _mediaCard(
-                            'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=400&auto=format&fit=crop'),
-                      ],
-                    ),
-                  ),
+                  // _sectionHeader('Past Events'),
+                  // ... (Mock images or fetch from brand)
+                  
                   const SizedBox(height: 60),
                 ],
               ),
@@ -239,13 +244,10 @@ class JobDetailScreen extends StatelessWidget {
           color: AppTheme.cream,
           border: Border(
             top: BorderSide(color: AppTheme.black.withOpacity(0.06)),
-            ),
+          ),
         ),
         child: ElevatedButton(
-          onPressed: () {
-            ApplicationConfirmationModal.show(context,
-                jobName: job['jobName']);
-          },
+          onPressed: _isApplying ? null : _handleApply,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.gold,
             foregroundColor: AppTheme.black,
@@ -254,18 +256,18 @@ class JobDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
             ),
           ),
-          child: Text(
-            'Apply Now',
-            style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold, fontSize: 16),
-          ),
+          child: _isApplying 
+            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: AppTheme.black, strokeWidth: 2))
+            : Text(
+              'Apply Now',
+              style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
         ),
       ),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value,
-      {bool isHighlight = false}) {
+  Widget _infoRow(IconData icon, String label, String value, {bool isHighlight = false}) {
     return Row(
       children: [
         Container(
@@ -283,16 +285,14 @@ class JobDetailScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: GoogleFonts.montserrat(
-                    color: AppTheme.grey, fontSize: 12),
+                style: GoogleFonts.montserrat(color: AppTheme.grey, fontSize: 12),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
                 style: GoogleFonts.montserrat(
                   color: isHighlight ? AppTheme.gold : AppTheme.black,
-                  fontWeight:
-                      isHighlight ? FontWeight.bold : FontWeight.w500,
+                  fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
                   fontSize: 15,
                 ),
               ),
@@ -331,10 +331,10 @@ class JobDetailScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-            text,
+              text,
               style: GoogleFonts.montserrat(
                 color: AppTheme.grey,
-              fontSize: 14,
+                fontSize: 14,
               ),
             ),
           ),

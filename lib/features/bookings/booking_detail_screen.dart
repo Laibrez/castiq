@@ -130,16 +130,179 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               _buildRequirementsTab(booking),
               _buildPaymentTab(booking),
               _buildContractsTab(booking),
-              ChatDetailScreen(
-                isRequested: false,
-                isLocked: booking.status == 'pending' || booking.status == 'offer_sent',
-              ),
+              _buildChatTab(booking),
             ],
           ),
           bottomNavigationBar: _buildBottomActions(booking),
         );
       },
     );
+  }
+
+  Widget _buildChatTab(BookingModel booking) {
+    if (booking.status == 'pending' || booking.status == 'offer_sent') {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(LucideIcons.lock, size: 48, color: AppTheme.grey),
+            const SizedBox(height: 16),
+            Text(
+              'Chat is locked',
+              style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Chat will be enabled once the offer is accepted.',
+              style: GoogleFonts.montserrat(color: AppTheme.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final currentUserId = AuthService().currentUser?.uid;
+    if (currentUserId == null) return const SizedBox.shrink();
+
+    final otherUserId = widget.userType == 'brand' ? booking.modelId : booking.brandId;
+
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _fetchChatAndUser(booking, otherUserId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: AppTheme.gold));
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        final data = snapshot.data;
+        final chatDoc = data?['chat'] as DocumentSnapshot?;
+        final userDoc = data?['user'] as DocumentSnapshot?;
+        
+        final otherUserName = userDoc?.get('name') ?? 'User';
+        final otherUserImage = userDoc?.data().toString().contains('profileImageUrl') == true ? userDoc?.get('profileImageUrl') : null;
+
+        if (chatDoc != null && chatDoc.exists) {
+          return ChatDetailScreen(
+            chatId: chatDoc.id,
+            otherUserId: otherUserId,
+            otherUserName: otherUserName,
+            otherUserImage: otherUserImage,
+          );
+        } else {
+          // Chat doesn't exist, show "Start Chat" button
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.messageSquare, size: 64, color: AppTheme.gold.withOpacity(0.5)),
+                const SizedBox(height: 24),
+                Text(
+                  'Start a Conversation',
+                  style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Discuss details with ${otherUserName}',
+                  style: GoogleFonts.montserrat(color: AppTheme.grey),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () => _createChat(booking, otherUserId, otherUserName, otherUserImage),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.black,
+                    foregroundColor: AppTheme.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  ),
+                  child: const Text('Start Chat'),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> _fetchChatAndUser(BookingModel booking, String otherUserId) async {
+    // 1. Fetch Other User
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(otherUserId).get();
+
+    // 2. Fetch Chat (Query by participants and jobId)
+    final chatQuery = await FirebaseFirestore.instance
+        .collection('chats')
+        .where('jobId', isEqualTo: booking.jobId)
+        .where('participants', arrayContains: booking.modelId) // We know modelId is one participant
+        .get();
+
+    // Filter locally for the exact match if needed, or rely on compound query if we had one
+    // But simple query: participants arrayContains modelId. Then check if brandId matches.
+    DocumentSnapshot? chatDoc;
+    for (var doc in chatQuery.docs) {
+      final data = doc.data();
+      if (data['brandId'] == booking.brandId && data['modelId'] == booking.modelId) {
+        chatDoc = doc;
+        break;
+      }
+    }
+
+    return {
+      'user': userDoc,
+      'chat': chatDoc,
+    };
+  }
+
+  Future<void> _createChat(BookingModel booking, String otherUserId, String otherUserName, String? otherUserImage) async {
+    setState(() => _isLoading = true);
+    try {
+      // Need self details
+      final currentUser = AuthService().currentUser;
+      final selfDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).get();
+      final selfName = selfDoc.data()?['name'] ?? 'User';
+      final selfImage = selfDoc.data().toString().contains('profileImageUrl') == true ? selfDoc.get('profileImageUrl') : null;
+
+      // Determine who is who
+      final isBrand = widget.userType == 'brand';
+      final modelId = isBrand ? otherUserId : currentUser.uid;
+      final modelName = isBrand ? otherUserName : selfName;
+      final modelImage = isBrand ? otherUserImage : selfImage;
+      
+      final brandId = isBrand ? currentUser.uid : otherUserId;
+      final brandName = isBrand ? selfName : otherUserName;
+      final brandImage = isBrand ? selfImage : otherUserImage;
+
+      // Call ChatService to create (it handles checks)
+      // But ChatService.createChat in dart isn't updated to match backend fully or vice versa? 
+      // The current ChatService.dart createChat uses direct Firestore.
+      final chatService = kIsWeb ? BookingService() : BookingService(); // Just using Firestore direct here for simplicity or import ChatService
+
+      // Actually, let's use the startChat logic
+       final chatRef = await FirebaseFirestore.instance.collection('chats').add({
+        'modelId': modelId,
+        'modelName': modelName,
+        'modelImage': modelImage,
+        'brandId': brandId,
+        'brandName': brandName,
+        'brandImage': brandImage,
+        'jobId': booking.jobId,
+        'jobTitle': booking.jobTitle,
+        'participants': [modelId, brandId],
+        'lastMessage': 'Chat started',
+        'lastMessageTime': FieldValue.serverTimestamp(),
+        'lastMessageSenderId': currentUser.uid,
+        'unreadCount': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'chatEnabled': true,
+      });
+      
+      setState(() {}); // specific chat created, rebuild to show it
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error creating chat: $e')));
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Widget _buildOverviewTab(BookingModel booking) {
@@ -754,13 +917,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   }
 
   void _showSignaturePad(BookingModel booking, String docType) {
+    final TextEditingController _nameController = TextEditingController();
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppTheme.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
       builder: (context) => Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.fromLTRB(32, 32, 32, MediaQuery.of(context).viewInsets.bottom + 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -769,19 +934,18 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             const SizedBox(height: 8),
             Text('Signing: $docType', style: GoogleFonts.montserrat(color: AppTheme.grey)),
             const SizedBox(height: 32),
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppTheme.cream,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE0DCD5)),
-              ),
-              child: Center(
-                child: Text(
-                  'Signature Pad Placeholder',
-                  style: GoogleFonts.montserrat(color: AppTheme.grey),
-                ),
+            Text(
+              'To sign this document, please type your full legal name below. This counts as a legal signature.',
+              style: GoogleFonts.montserrat(color: AppTheme.black, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Full Legal Name',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                filled: true,
+                fillColor: AppTheme.cream,
               ),
             ),
             const SizedBox(height: 32),
@@ -794,23 +958,53 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  // Simulate digital signature saving
-                  final signatureInfo = 'Forensic Hash: ${DateTime.now().millisecondsSinceEpoch}';
-                  await FirebaseFirestore.instance.collection('bookings').doc(booking.id).update({
-                    'signedDocuments.$docType': signatureInfo,
-                  });
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$docType signed successfully!')));
+                  if (_nameController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your full name to sign.')));
+                    return;
+                  }
+                  
+                  Navigator.pop(context); // Close modal first
+                  setState(() => _isLoading = true);
+                  
+                  try {
+                    final signature = 'Signed by ${_nameController.text.trim()} on ${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}';
+                    
+                    // Update Booking
+                    final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(booking.id);
+                    await bookingRef.update({
+                      'signedDocuments.$docType': signature,
+                      widget.userType == 'brand' ? 'brandSignedAt' : 'modelSignedAt': FieldValue.serverTimestamp(),
+                    });
+                    
+                    // Check if all needed docs are signed by both? 
+                    // Simplified: If this was the last pending signature for this user, check if other user also signed everything?
+                    // For now, let's just check if both brandSignedAt and modelSignedAt are present in the updated doc.
+                    
+                    final updatedDoc = await bookingRef.get();
+                    final data = updatedDoc.data() as Map<String, dynamic>;
+                    
+                    if (data['brandSignedAt'] != null && data['modelSignedAt'] != null) {
+                       await _bookingService.updateBookingStatus(booking.id, 'fully_signed');
+                    }
+                    
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$docType signed successfully.')));
+                  } catch (e) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error signing: $e')));
+                  } finally {
+                     if (mounted) setState(() => _isLoading = false);
+                  }
                 },
                 style: _btnStyle(AppTheme.black, AppTheme.white),
-                child: const Text('Confirm & Sign', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('Sign Document', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
-            const SizedBox(height: 40),
           ],
         ),
       ),
     );
+  }
   }
 }
 

@@ -112,7 +112,7 @@ class _BookingsScreenState extends State<BookingsScreen> with SingleTickerProvid
     
     switch (filter) {
       case 'upcoming':
-        filtered = bookings.where((b) => ['pending', 'confirmed', 'signed', 'in_progress', 'awaiting_confirmation'].contains(b.status)).toList();
+        filtered = bookings.where((b) => ['pending', 'confirmed', 'signed', 'in_progress', 'awaiting_confirmation', 'offer_sent'].contains(b.status)).toList();
         break;
       case 'completed':
         filtered = bookings.where((b) => ['completed', 'paid'].contains(b.status)).toList();

@@ -1,0 +1,44 @@
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.65 (1.3.66 available)
+  characters 1.4.0 (1.4.1 available)
+  cloud_firestore 6.1.1 (6.1.2 available)
+  cloud_firestore_platform_interface 7.0.5 (7.0.6 available)
+  cloud_firestore_web 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+1 (0.3.5+2 available)
+  dbus 0.7.11 (0.7.12 available)
+  dio 5.9.0 (5.9.1 available)
+  ffi 2.1.4 (2.2.0 available)
+  file_picker 10.3.8 (10.3.10 available)
+  firebase_auth 6.1.3 (6.1.4 available)
+  firebase_auth_platform_interface 8.1.5 (8.1.6 available)
+  firebase_auth_web 6.1.1 (6.1.2 available)
+  firebase_storage 13.0.5 (13.0.6 available)
+  firebase_storage_platform_interface 5.2.16 (5.2.17 available)
+  firebase_storage_web 3.11.1 (3.11.2 available)
+  google_fonts 6.3.3 (8.0.1 available)
+  image_picker_android 0.8.13+10 (0.8.13+13 available)
+  image_picker_ios 0.8.13+3 (0.8.13+6 available)
+  lints 6.0.0 (6.1.0 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.1 available)
+  path_provider_foundation 2.5.1 (2.6.0 available)
+  petitparser 7.0.1 (7.0.2 available)
+  source_span 1.10.1 (1.10.2 available)
+  test_api 0.7.7 (0.7.9 available)
+  url_launcher_ios 6.3.6 (6.4.1 available)
+  url_launcher_web 2.4.1 (2.4.2 available)
+Got dependencies!
+29 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing flutter_application_1...                              
+This crash may already be reported. Check GitHub for similar crashes.
+https://github.com/flutter/flutter/issues?q=is%3Aissue+Exception%3A+analysis+server+exited+with+code+64+and+output%3A%0A%5Bstderr%5D+Project%0A%5Bstderr%5D+++build+++++++Build+a+Dart+application+including+code+assets.%0A%5Bstderr%5D+++compile+++++Compile+Dart+to+various+formats.%0A%5Bstderr%5D+++create++++++Create+a+new+Dart+project.%0A%5Bstderr%5D+++pub+++++++++Work+with+packages.%0A%5Bstderr%5D+++run+++++++++Run+a+Dart+program.%0A%5Bstderr%5D+++test++++++++Run+tests+for+a+project.%0A%5Bstderr%5D+%0A%5Bstderr%5D+Source+code%0A%5Bstderr%5D+++analyze+++++Analyze+Dart+code+in+a+directory.%0A%5Bstderr%5D+++doc+++++++++Generate+API+documentation+for+Dart+projects.%0A%5Bstderr%5D+++fix+++++++++Apply+automated+fixes+to+Dart+source+code.%0A%5Bstderr%5D+++format++++++Idiomatically+format+Dart+source+code.%0A%5Bstderr%5D+%0A%5Bstderr%5D+Tools%0A%5Bstderr%5D+++devtools++++Open+DevTools+%28optionally+connecting+to+an+existing+application%29.%0A%5Bstderr%5D+++info++++++++Show+diagnostic+information+about+the+installed+tooling.%0A%5Bstderr%5D+%0A%5Bstderr%5D+Run+%22dart+help+%3Ccommand%3E%22+for+more+information+about+a+command.%0A%5Bstderr%5D+See+https%3A%2F%2Fdart.dev%2Ftools%2Fdart-tool+for+detailed+documentation.
+
+To report your crash to the Flutter team, first read the guide to filing a bug.
+https://flutter.dev/to/report-bugs
+
+Create a new GitHub issue by pasting this link into your browser and completing the issue template. Thank you!
+https://github.com/flutter/flutter/issues/new?title=%5Btool_crash%5D+_Exception&body=%23%23+Command%0A%60%60%60sh%0Aflutter+analyze%0A%60%60%60%0A%0A%23%23+Steps+to+Reproduce%0A1.+...%0A2.+...%0A3.+...%0A%0A%23%23+Logs%0A_Exception%0A%60%60%60console%0A%0A%60%60%60%0A%60%60%60console%0A%5B%E2%9C%93%5D+Flutter+%28Channel+stable%2C+3.38.3%2C+on+macOS+12.7.6+21H1320+darwin-x64%2C+locale+en-US%29+%5B325ms%5D%0A++++%E2%80%A2+Flutter+version+3.38.3+on+channel+stable+at+%2FUsers%2Flaishabraja%2FappOne%2Fflutter%0A++++%E2%80%A2+Upstream+repository+https%3A%2F%2Fgithub.com%2Fflutter%2Fflutter.git%0A++++%E2%80%A2+Framework+revision+19074d12f7+%283+months+ago%29%2C+2025-11-20+17%3A53%3A13+-0500%0A++++%E2%80%A2+Engine+revision+13e658725d%0A++++%E2%80%A2+Dart+version+3.10.1%0A++++%E2%80%A2+DevTools+version+2.51.1%0A++++%E2%80%A2+Feature+flags%3A+enable-web%2C+enable-linux-desktop%2C+enable-macos-desktop%2C+enable-windows-desktop%2C+enable-android%2C+enable-ios%2C+cli-animations%2C+enable-native-assets%2C+omit-legacy-version-file%2C+enable-lldb-debugging%0A%0A%5B%E2%9C%97%5D+Android+toolchain+-+develop+for+Android+devices+%5B280ms%5D%0A++++%E2%9C%97+Unable+to+locate+Android+SDK.%0A++++++Install+Android+Studio+from%3A+https%3A%2F%2Fdeveloper.android.com%2Fstudio%2Findex.html%0A++++++On+first+launch+it+will+assist+you+in+installing+the+Android+SDK+components.%0A++++++%28or+visit+https%3A%2F%2Fflutter.dev%2Fto%2Fmacos-android-setup+for+detailed+instructions%29.%0A++++++If+the+Android+SDK+has+been+installed+to+a+custom+location%2C+please+use%0A++++++%60flutter+config+--android-sdk%60+to+update+to+that+location.%0A%0A%0A%5B%E2%9C%97%5D+Xcode+-+develop+for+iOS+and+macOS+%5B362ms%5D%0A++++%E2%9C%97+Xcode+installation+is+incomplete%3B+a+full+installation+is+necessary+for+iOS+and+macOS+development.%0A++++++Download+at%3A+https%3A%2F%2Fdeveloper.apple.com%2Fxcode%2F%0A++++++Or+install+Xcode+via+the+App+Store.%0A++++++Once+installed%2C+run%3A%0A++++++++sudo+xcode-select+--switch+%2FApplications%2FXcode.app%2FContents%2FDeveloper%0A++++++++sudo+xcodebuild+-runFirstLaunch%0A++++%E2%9C%97+CocoaPods+not+installed.%0A++++++++CocoaPods+is+a+package+manager+for+iOS+or+macOS+platform+code.%0A++++++++Without+CocoaPods%2C+plugins+will+not+work+on+iOS+or+macOS.%0A++++++++For+more+info%2C+see+https%3A%2F%2Fflutter.dev%2Fto%2Fplatform-plugins%0A++++++For+installation+instructions%2C+see+https%3A%2F%2Fguides.cocoapods.org%2Fusing%2Fgetting-started.html%23installation%0A%0A%5B%E2%9C%93%5D+Chrome+-+develop+for+the+web+%5B141ms%5D%0A++++%E2%80%A2+Chrome+at+%2FApplications%2FGoogle+Chrome.app%2FContents%2FMacOS%2FGoogle+Chrome%0A%0A%5B%E2%9C%93%5D+Connected+device+%282+available%29+%5B961ms%5D%0A++++%E2%80%A2+macOS+%28desktop%29+%E2%80%A2+macos++%E2%80%A2+darwin-x64+++++%E2%80%A2+macOS+12.7.6+21H1320+darwin-x64%0A++++%E2%80%A2+Chrome+%28web%29++++%E2%80%A2+chrome+%E2%80%A2+web-javascript+%E2%80%A2+Google+Chrome+144.0.7559.133%0A%0A%5B%E2%9C%93%5D+Network+resources+%5B581ms%5D%0A++++%E2%80%A2+All+expected+network+resources+are+available.%0A%0A%21+Doctor+found+issues+in+2+categories.%0A%0A%60%60%60%0A%0A%23%23+Flutter+Application+Metadata%0A%2A%2AType%2A%2A%3A+app%0A%2A%2AVersion%2A%2A%3A+1.0.0%2B1%0A%2A%2AMaterial%2A%2A%3A+true%0A%2A%2AAndroid+X%2A%2A%3A+false%0A%2A%2AModule%2A%2A%3A+false%0A%2A%2APlugin%2A%2A%3A+false%0A%2A%2AAndroid+package%2A%2A%3A+null%0A%2A%2AiOS+bundle+identifier%2A%2A%3A+null%0A%2A%2ACreation+channel%2A%2A%3A+stable%0A%2A%2ACreation+framework+version%2A%2A%3A+19074d12f7eaf6a8180cd4036a430c1d76de904e%0A%23%23%23+Plugins%0Acloud_firestore-6.1.1%0Acloud_functions-6.0.6%0Afile_picker-10.3.8%0Afirebase_auth-6.1.3%0Afirebase_core-4.4.0%0Afirebase_storage-13.0.5%0Aimage_gallery_saver-2.0.3%0Aimage_picker_ios-0.8.13%2B3%0Amobile_scanner-7.1.4%0Apath_provider_foundation-2.5.1%0Ashare_plus-12.0.1%0Astripe_ios-12.2.0%0Aurl_launcher_ios-6.3.6%0Aflutter_plugin_android_lifecycle-2.0.33%0Aimage_picker_android-0.8.13%2B10%0Apath_provider_android-2.2.22%0Astripe_android-12.2.0%0Aurl_launcher_android-6.3.28%0Afile_selector_macos-0.9.5%0Aimage_picker_macos-0.2.2%2B1%0Aurl_launcher_macos-3.2.5%0Afile_selector_linux-0.9.4%0Aimage_picker_linux-0.2.2%0Apath_provider_linux-2.2.1%0Aurl_launcher_linux-3.2.2%0Afile_selector_windows-0.9.3%2B5%0Aimage_picker_windows-0.2.2%0Apath_provider_windows-2.3.0%0Aurl_launcher_windows-3.1.5%0Acloud_firestore_web-5.1.1%0Acloud_functions_web-5.1.2%0Afirebase_auth_web-6.1.1%0Afirebase_core_web-3.4.0%0Afirebase_storage_web-3.11.1%0Aimage_picker_for_web-3.1.1%0Aurl_launcher_web-2.4.1%0A%0A&labels=tool%2Csevere%3A+crash
+

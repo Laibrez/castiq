@@ -3,7 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/core/services/auth_service.dart';
-import 'package:flutter_application_1/features/chat/chat_screen.dart';
+import 'package:flutter_application_1/features/chat/chat_detail_screen.dart';
 import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
@@ -173,10 +173,11 @@ class _ChatTile extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatScreen(
+                builder: (context) => ChatDetailScreen(
                   chatId: chatId,
                   otherUserId: otherUserId,
                   otherUserName: otherUserName,
+                  otherUserImage: otherUserImage,
                 ),
               ),
             );
@@ -264,8 +265,18 @@ class _ChatTile extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
-  String _formatTime(DateTime time) {
+  String _formatDate(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    final time = timestamp.toDate();
     final now = DateTime.now();
     final diff = now.difference(time);
 

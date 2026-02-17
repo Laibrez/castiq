@@ -37,32 +37,8 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
       backgroundColor: AppTheme.cream,
       body: Column(
         children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 60, 24, 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Payments',
-                  style: GoogleFonts.cormorantGaramond(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.black,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppTheme.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFE0DCD5)),
-                  ),
-                  child: const Icon(LucideIcons.creditCard, size: 20, color: AppTheme.black),
-                ),
-              ],
-            ),
-          ),
+          // Header removed as it's already in AppBar or top level
+          const SizedBox(height: 24),
 
           // Balance Card
           Padding(
@@ -71,11 +47,12 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppTheme.black,
+                color: AppTheme.white,
                 borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: const Color(0xFFE0DCD5)),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.black.withOpacity(0.2),
+                    color: AppTheme.black.withOpacity(0.05),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -90,14 +67,14 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
                       Text(
                         'Total Balance',
                         style: GoogleFonts.montserrat(
-                          color: AppTheme.white.withOpacity(0.7),
+                          color: AppTheme.grey,
                           fontSize: 14,
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppTheme.white.withOpacity(0.1),
+                          color: AppTheme.gold.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -121,7 +98,7 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
                   Text(
                     '\$12,450.00',
                     style: GoogleFonts.cormorantGaramond(
-                      color: AppTheme.white,
+                      color: AppTheme.black,
                       fontSize: 42,
                       fontWeight: FontWeight.bold,
                     ),
@@ -132,8 +109,8 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.gold,
-                        foregroundColor: AppTheme.black,
+                        backgroundColor: AppTheme.black,
+                        foregroundColor: AppTheme.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
@@ -160,13 +137,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
             child: TabBar(
               controller: _tabController,
               indicator: BoxDecoration(
-                color: AppTheme.black,
+                color: AppTheme.cream,
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFE0DCD5)),
               ),
-              labelColor: AppTheme.white,
+              labelColor: AppTheme.black,
               unselectedLabelColor: AppTheme.grey,
               labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13),
               unselectedLabelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w500, fontSize: 13),
+              dividerColor: Colors.transparent,
+              indicatorPadding: const EdgeInsets.all(4),
               tabs: const [
                 Tab(text: 'History'),
                 Tab(text: 'Upcoming'),
