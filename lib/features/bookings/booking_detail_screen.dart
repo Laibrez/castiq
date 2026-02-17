@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_application_1/features/chat/chat_detail_screen.dart';
@@ -205,7 +206,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Discuss details with ${otherUserName}',
+                  'Discuss details with $otherUserName',
                   style: GoogleFonts.montserrat(color: AppTheme.grey),
                 ),
                 const SizedBox(height: 32),
@@ -717,7 +718,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
       context: context,
       isScrollControlled: true,
       backgroundColor: AppTheme.white,
-      builder: (context) => Container(
+      builder: (context) => SizedBox(
         height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
           children: [
@@ -917,7 +918,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
   }
 
   void _showSignaturePad(BookingModel booking, String docType) {
-    final TextEditingController _nameController = TextEditingController();
+    final TextEditingController nameController = TextEditingController();
     
     showModalBottomSheet(
       context: context,
@@ -940,7 +941,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: _nameController,
+              controller: nameController,
               decoration: InputDecoration(
                 labelText: 'Full Legal Name',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -958,7 +959,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  if (_nameController.text.trim().isEmpty) {
+                  if (nameController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter your full name to sign.')));
                     return;
                   }
@@ -967,7 +968,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> with SingleTi
                   setState(() => _isLoading = true);
                   
                   try {
-                    final signature = 'Signed by ${_nameController.text.trim()} on ${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}';
+                    final signature = 'Signed by ${nameController.text.trim()} on ${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}';
                     
                     // Update Booking
                     final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(booking.id);

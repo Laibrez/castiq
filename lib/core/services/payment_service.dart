@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/models/payment_model.dart';
 
 class PaymentService {
@@ -26,7 +27,7 @@ class PaymentService {
         ),
       );
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -36,7 +37,7 @@ class PaymentService {
       // On success, the server webhook should update the booking status.
       // For now, we can optimistically update or poll.
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});

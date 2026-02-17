@@ -44,7 +44,7 @@ class AuthService {
 
       return userCredential;
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -59,7 +59,7 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -93,7 +93,7 @@ class AuthService {
         await user.delete();
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }

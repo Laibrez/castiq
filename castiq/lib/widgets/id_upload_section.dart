@@ -10,11 +10,11 @@ class IdUploadSection extends StatefulWidget {
   final String? userId; // Optional: if not provided, will use 'temp_user_id'
 
   const IdUploadSection({
-    Key? key,
+    super.key,
     required this.onIdUploaded,
     this.isRequired = true,
     this.userId,
-  }) : super(key: key);
+  });
 
   @override
   State<IdUploadSection> createState() => _IdUploadSectionState();

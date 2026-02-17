@@ -138,7 +138,6 @@ class ChatService {
         await doc.reference.update({'isRead': true});
       }
     } catch (e) {
-    } catch (e) {
       // Error
     }
   }

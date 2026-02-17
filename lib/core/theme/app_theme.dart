@@ -26,8 +26,6 @@ class AppTheme {
       onSurface: black,
       error: error,
       onError: white,
-      background: cream,
-      onBackground: black,
     ),
     textTheme: TextTheme(
       // Display & Headlines → Cormorant Garamond (Sophisticated serif)

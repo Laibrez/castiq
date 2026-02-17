@@ -5,6 +5,10 @@ import '../models/application_model.dart';
 class JobService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<void> createJob(JobModel job) async {
+    await _firestore.collection('jobs').doc(job.id).set(job.toMap());
+  }
+
   // Fetch jobs with filters
   Future<List<JobModel>> getJobs({
     String? category,

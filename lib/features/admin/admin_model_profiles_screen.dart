@@ -431,7 +431,7 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ...(model.categories?.take(2).map((cat) {
+                  ...(model.categories.take(2).map((cat) {
                     return Container(
                       margin: const EdgeInsets.only(right: 6),
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -448,9 +448,9 @@ class _AdminModelProfilesScreenState extends State<AdminModelProfilesScreen> {
                       ),
                     );
                   }) ?? []),
-                  if ((model.categories?.length ?? 0) > 2)
+                  if ((model.categories.length ?? 0) > 2)
                     Text(
-                      '+${(model.categories?.length ?? 0) - 2}',
+                      '+${(model.categories.length ?? 0) - 2}',
                       style: TextStyle(
                         color: AppTheme.grey,
                         fontSize: 11,

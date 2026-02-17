@@ -22,7 +22,7 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
   final _requirementsController = TextEditingController();
   final _expectationsController = TextEditingController();
   DateTime? _selectedDate;
-  bool _imageUploaded = false;
+  final bool _imageUploaded = false;
   bool _isLoading = false;
 
   final AuthService _authService = AuthService();
@@ -72,9 +72,15 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
         title: _titleController.text.trim(),
         description: _expectationsController.text.trim(),
         location: _locationController.text.trim(),
-        date: _selectedDate!,
-        rate: double.tryParse(_paymentController.text) ?? 0.0,
-        requirements: _requirementsController.text.split('\n'),
+        shootDate: _selectedDate!,
+        payRate: double.tryParse(_paymentController.text) ?? 0.0,
+        // requirements: _requirementsController.text.split('\n'), // Removed as not in JobModel
+        category: 'Commercial', // Default
+        experienceRequired: 0, // Default
+        heightMin: 0, // Default
+        heightMax: 0, // Default
+        genderRequirement: 'Any', // Default
+        contractType: 'One-day', // Default
         createdAt: DateTime.now(),
         images: _imageUploaded ? ['https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop'] : [],
       );

@@ -14,9 +14,9 @@ class WorkHistoryScreen extends StatelessWidget {
     // For now, mocking balance data until integrated with real Stripe Connect account data
     const double availableBalance = 0.00;
     const double pendingBalance = 0.00;
-    final AuthService _authService = AuthService();
-    final PaymentService _paymentService = PaymentService();
-    final userId = _authService.currentUser?.uid;
+    final AuthService authService = AuthService();
+    final PaymentService paymentService = PaymentService();
+    final userId = authService.currentUser?.uid;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -140,7 +140,7 @@ class WorkHistoryScreen extends StatelessWidget {
             // History List
             if (userId != null)
               StreamBuilder<List<PaymentModel>>(
-                stream: _paymentService.getModelPayments(userId),
+                stream: paymentService.getModelPayments(userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));

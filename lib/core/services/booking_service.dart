@@ -22,7 +22,7 @@ class BookingService {
         }
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -69,7 +69,7 @@ class BookingService {
         await _firestore.collection('bookings').doc(bookingId).update({'status': status});
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -83,7 +83,7 @@ class BookingService {
       
       await _firestore.collection('bookings').doc(bookingId).update(data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -96,7 +96,7 @@ class BookingService {
       };
       await _firestore.collection('bookings').doc(bookingId).update(data);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -108,7 +108,7 @@ class BookingService {
         'brandConfirmedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -119,7 +119,7 @@ class BookingService {
         'isDisputed': true,
       });
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }

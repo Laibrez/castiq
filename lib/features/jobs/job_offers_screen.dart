@@ -35,7 +35,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
   String _contractType = 'All'; // 'One-day', 'Multi-day', 'Long-term'
   bool _isUrgent = false;
   bool _isInstantPayout = false;
-  String _locationQuery = '';
+  final String _locationQuery = '';
 
   @override
   void initState() {
@@ -192,7 +192,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                           Text('Filter by My Height (${_myHeight.toInt()} cm)', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600)),
                           Switch(
                             value: _filterByHeight,
-                            activeColor: AppTheme.gold,
+                            activeThumbColor: AppTheme.gold,
                             onChanged: (val) {
                               setModalState(() => _filterByHeight = val);
                               setState(() => _filterByHeight = val);
@@ -240,7 +240,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                       SwitchListTile(
                         title: Text('Urgent Jobs Only', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600)),
                         value: _isUrgent,
-                        activeColor: AppTheme.gold,
+                        activeThumbColor: AppTheme.gold,
                         onChanged: (val) {
                           setModalState(() => _isUrgent = val);
                           setState(() => _isUrgent = val);
@@ -249,7 +249,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                       SwitchListTile(
                         title: Text('Instant Payout Only', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600)),
                         value: _isInstantPayout,
-                        activeColor: AppTheme.gold,
+                        activeThumbColor: AppTheme.gold,
                         onChanged: (val) {
                           setModalState(() => _isInstantPayout = val);
                           setState(() => _isInstantPayout = val);
@@ -540,7 +540,7 @@ class _JobOffersScreenState extends State<JobOffersScreen> {
                     color: AppTheme.grey,
                     fontSize: 14,
                     height: 1.4,
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Row(

@@ -151,12 +151,12 @@ class _ChatTile extends StatelessWidget {
     );
 
     // Determines if the last message was read by the current user
-    bool _hasUnread = false;
+    bool hasUnread = false;
     final lastMessageSenderId = chatData['lastMessageSenderId'];
     final isRead = chatData['isRead'] ?? true;
     
     if (lastMessageSenderId != currentUserId && !isRead) {
-      _hasUnread = true;
+      hasUnread = true;
     }
 
     return FutureBuilder<DocumentSnapshot>(
@@ -186,12 +186,12 @@ class _ChatTile extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _hasUnread 
+              color: hasUnread 
                   ? AppTheme.gold.withOpacity(0.05) 
                   : AppTheme.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _hasUnread 
+                color: hasUnread 
                     ? AppTheme.gold.withOpacity(0.3) 
                     : const Color(0xFFE0DCD5),
               ),
@@ -239,15 +239,15 @@ class _ChatTile extends StatelessWidget {
                             style: GoogleFonts.cormorantGaramond(
                               color: AppTheme.black,
                               fontSize: 18,
-                              fontWeight: _hasUnread ? FontWeight.bold : FontWeight.w600,
+                              fontWeight: hasUnread ? FontWeight.bold : FontWeight.w600,
                             ),
                           ),
                           Text(
                             _formatDate(chatData['lastMessageTime']),
                             style: GoogleFonts.montserrat(
-                              color: _hasUnread ? AppTheme.gold : AppTheme.grey,
+                              color: hasUnread ? AppTheme.gold : AppTheme.grey,
                               fontSize: 12,
-                              fontWeight: _hasUnread ? FontWeight.bold : FontWeight.normal,
+                              fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                         ],
@@ -258,9 +258,9 @@ class _ChatTile extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.montserrat(
-                          color: _hasUnread ? AppTheme.black : AppTheme.grey,
+                          color: hasUnread ? AppTheme.black : AppTheme.grey,
                           fontSize: 14,
-                          fontWeight: _hasUnread ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ],

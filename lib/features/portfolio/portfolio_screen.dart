@@ -362,7 +362,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               Icon(LucideIcons.externalLink, size: 14, color: AppTheme.grey.withOpacity(0.5)),
                             ],
                           ),
-                        )).toList(),
+                        )),
                         if (history.length > 3)
                           Padding(
                             padding: const EdgeInsets.only(top: 8),

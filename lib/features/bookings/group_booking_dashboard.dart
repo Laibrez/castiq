@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_1/core/models/job_model.dart';
 import 'package:flutter_application_1/core/models/booking_model.dart';
-import 'package:flutter_application_1/core/services/booking_service.dart';
 import 'package:flutter_application_1/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
@@ -134,7 +133,7 @@ class _GroupBookingDashboardState extends State<GroupBookingDashboard> {
             title: 'Project Summary',
             child: Column(
               children: [
-                _summaryRow(LucideIcons.calendar, 'Production Date', DateFormat('MMMM d, yyyy').format(widget.job.date)),
+                _summaryRow(LucideIcons.calendar, 'Production Date', DateFormat('MMMM d, yyyy').format(widget.job.shootDate)),
                 _summaryRow(LucideIcons.mapPin, 'Location', widget.job.location),
                 _summaryRow(LucideIcons.users, 'Team Size', '${widget.bookings.length} Models Confirmed'),
               ],

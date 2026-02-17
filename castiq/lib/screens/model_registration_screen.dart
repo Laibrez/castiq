@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/id_upload_section.dart';
 
 class ModelRegistrationScreen extends StatefulWidget {
-  const ModelRegistrationScreen({Key? key}) : super(key: key);
+  const ModelRegistrationScreen({super.key});
 
   @override
   State<ModelRegistrationScreen> createState() => _ModelRegistrationScreenState();

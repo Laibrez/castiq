@@ -10,8 +10,6 @@ class JobModel {
   final String location;
   final DateTime shootDate;
   final double payRate;
-  final String experienceRequired; // e.g. "Entry", "Experienced", "Pro" - or years? Request says "where experienceRequired <= modelExperience" so likely int years or level. Let's start with int years or string level. Request says "Experience Required: where experienceRequired <= modelExperience".
-  // If modelExperience is years, then experienceRequired should be int.
   // "Jobs Completed" is another filter.
   // "Years of Experience" is a brand filter.
   // For Job Filter 5: "Experience Required where(experienceRequired <= modelExperience)".

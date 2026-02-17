@@ -667,7 +667,7 @@ class _InviteBottomSheetState extends State<_InviteBottomSheet> {
                   child: Center(child: Text('No active jobs to invite to', style: GoogleFonts.montserrat(color: AppTheme.grey))),
                 );
               }
-              return Container(
+              return SizedBox(
                 height: 60,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
