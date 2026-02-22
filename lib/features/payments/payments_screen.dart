@@ -37,7 +37,6 @@ class _PaymentsScreenState extends State<PaymentsScreen> with SingleTickerProvid
       backgroundColor: AppTheme.cream,
       body: Column(
         children: [
-          // Header removed as it's already in AppBar or top level
           const SizedBox(height: 24),
 
           // Balance Card
@@ -219,29 +218,28 @@ class _PaymentHistoryTab extends StatelessWidget {
 class _UpcomingPayoutsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Mock data for upcoming payouts
     final upcoming = [
       PaymentModel(
         id: '1',
-        bookingId: 'job1',
         brandId: 'brand1',
         modelId: 'model1',
+        bookingId: 'booking1',
+        jobTitle: 'Summer Campaign 2024',
         amount: 3200.00,
-        method: 'card', 
+        method: 'card',
         status: 'pending',
         createdAt: DateTime.now().add(const Duration(days: 2)),
-        jobTitle: 'Summer Campaign 2024',
       ),
-       PaymentModel(
+      PaymentModel(
         id: '2',
-        bookingId: 'job2',
         brandId: 'brand2',
         modelId: 'model1',
+        bookingId: 'booking2',
+        jobTitle: 'Editorial Shoot',
         amount: 1500.00,
-        method: 'card',
+        method: 'paypal',
         status: 'processing',
         createdAt: DateTime.now().add(const Duration(days: 5)),
-        jobTitle: 'Editorial Shoot',
       ),
     ];
 
@@ -315,7 +313,7 @@ class _PaymentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  payment.jobTitle ?? 'Payment',
+                  payment.jobTitle,
                   style: GoogleFonts.cormorantGaramond(
                     color: AppTheme.black,
                     fontSize: 18,
@@ -390,7 +388,7 @@ class _PaymentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 32),
-            _detailSection('Project', payment.jobTitle ?? 'Unknown Project'),
+            _detailSection('Project', payment.jobTitle),
             const SizedBox(height: 16),
             _detailSection('Transaction ID', 'TRX-${payment.id.hashCode.toString().toUpperCase()}'),
             const SizedBox(height: 32),

@@ -34,8 +34,6 @@ class PaymentService {
   Future<void> presentPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet();
-      // On success, the server webhook should update the booking status.
-      // For now, we can optimistically update or poll.
     } catch (e) {
       rethrow;
     }
@@ -62,6 +60,7 @@ class PaymentService {
             .map((doc) => PaymentModel.fromMap(doc.data(), doc.id))
             .toList());
   }
+
   Stream<List<PaymentModel>> getUserPayments(String userId) {
     return _firestore
         .collection('payments')
@@ -76,4 +75,3 @@ class PaymentService {
             .toList());
   }
 }
-
